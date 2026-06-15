@@ -1,0 +1,1118 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Solenis Account Studio</title>
+<style>
+  :root{
+    --bg:#FFFFFF; --surface:#FFFFFF; --soft:#F5F5F6; --soft-2:#F0F0F1;
+    --ink:#000000; --body:#1A1A1A; --grey:#4B4B55; --grey-2:#6C6C75; --faint:#9A9AA2;
+    --line:#E4E4E6; --line-2:#D6D6DA; --red:#F94F5E; --red-text:#D8313F; --red-soft:#FDECED;
+    --sans:Arial, Helvetica, "Liberation Sans", sans-serif;
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{margin:0;background:var(--bg);color:var(--body);font-family:var(--sans);font-size:15.5px;line-height:1.62;-webkit-font-smoothing:antialiased}
+  a{color:var(--red-text)} a:hover{text-decoration:underline}
+  .wrap{display:grid;grid-template-columns:256px minmax(0,1fr);min-height:100vh}
+  .rail{position:sticky;top:0;align-self:start;height:100vh;overflow:auto;background:var(--surface);border-right:1px solid var(--line);padding:26px 20px 22px;display:flex;flex-direction:column}
+  .brand{display:flex;flex-direction:column;margin-bottom:22px}
+  .device{color:var(--ink);height:26px;width:auto;display:block;margin-bottom:14px}
+  .brand .org{font-size:11px;color:var(--faint);letter-spacing:.02em}
+  .brand .title{font-size:19px;font-weight:bold;color:var(--ink);line-height:1.2;margin-top:3px}
+  .brand .sub{font-size:12.5px;color:var(--grey-2);margin-top:3px}
+  .nav{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:2px}
+  .nav button{width:100%;text-align:left;background:none;border:0;border-left:2px solid transparent;cursor:pointer;font-family:var(--sans);font-size:14px;color:var(--grey);padding:9px 12px;border-radius:0 7px 7px 0;line-height:1.3;display:flex;align-items:center;justify-content:space-between;gap:8px}
+  .nav button:hover{background:var(--soft);color:var(--ink)}
+  .nav button.active{color:var(--red-text);font-weight:bold;border-left-color:var(--red);background:var(--soft)}
+  .nav .count{font-size:11px;font-weight:bold;color:#fff;background:var(--grey);border-radius:999px;min-width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;padding:0 5px}
+  .nav button.active .count{background:var(--red)}
+  .railspace{flex:1}
+  .settings-link{width:100%;text-align:left;background:none;border:0;cursor:pointer;font-family:var(--sans);font-size:13px;color:var(--grey-2);padding:9px 12px;border-top:1px solid var(--line);margin-top:14px}
+  .settings-link:hover{color:var(--ink)} .settings-link.active{color:var(--red-text);font-weight:bold}
+  .main{min-width:0}
+  .panel{display:none;padding:42px 52px 90px;max-width:1040px} .panel.show{display:block}
+  h1{font-size:26px;line-height:1.25;font-weight:bold;color:var(--ink);margin:0 0 16px}
+  h2{font-size:18px;line-height:1.3;font-weight:bold;color:var(--ink);margin:36px 0 12px}
+  h3{font-size:15px;font-weight:bold;color:var(--ink);margin:0 0 6px}
+  p{margin:0 0 13px}
+  .lead{font-size:16.5px;line-height:1.6;color:var(--body);max-width:72ch}
+  .muted{color:var(--grey)} .faint{color:var(--grey-2)}
+  .label{font-size:11px;color:var(--faint);letter-spacing:.04em;text-transform:uppercase;margin:0 0 8px}
+  hr.rule{height:1px;background:var(--line);border:0;margin:30px 0}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:22px 24px} .card + .card{margin-top:14px}
+  .soft-card{background:var(--soft);border:1px solid var(--line);border-radius:12px;padding:22px 24px}
+  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px} .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media(max-width:880px){.grid3,.grid2{grid-template-columns:1fr}}
+  .kv .label{margin-bottom:6px} .kv .big{font-size:16px;font-weight:bold;color:var(--ink)} .kv p{font-size:13.5px;color:var(--grey);margin:6px 0 0}
+  .signal{display:grid;grid-template-columns:130px 1fr;gap:16px;padding:14px 0;border-bottom:1px solid var(--line)}
+  .signal:last-child{border-bottom:0} .signal .when{font-weight:bold;color:var(--ink);font-size:13.5px} .signal .what{font-size:13.5px;color:var(--grey);margin:0}
+  @media(max-width:680px){.signal{grid-template-columns:1fr;gap:4px}}
+  .wedge{border:1px solid var(--line);border-radius:11px;background:var(--surface);overflow:hidden} .wedge + .wedge{margin-top:10px}
+  .wedge > button{width:100%;display:flex;align-items:center;gap:14px;background:none;border:0;cursor:pointer;padding:16px 20px;text-align:left;font-family:var(--sans)} .wedge > button:hover{background:var(--soft)}
+  .wedge .rank{font-size:12px;font-weight:bold;color:#fff;background:var(--grey);width:24px;height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;flex:0 0 auto} .wedge.top .rank{background:var(--red)}
+  .wedge .wt{font-size:15px;font-weight:bold;color:var(--ink);flex:1;line-height:1.3}
+  .caret{box-sizing:border-box;width:7px;height:7px;border-right:1.6px solid var(--faint);border-bottom:1.6px solid var(--faint);transform:rotate(-45deg);transition:transform .2s;flex:0 0 auto} .wedge.open .caret{transform:rotate(45deg)}
+  .wedge .body{display:none;padding:2px 20px 20px;border-top:1px solid var(--line)} .wedge.open .body{display:block}
+  .wedge .body .row{margin-top:14px} .wedge .body .row .label{margin-bottom:3px} .wedge .body .row p{margin:0;font-size:14px;color:var(--body)}
+  .wedge .q{background:var(--soft);border-radius:8px;padding:12px 14px;margin-top:14px} .wedge .q .label{margin-bottom:4px} .wedge .q p{font-weight:bold;color:var(--ink)}
+  .principle{border-left:3px solid var(--red);padding:2px 0 2px 18px;margin:0 0 20px} .principle p{font-size:17px;line-height:1.5;color:var(--ink);margin:0;max-width:66ch}
+  .rule{display:grid;grid-template-columns:26px 1fr;gap:14px;padding:15px 0;border-bottom:1px solid var(--line)} .rule:last-child{border-bottom:0}
+  .rule .num{font-weight:bold;color:var(--red-text);font-size:14px} .rule h3{margin:0 0 4px} .rule p{margin:0;font-size:14px;color:var(--grey)}
+  .filter{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 18px}
+  .filter button{font-size:13px;color:var(--grey);background:var(--surface);border:1px solid var(--line-2);border-radius:999px;padding:6px 14px;cursor:pointer;font-family:var(--sans)} .filter button.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .contact{border:1px solid var(--line);border-radius:13px;background:var(--surface);overflow:hidden} .contact + .contact{margin-top:14px}
+  .contact .head{display:flex;align-items:flex-start;gap:16px;padding:20px 22px;cursor:pointer} .contact .head:hover{background:var(--soft)}
+  .contact .who{flex:1;min-width:0} .contact .nm{font-size:17px;font-weight:bold;color:var(--ink)} .contact .seat{font-size:13px;color:var(--grey);margin-top:1px}
+  .contact .role{font-size:13.5px;color:var(--body);margin-top:9px;line-height:1.5;max-width:74ch}
+  .contact .head .caret{margin-top:7px} .contact.open .head .caret{transform:rotate(45deg)}
+  .contact .detail{display:none;border-top:1px solid var(--line);padding:8px 22px 24px} .contact.open .detail{display:block}
+  .block{margin-top:18px} .block .label{margin-bottom:5px} .block p{font-size:14px;margin:0 0 4px;color:var(--body)}
+  .flag{margin-top:16px;background:var(--red-soft);border:1px solid #f3cdd0;border-radius:9px;padding:12px 14px;font-size:13.5px;color:#7a2f37}
+  .status{display:inline-flex;align-items:center;gap:8px;font-size:12.5px;color:var(--grey);white-space:nowrap}
+  .sq{display:inline-block;width:9px;height:9px;background:var(--ink);flex:0 0 auto} .sq.grey{background:var(--grey)} .sq.open{background:transparent;border:1.5px solid var(--grey-2)}
+  .status.attn{color:var(--red-text)} .status.attn .sq{background:var(--red)}
+  .pill{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:bold;color:#fff;background:var(--grey);border-radius:999px;padding:3px 10px} .pill.red{background:var(--red)} .pill.ok{background:#1d7a4d}
+  .email{margin-top:20px;border:1px solid var(--line-2);border-radius:11px;overflow:hidden}
+  .email .ehead{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 16px;border-bottom:1px solid var(--line);background:var(--soft);flex-wrap:wrap} .email .ehead .label{margin:0} .email .ehead .acts{display:flex;gap:7px;flex-wrap:wrap}
+  .email .subj{padding:13px 18px 4px;font-size:13px;color:var(--grey)} .email .subj b{color:var(--ink)}
+  .email .bodytext{padding:6px 18px 18px;white-space:pre-wrap;font-size:14.5px;line-height:1.62;color:var(--body)}
+  .email.edited .ehead{background:#FFF6E9}
+  .edit-area{padding:12px 18px 16px}
+  .edit-area label{display:block;font-size:11px;color:var(--faint);letter-spacing:.04em;text-transform:uppercase;margin:0 0 5px}
+  .edit-area input,.edit-area textarea{width:100%;font-family:var(--sans);font-size:14px;color:var(--body);background:#fff;border:1px solid var(--line-2);border-radius:8px;padding:9px 11px;resize:vertical} .edit-area textarea{margin-bottom:10px;line-height:1.6} .edit-area input{margin-bottom:12px}
+  .edit-area input:focus,.edit-area textarea:focus{outline:2px solid var(--red);outline-offset:1px;border-color:var(--red)}
+  .btn{font-family:var(--sans);font-size:12.5px;font-weight:bold;cursor:pointer;border-radius:8px;padding:7px 14px;border:1px solid var(--line-2);background:var(--surface);color:var(--ink)} .btn:hover{border-color:var(--ink)} .btn:disabled{opacity:.5;cursor:not-allowed}
+  .btn.red{background:var(--red);color:#fff;border-color:var(--red)} .btn.red:hover{background:#e7414f;border-color:#e7414f} .btn.red:disabled{background:var(--line-2);border-color:var(--line-2);color:#fff}
+  .btn.dark{background:var(--ink);color:#fff;border-color:var(--ink)} .btn.dark:hover{background:#222}
+  .btn.sm{font-size:11.5px;padding:5px 11px} .btn.ghost{background:none;border-color:transparent;color:var(--red-text)} .btn.ghost:hover{border-color:var(--line-2)}
+  .sources{margin-top:6px} .sources .sr{display:flex;align-items:flex-start;gap:12px;padding:9px 0;border-bottom:1px solid var(--line);font-size:13px} .sources .sr:last-child{border-bottom:0}
+  .sources .sr .txt{flex:1;color:var(--body)} .sources .sr .src{color:var(--faint);font-size:12px}
+  .explain{background:var(--soft);border:1px solid var(--line);border-radius:12px;padding:22px 24px} .explain p{margin:0 0 11px;color:var(--body)} .explain p:last-child{margin-bottom:0}
+  .gate{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px 22px}
+  .gate .g{display:flex;align-items:flex-start;gap:14px;padding:13px 0;border-bottom:1px solid var(--line)} .gate .g:last-of-type{border-bottom:0}
+  .gate .g .q{flex:1;font-size:14px;color:var(--body)} .gate .g .q small{display:block;color:var(--grey-2);font-size:12.5px;margin-top:3px}
+  .toggle{display:inline-flex;border:1px solid var(--line-2);border-radius:8px;overflow:hidden;flex:0 0 auto}
+  .toggle button{font-size:12.5px;padding:6px 13px;border:0;background:var(--surface);color:var(--grey);cursor:pointer;font-family:var(--sans)} .toggle button.yes{background:var(--ink);color:#fff} .toggle button.no{background:var(--grey);color:#fff}
+  .verdict{margin-top:16px;border-radius:10px;padding:14px 16px;font-size:14px;display:none} .verdict.show{display:block}
+  .verdict.pass{background:var(--soft);border:1px solid var(--line-2);color:var(--body)} .verdict.fail{background:var(--red-soft);border:1px solid #f3cdd0;color:#7a2f37}
+  .field{margin-bottom:16px} .field label{display:block;font-size:13px;font-weight:bold;color:var(--ink);margin-bottom:4px} .field .hint{font-size:12.5px;color:var(--grey-2);margin-bottom:7px}
+  .field input[type=text],.field textarea{width:100%;font-family:var(--sans);font-size:14px;color:var(--body);background:var(--surface);border:1px solid var(--line-2);border-radius:9px;padding:10px 12px;resize:vertical}
+  .field input:focus,.field textarea:focus{outline:2px solid var(--red);outline-offset:1px;border-color:var(--red)}
+  .note{font-size:12.5px;color:var(--grey-2);margin-top:8px}
+  .err{background:var(--red-soft);border:1px solid #f3cdd0;color:#7a2f37;border-radius:10px;padding:13px 15px;font-size:13.5px;margin-top:14px;display:none} .err.show{display:block}
+  .ok-box{background:#eaf6ef;border:1px solid #bfe3cd;color:#1d6b41;border-radius:10px;padding:13px 15px;font-size:13.5px;margin-top:14px;display:none} .ok-box.show{display:block}
+  .builder-out{margin-top:18px;display:none} .builder-out.show{display:block}
+  .spinner{display:inline-block;width:12px;height:12px;border:2px solid #ffffff66;border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;vertical-align:-1px;margin-right:7px}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .sender-bar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:var(--soft);border:1px solid var(--line);border-radius:10px;padding:12px 16px;margin-bottom:22px}
+  .sender-bar label{font-size:13px;font-weight:bold;color:var(--ink)} .sender-bar input{font-family:var(--sans);font-size:14px;border:1px solid var(--line-2);border-radius:8px;padding:7px 11px;min-width:200px} .sender-bar .hint{font-size:12.5px;color:var(--grey-2)}
+  .step{display:grid;grid-template-columns:30px 1fr;gap:16px;padding-bottom:20px;position:relative}
+  .step:not(:last-child)::before{content:"";position:absolute;left:14px;top:30px;bottom:-2px;width:1px;background:var(--line-2)}
+  .step .dot{width:30px;height:30px;border-radius:50%;background:var(--soft);border:1px solid var(--line-2);color:var(--ink);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:bold;z-index:1} .step.first .dot{background:var(--red);border-color:var(--red);color:#fff}
+  .step .c h3{margin:4px 0 3px} .step .c p{font-size:13.5px;color:var(--grey);margin:0}
+  ul.plain{margin:8px 0 0;padding-left:18px} ul.plain li{margin-bottom:9px;font-size:14px;color:var(--body)}
+  .approved-item{border:1px solid var(--line);border-radius:12px;background:var(--surface);padding:18px 20px} .approved-item + .approved-item{margin-top:12px}
+  .approved-item .top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+  .approved-item .nm{font-size:16px;font-weight:bold;color:var(--ink)} .approved-item .seat{font-size:12.5px;color:var(--grey)}
+  .approved-item .addr{margin-top:10px;display:flex;align-items:center;gap:8px;flex-wrap:wrap} .approved-item .addr label{font-size:12px;color:var(--grey-2)}
+  .approved-item .addr input{font-family:var(--sans);font-size:13px;border:1px solid var(--line-2);border-radius:7px;padding:6px 10px;min-width:260px}
+  .approved-item .em{margin-top:12px;background:var(--soft);border-radius:9px;padding:12px 14px} .approved-item .em .s{font-size:12.5px;color:var(--grey);margin-bottom:6px} .approved-item .em .s b{color:var(--ink)}
+  .approved-item .em .bd{white-space:pre-wrap;font-size:13.5px;line-height:1.58;color:var(--body)}
+  .toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:0 0 18px}
+  .asst-head{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
+  .asst-head select{font-family:var(--sans);font-size:13.5px;border:1px solid var(--line-2);border-radius:8px;padding:8px 11px;background:#fff;color:var(--ink)} .asst-head label{font-size:12.5px;color:var(--grey-2)}
+  .chat{border:1px solid var(--line);border-radius:12px;background:var(--surface);display:flex;flex-direction:column;height:560px;overflow:hidden}
+  .chat .scroll{flex:1;overflow:auto;padding:18px}
+  .msg{max-width:88%;margin-bottom:14px;font-size:14px;line-height:1.6;white-space:pre-wrap}
+  .msg.user{margin-left:auto;background:var(--ink);color:#fff;border-radius:12px 12px 4px 12px;padding:11px 14px}
+  .msg.bot{margin-right:auto;background:var(--soft);color:var(--body);border-radius:12px 12px 12px 4px;padding:11px 14px}
+  .msg.sys{margin:0 auto 14px;background:#fff;border:1px dashed var(--line-2);color:var(--grey);border-radius:10px;padding:10px 13px;font-size:13px;max-width:100%}
+  .apply-bar{margin-top:9px;display:flex;gap:8px;flex-wrap:wrap}
+  .chat .composer{border-top:1px solid var(--line);padding:12px;display:flex;gap:10px;align-items:flex-end;background:#fff}
+  .chat .composer textarea{flex:1;font-family:var(--sans);font-size:14px;border:1px solid var(--line-2);border-radius:9px;padding:10px 12px;resize:none;max-height:140px;line-height:1.5}
+  .chat .composer textarea:focus{outline:2px solid var(--red);outline-offset:1px;border-color:var(--red)}
+  .chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+  .chip{font-size:12px;color:var(--grey);background:var(--surface);border:1px solid var(--line-2);border-radius:999px;padding:6px 12px;cursor:pointer} .chip:hover{border-color:var(--ink);color:var(--ink)}
+  .setting-row{margin-bottom:22px} .setting-row label{display:block;font-size:14px;font-weight:bold;color:var(--ink);margin-bottom:3px} .setting-row .hint{font-size:13px;color:var(--grey-2);margin-bottom:8px;max-width:74ch}
+  .setting-row input{width:100%;max-width:520px;font-family:var(--sans);font-size:14px;border:1px solid var(--line-2);border-radius:9px;padding:10px 12px} .setting-row input:focus{outline:2px solid var(--red);outline-offset:1px;border-color:var(--red)}
+  .setting-row textarea{width:100%;font-family:var(--sans);font-size:14px;border:1px solid var(--line-2);border-radius:9px;padding:10px 12px;resize:vertical;line-height:1.55}
+  .empty{background:var(--soft);border:1px dashed var(--line-2);border-radius:12px;padding:30px;text-align:center;color:var(--grey)}
+  .drop{border:1.5px dashed var(--line-2);border-radius:12px;background:var(--soft);padding:26px;text-align:center}
+  .drop.over{border-color:var(--red);background:var(--red-soft)}
+  .drop p{margin:0 0 10px;color:var(--grey)}
+  .upcard{border:1px solid var(--line);border-radius:12px;background:var(--surface);padding:18px 20px} .upcard + .upcard{margin-top:12px}
+  .upcard .uphead{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+  .upcard .un{font-size:16px;font-weight:bold;color:var(--ink)} .upcard .ut{font-size:12.5px;color:var(--grey);margin-top:1px}
+  .vlinks{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px}
+  .vlink{font-size:12px;color:var(--ink);background:var(--soft);border:1px solid var(--line-2);border-radius:7px;padding:5px 10px;text-decoration:none;display:inline-flex;align-items:center;gap:6px} .vlink:hover{border-color:var(--ink);text-decoration:none}
+  .vlink.li{background:#0a66c2;color:#fff;border-color:#0a66c2}
+  .liverify{margin-top:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:var(--soft);border:1px solid var(--line);border-radius:9px;padding:10px 12px;font-size:13px;color:var(--body)}
+  .ctxbox{margin-top:12px} .ctxbox summary{cursor:pointer;font-size:13px;color:var(--red-text);font-weight:bold;list-style:none} .ctxbox summary::-webkit-details-marker{display:none}
+  .ctxbox textarea{width:100%;font-family:var(--sans);font-size:13.5px;border:1px solid var(--line-2);border-radius:8px;padding:9px 11px;margin-top:8px;resize:vertical;line-height:1.5}
+  .intel{margin-top:14px;border-top:1px solid var(--line);padding-top:12px} .intel .row{margin-bottom:10px} .intel .row b{color:var(--ink)}
+  .intel ul{margin:6px 0 0;padding-left:18px} .intel li{font-size:13.5px;color:var(--body);margin-bottom:6px} .intel li a{font-size:12px}
+  .upstatus{display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:bold;border-radius:999px;padding:4px 11px}
+  .upstatus.pend{background:var(--soft);color:var(--grey)} .upstatus.inco{background:#eaf6ef;color:#1d6b41} .upstatus.left{background:var(--red-soft);color:#b3303c} .upstatus.unc{background:#fff4e5;color:#a4631a} .upstatus.work{background:#eef;color:#3a3aa0}
+  .upacts{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+  @media(max-width:760px){
+    .wrap{grid-template-columns:1fr}
+    .rail{position:static;height:auto;border-right:0;border-bottom:1px solid var(--line)}
+    .nav{flex-direction:row;flex-wrap:wrap} .nav button{width:auto;border-left:0;border-bottom:2px solid transparent;border-radius:7px} .nav button.active{border-left:0;border-bottom-color:var(--red)}
+    .railspace{display:none} .panel{padding:30px 20px 64px} h1{font-size:22px}
+  }
+  .skip{position:absolute;left:-999px} .skip:focus{left:12px;top:12px;background:#fff;padding:8px;z-index:99;border-radius:6px}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<div class="wrap">
+  <aside class="rail">
+    <div class="brand">
+      <svg class="device" viewBox="0 0 200.8 322.8" aria-label="FutureBridge" role="img">
+        <rect x="0" y="0" width="200.8" height="54.6" fill="currentColor"/>
+        <rect x="0" y="134.1" width="200.8" height="54.6" fill="currentColor"/>
+        <rect x="0" y="268.2" width="54.6" height="54.6" fill="currentColor"/>
+      </svg>
+      <span class="org">FutureBridge CNR</span>
+      <span class="title">Solenis Account Studio</span>
+      <span class="sub">Account brief and outreach for Consumer Solutions</span>
+    </div>
+    <ul class="nav" id="nav">
+      <li><button data-p="account" class="active">Account summary</button></li>
+      <li><button data-p="approach">How we write the emails</button></li>
+      <li><button data-p="contacts">Contacts and emails</button></li>
+      <li><button data-p="builder">Add contacts</button></li>
+      <li><button data-p="approved">Approved emails <span class="count" id="approvedCount">0</span></button></li>
+      <li><button data-p="assistant">Assistant</button></li>
+      <li><button data-p="sources">Sources and checks</button></li>
+      <li><button data-p="order">Sending order</button></li>
+    </ul>
+    <div class="railspace"></div>
+    <button class="settings-link" data-p="settings">Settings</button>
+  </aside>
+  <main class="main" id="main">
+
+    <section class="panel show" id="account">
+      <h1>Account summary</h1>
+      <p class="lead">Solenis is a large specialty chemicals company. Its core business, and its main source of profit, is the chemistry used to make pulp, paper and packaging. That core market is changing. Some grades of paper are in decline, others are growing, and the picture varies by region. At the same time Solenis is trying to grow a newer line, barrier coatings, which let paper packaging replace plastic. The chemistry works. The open question is whether converters and brand owners will buy it at scale, and how quickly. The gap between a product that works and customers who are ready to buy is where we can help.</p>
+      <h2>What Solenis will and will not pay for</h2>
+      <p class="muted">Solenis is privately owned by Platinum Equity and carries a lot of debt, so budgets are tight and spending is disciplined. It is not in trouble, but it does not have easy growth carrying it either. In that situation, a company like this does not pay for general intelligence. It pays for work that protects profit in the core business, helps it decide where to grow next, or reduces the risk on money it has already committed. The right offer is small, fast and tied to a clear decision, with a plain yes or no at the end.</p>
+      <h2>Where to focus</h2>
+      <div class="grid3">
+        <div class="card kv"><p class="label">Business unit</p><p class="big">Consumer Solutions</p><p>The pulp, paper and packaging chemistry business. This is the core, and where barrier coatings sit. Start here, not with procurement or sustainability teams.</p></div>
+        <div class="card kv"><p class="label">First geography</p><p class="big">Europe</p><p>European mills are closing and customers are switching suppliers now, so this is where movement and pressure are most concrete. APAC comes later.</p></div>
+        <div class="card kv"><p class="label">First project</p><p class="big">A short adoption study</p><p>A five to seven week look at which European converters and brand owners are actually buying coated fibre, ending in a clear go or no-go by segment.</p></div>
+      </div>
+      <h2>What not to pitch</h2>
+      <p class="muted">Two things will not land. The first is sustainability intelligence. Solenis already reports against recognised standards and treats sustainability as a settled part of how it runs, so it does not need help with reporting. The second is market databases. Solenis already buys strong syndicated data for its core market. The value we can add is the part those databases cannot show: how converters are actually behaving, whether brand owners are ready to buy, what they will pay, what is holding adoption back, and the network of converters, inks and presses that Solenis does not naturally see.</p>
+      <h2>The regulation that sets the timing</h2>
+      <p class="muted">From 12 August 2026, new EU packaging rules apply, and on the same date PFAS limits for food contact packaging take effect, at 25 parts per billion for any single PFAS and 250 for the total. There is no grace period for packaging placed on the market after that date. This is the clearest near-term reason for demand in PFAS-free coatings and paper-based packaging. Solenis knows the legal timeline well, so there is no value in explaining it. The useful question is which of these rules actually change buying behaviour, and for which pack formats and regions.</p>
+      <h2>Recent signals worth knowing</h2>
+      <div class="card" style="padding:6px 24px">
+        <div class="signal"><div class="when">April 2026</div><p class="what">Solenis broke ground on a 35 million dollar, 60,000 tonne papermaking chemicals plant in Beihai, China, opening in mid 2027. This is firm evidence that growth in Asia is a funded priority, in a region it sees as contested by low-cost local players.</p></div>
+        <div class="signal"><div class="when">Through 2026</div><p class="what">European mill closures and cutbacks continued, with graphic paper falling sharply. Customers are removing capacity and changing suppliers, which is why Europe is the natural first market for paid work.</p></div>
+        <div class="signal"><div class="when">From 2024</div><p class="what">Solenis and Heidelberg are working together to apply barrier coatings on the printing press rather than at the mill. The partnership is real and public. How much business it has actually won is not public, and that is exactly the adoption question worth looking at.</p></div>
+        <div class="signal"><div class="when">June 2026</div><p class="what">Solenis joined Dow's Coolant Care network for data-center cooling. This is real momentum in industrial and data-center water, but it is a separate lane and does not change where the first conversation should start.</p></div>
+      </div>
+      <h2>Where not to take this message</h2>
+      <p class="muted">The barrier coatings and paper story only works inside Consumer Solutions. It does not belong with the Food and Beverage, Pool, or Diversey hygiene businesses, which buy in completely different ways. Using paper or barrier coating language with those audiences reads as not understanding the company, and it costs credibility. Procurement and plant operations are also not the right first door. The decisions we can help with sit with strategy, marketing and innovation, not with buying or running plants.</p>
+      <h2>Where to concentrate effort</h2>
+      <p class="muted">Five possible pieces of work survive a simple test: could Solenis realistically fund this in a tight year. They are listed in order of how close they sit to a real budget today.</p>
+      <div id="wedges"></div>
+      <h2>The first project to propose</h2>
+      <div class="soft-card"><p style="margin:0">A five to seven week study, Europe first, of a defined set of priority converters and brand owners. It would show who is actually moving from plastic to coated fibre, what they will pay, what is holding adoption back, and where the print-applied route makes economic sense. It would end with a clear go or no-go for each segment. It is deliberately kept to one decision and one buyer, because that is what a budget-disciplined company with no prior relationship to us can actually fund.</p></div>
+    </section>
+
+    <section class="panel" id="approach">
+      <h1>How we write the emails</h1>
+      <div class="principle"><p>Each email should show that we understand the person's job and the decisions they are working on, and that we have real depth in their area. It should not simply repeat facts about their company that they already know.</p></div>
+      <p class="muted">People notice straight away when an email was not really written for them. So in every email the useful part is our reading of their situation, the part they may not have put into words yet, tied to the specific job they do. We make two or three connected points rather than one, so the email shows range, and we say plainly what we do in their area so the credibility is clear without selling.</p>
+      <h2>The rules we follow</h2>
+      <div class="card" style="padding:6px 24px">
+        <div class="rule"><div class="num">1</div><div><h3>Do not repeat their own company facts</h3><p>They already know their plants, products and the rules that affect them. Repeating those back is the clearest sign an email was not written for them.</p></div></div>
+        <div class="rule"><div class="num">2</div><div><h3>Make two or three connected points</h3><p>Each point should speak to part of what this person is responsible for, so the email shows real depth in their area rather than a single observation.</p></div></div>
+        <div class="rule"><div class="num">3</div><div><h3>Only mention a regulation if it carries a consequence they may have missed</h3><p>The useful part is what the rule means for their job, not the rule itself.</p></div></div>
+        <div class="rule"><div class="num">4</div><div><h3>Connect the points to something real about them</h3><p>Tie the observations to a detail from their own background or role, so it is clear the email was written for them and no one else.</p></div></div>
+        <div class="rule"><div class="num">5</div><div><h3>Show the relevant experience plainly</h3><p>Establish credibility with the specific work we do in their area. State it as something we do, not as a boast, so the depth is clear without selling.</p></div></div>
+        <div class="rule"><div class="num">6</div><div><h3>Do not promise anything</h3><p>Do not say we will prove or show them something. Say what we understand and how we might help, and stop there.</p></div></div>
+        <div class="rule"><div class="num">7</div><div><h3>Keep it readable</h3><p>Three or four short paragraphs. Every line should be clear on the first read, with no dramatic phrasing.</p></div></div>
+        <div class="rule"><div class="num">8</div><div><h3>End with a clear ask for a meeting</h3><p>Close by asking for a short meeting at a time that suits them, in a way that makes it easy to say yes. Avoid soft phrases like comparing notes.</p></div></div>
+        <div class="rule"><div class="num">9</div><div><h3>Decide who not to email</h3><p>If a person is hard to reach with a relevant message, or cannot influence the kind of work we sell, leave them.</p></div></div>
+      </div>
+      <h2>A note on the subject line</h2>
+      <p class="muted">Write the subject line last, once the email is settled. It should say the main point in plain words, so the person can see why it is worth opening. A subject that only hints at a topic, without the point, gives no reason to read on.</p>
+    </section>
+
+    <section class="panel" id="contacts">
+      <h1>Contacts and emails</h1>
+      <p class="lead">These are the five people we have researched, each with a finished email. You can edit any email and save it, and approve the ones you are happy with. Approved emails move to the Approved tab, where you can export them or send them to HubSpot. Set your name below and it appears in each email.</p>
+      <div class="sender-bar"><label for="sender">Your name</label><input type="text" id="sender" placeholder="Type your name" autocomplete="off" /><span class="hint">This goes into the sign-off of every email.</span></div>
+      <div class="filter" id="filter"><button data-f="all" class="on">All five</button><button data-f="send">Ready to send</button><button data-f="check">Send after one check</button></div>
+      <div id="contactList"></div>
+      <h2>Two people we decided not to email</h2>
+      <p class="muted">Part of the method is choosing who not to contact. Here are two we looked at and left, with the reason in each case.</p>
+      <div id="parkedList"></div>
+    </section>
+
+    <section class="panel" id="builder">
+      <h1>Add contacts</h1>
+      <p class="lead">Upload a CSV of Solenis contacts and the tool verifies each person before writing anything. It checks the current title against trusted public sources, corrects it where needed, and flags anyone who has left the company so no further work is done on them. For those still in place, it gathers contact intelligence, shows the sources, and gives you the links to confirm the LinkedIn profile yourself. It then writes a hyperpersonal email and a LinkedIn InMail in the same way as the five.</p>
+
+      <h2>Upload a CSV</h2>
+      <div class="drop" id="drop">
+        <p>Drop a CSV here, or choose a file. A name column is all that is required. Title, company, email, LinkedIn and business unit are used if present.</p>
+        <input type="file" id="csvFile" accept=".csv,text/csv" style="display:none" />
+        <button class="btn red" id="csvPick">Choose CSV file</button>
+        <button class="btn" id="csvTemplate">Download a template</button>
+        <button class="btn" id="addManual">Add a person manually</button>
+      </div>
+      <p class="note" id="uploadNote">Verification and research use the Anthropic API. Inside the Claude preview this works without a key. If you host this yourself, add your Anthropic API key in Settings. The verification links work without any key.</p>
+      <div class="err" id="uploadErr"></div>
+
+      <h2 id="upHeading" style="display:none">Uploaded contacts</h2>
+      <div class="toolbar" id="upToolbar" style="display:none">
+        <button class="btn dark" id="researchAll">Verify and research all</button>
+        <button class="btn ghost" id="clearUploaded">Clear list</button>
+        <span class="faint" style="font-size:12.5px">Research checks the current title, skips anyone who has left, and gathers intelligence on the rest.</span>
+      </div>
+      <div id="uploadList"></div>
+
+      <hr class="rule" />
+      <h2>Or add one person manually</h2>
+      <div class="explain">
+        <p>Use this when you want to write a single email from details you already have, without uploading a file. It does not look anyone up. It only uses what you enter.</p>
+        <p>It first checks whether the person is worth emailing, then writes a draft in the same way as the five.</p>
+      </div>
+      <h2>Step one. Is this person worth emailing?</h2>
+      <div class="gate" id="gate">
+        <div class="g"><div class="q">Can you describe this person's job in one sentence?<small>What is the one thing they are responsible for. If you cannot say it clearly, the email will miss.</small></div><div class="toggle" data-g="role"><button data-v="y">Yes</button><button data-v="n">No</button></div></div>
+        <div class="g"><div class="q">Have you confirmed a real detail about their role or background to write to?<small>Something that shows the email was written for them, not a fact anyone could find about the company.</small></div><div class="toggle" data-g="anchor"><button data-v="y">Yes</button><button data-v="n">No</button></div></div>
+        <div class="g"><div class="q">Can this person influence the kind of work we sell?<small>Either they can fund or sponsor it, or they sit close enough to someone who can.</small></div><div class="toggle" data-g="buy"><button data-v="y">Yes</button><button data-v="n">No</button></div></div>
+        <div class="g"><div class="q">Do you have two or three points that are fresh to them, not facts they already know?<small>Consequences for their job they may not have drawn yet.</small></div><div class="toggle" data-g="angle"><button data-v="y">Yes</button><button data-v="n">No</button></div></div>
+        <div class="verdict" id="verdict"></div>
+      </div>
+      <h2>Step two. What you have confirmed</h2>
+      <div class="card">
+        <div class="grid2">
+          <div class="field"><label for="b-name">Name</label><input type="text" id="b-name" placeholder="Full name, as confirmed" autocomplete="off" /></div>
+          <div class="field"><label for="b-seat">Job title and business unit</label><input type="text" id="b-seat" placeholder="Title, team, business unit" autocomplete="off" /></div>
+        </div>
+        <div class="field"><label for="b-role">Their job in one sentence</label><div class="hint">The one thing this person is responsible for.</div><textarea id="b-role" rows="2" placeholder="For example: getting the new Asian plant up to plan without losing existing customers."></textarea></div>
+        <div class="field"><label for="b-anchor">A confirmed detail about their role or background</label><div class="hint">Something that makes it clear the email was written for them. Note where you confirmed it.</div><textarea id="b-anchor" rows="2" placeholder="For example: has run paper chemistry supply chains in this region for years. Confirmed on LinkedIn."></textarea></div>
+        <div class="field"><label for="b-angle">Two or three points, in plain words</label><div class="hint">Your reading of their situation, each tied to part of their job. Not company facts.</div><textarea id="b-angle" rows="3" placeholder="For example: the plant is the easy part. Customers must requalify the local product first, which takes time. The order you move them in sets both the ramp speed and the competitive risk."></textarea></div>
+        <div class="field"><label for="b-help">What we do in their area</label><div class="hint">Stated plainly, as something we do, not as a promise.</div><textarea id="b-help" rows="2" placeholder="For example: we work with chemical companies localising in Asia on customer and competitor sequencing."></textarea></div>
+        <button class="btn red" id="composeBtn" disabled>Write a draft</button>
+        <span class="note" id="composeNote">Answer the four questions above to turn this on.</span>
+      </div>
+      <div class="err" id="builderErr"></div>
+      <div class="builder-out" id="builderOut"><h2>The draft</h2><div id="builderResult"></div></div>
+    </section>
+
+    <section class="panel" id="approved">
+      <h1>Approved emails</h1>
+      <p class="lead">Emails you have approved are stored here, and stay here when you refresh or close the tool. Add the email address for each person, then export the set as a CSV or create the contacts in HubSpot. You can still edit the text here before you send.</p>
+      <div class="toolbar">
+        <button class="btn dark" id="exportCsv">Export CSV</button>
+        <button class="btn" id="pushHubspot">Create contacts in HubSpot</button>
+        <span class="faint" style="font-size:12.5px">The CSV is the reliable path and carries the full email text. The HubSpot button needs a token in Settings.</span>
+      </div>
+      <div class="ok-box" id="approvedMsg"></div>
+      <div class="err" id="approvedErr"></div>
+      <div id="approvedList"></div>
+    </section>
+
+    <section class="panel" id="assistant">
+      <h1>Assistant</h1>
+      <p class="lead">Ask for changes in plain language. The assistant knows the account and every email here. It can rewrite any email or change the house style and apply it for you. For changes to the account intelligence, the layout or the overall design, it will draft the change and explain it, and those structural updates are made by bringing the request back to the main build.</p>
+      <div class="asst-head">
+        <label for="asstTarget">Working on</label>
+        <select id="asstTarget"><option value="none">General advice</option><option value="style">The house style for all emails</option></select>
+        <button class="btn sm" id="asstClear">Clear chat</button>
+      </div>
+      <div class="chips" id="asstChips">
+        <span class="chip" data-q="Make this email warmer and a little shorter, keeping all the insight.">Warmer and shorter</span>
+        <span class="chip" data-q="Sharpen the subject line so the main point is unmistakable.">Sharper subject line</span>
+        <span class="chip" data-q="Add one more insight that connects to this person's responsibilities.">Add one more insight</span>
+        <span class="chip" data-q="Rewrite the closing so the meeting request feels confident and easy to accept.">Stronger meeting ask</span>
+        <span class="chip" data-q="Suggest two ways to improve the account summary, with the new wording.">Improve the account summary</span>
+      </div>
+      <div class="chat" id="chat">
+        <div class="scroll" id="chatScroll"></div>
+        <div class="composer"><textarea id="chatInput" rows="1" placeholder="Ask for a change, or pick a contact above and ask to rewrite their email"></textarea><button class="btn red" id="chatSend">Send</button></div>
+      </div>
+      <p class="note" id="asstNote">If the assistant does not respond, add your Anthropic API key in Settings. Inside the Claude preview it works without a key.</p>
+    </section>
+
+    <section class="panel" id="sources">
+      <h1>Sources and checks</h1>
+      <p class="lead">Every fact used in the emails, where it came from, and whether it is confirmed, our own reading, or still to be checked before you send. A claim that cannot be stood behind should be removed rather than sent.</p>
+      <div class="card" style="padding:8px 24px"><div class="sources" id="sourcesList"></div></div>
+      <p class="note">Confirmed means a public source backs it. Our reading means it is our interpretation, useful as judgement but not a stated fact. Needs checking means confirm it before you send, and drop the line if you cannot.</p>
+    </section>
+
+    <section class="panel" id="order">
+      <h1>Sending order</h1>
+      <p class="lead">The first conversation we want is about barrier coatings in Europe, so the order below leads with the person closest to that, then works outward. The Asia and the separate-business contacts come after, because their topics are either a later stage of the same story or a different buying decision.</p>
+      <div style="margin-top:18px">
+        <div class="step first"><div class="dot">1</div><div class="c"><h3>Christophe Zebst first</h3><p>He is in innovation marketing for paper, closest to the barrier coatings decision and the most likely first buyer. His email is about where coated fibre is actually being adopted, which is the conversation we most want to start.</p></div></div>
+        <div class="step"><div class="dot">2</div><div class="c"><h3>Mingxiang Luo and James Zhu next</h3><p>Both are in Asia. Their topics are strong, but Asia is a later stage in the account, so treat these as building the relationship rather than the first sale.</p></div></div>
+        <div class="step"><div class="dot">3</div><div class="c"><h3>Paul Verbiest, as a separate conversation</h3><p>He sits in the hygiene side of the business, which buys differently from the paper side. Send his email on its own track, not in the same thread as the paper contacts.</p></div></div>
+        <div class="step"><div class="dot">4</div><div class="c"><h3>Kim Schieck, as a separate conversation again</h3><p>She runs logistics and indirect sourcing, an operational topic, not the barrier coatings work. Keep it apart from the others.</p></div></div>
+      </div>
+      <hr class="rule" />
+      <h2>Before any of these go out</h2>
+      <ul class="plain">
+        <li>Confirm each person's name and title in Sales Navigator, and check Paul Verbiest's exact remit, because sources place him in two different parts of the business.</li>
+        <li>Add the email address for each approved person on the Approved tab before you export or push to HubSpot.</li>
+        <li>If someone does not reply, the follow-up should make a different point, not repeat the first email.</li>
+        <li>Review the first one or two emails together before sending the rest, so the approach stays consistent.</li>
+      </ul>
+    </section>
+
+    <section class="panel" id="settings">
+      <h1>Settings</h1>
+      <p class="lead">These settings are saved in your browser on this device only. They are needed when you host the tool yourself, for example on GitHub. Inside the Claude preview, the assistant and the draft writer work without an API key.</p>
+      <h2>Anthropic API key</h2>
+      <div class="setting-row"><label for="set-key">Key for the assistant and the draft writer</label><div class="hint">Needed only when you run this outside the Claude preview. The key is stored in your browser and sent directly to Anthropic when you use the assistant or write a draft. It is never stored anywhere else. Leave blank inside the Claude preview.</div><input type="password" id="set-key" placeholder="sk-ant-..." autocomplete="off" /></div>
+      <h2>HubSpot</h2>
+      <div class="setting-row"><label for="set-hub">HubSpot private app token</label><div class="hint">Needed only for the Create contacts in HubSpot button. It needs permission to write contacts. If your HubSpot blocks direct browser requests, use the CSV export instead, which always works.</div><input type="password" id="set-hub" placeholder="pat-..." autocomplete="off" /></div>
+      <h2>House style for the emails</h2>
+      <div class="setting-row"><label for="set-style">Standing instruction applied to drafts and rewrites</label><div class="hint">Plain rules the assistant and the draft writer should follow for every email. The assistant can also update this for you.</div><textarea id="set-style" rows="4" placeholder="For example: keep emails under 180 words, always close with a 30-minute meeting request, never use dashes."></textarea></div>
+      <button class="btn red" id="saveSettings">Save settings</button>
+      <span class="note" id="settingsMsg"></span>
+      <hr class="rule" />
+      <h2>Reset</h2>
+      <p class="muted">Clearing storage removes your saved edits, approved emails, keys and house style from this browser. It cannot be undone.</p>
+      <button class="btn" id="resetAll">Clear all saved data</button>
+    </section>
+
+  </main>
+</div>
+<script>
+"use strict";
+
+/* safe storage: localStorage with in-memory fallback */
+var store=(function(){
+  var ok=false,mem={};
+  try{var k="__sas_test__";localStorage.setItem(k,"1");localStorage.removeItem(k);ok=true;}catch(e){ok=false;}
+  function key(n){return "sas_"+n;}
+  return {
+    get:function(n,d){try{if(ok){var v=localStorage.getItem(key(n));return v===null?d:v;}return (key(n) in mem)?mem[key(n)]:d;}catch(e){return d;}},
+    set:function(n,v){try{if(ok){localStorage.setItem(key(n),v);}else{mem[key(n)]=v;}}catch(e){mem[key(n)]=v;}},
+    getJSON:function(n,d){var v=this.get(n,null);if(v==null)return d;try{return JSON.parse(v);}catch(e){return d;}},
+    setJSON:function(n,o){this.set(n,JSON.stringify(o));},
+    clearAll:function(){try{if(ok){Object.keys(localStorage).filter(function(k){return k.indexOf("sas_")===0;}).forEach(function(k){localStorage.removeItem(k);});}mem={};}catch(e){mem={};}}
+  };
+})();
+
+var WEDGES=[
+  {rank:1,title:"Where barrier-coating demand becomes real orders in Europe",decision:"Where to focus barrier-coating effort across European converters and brand owners, and how to start selling to converters rather than only to mills.",budget:"Closest to a real budget. It pulls together the questions about selling to converters and about the Heidelberg partnership, it is tied to the 12 August PFAS date, and it targets a gap Solenis itself names.",question:"As the August PFAS rules take effect, where are converters and brand owners actually switching from plastic to coated fibre, and where is it still only talk?",project:"A five to seven week study of priority European converter and brand-owner segments. Who is moving, what they will pay, what is holding adoption back, and a clear go or no-go for each segment."},
+  {rank:2,title:"Whether the Turkey to Europe paperboard channel is a threat or an opportunity",decision:"Whether the flow of lower-cost Chinese paperboard through Turkish converters into Europe is a threat to defend against, a channel to use, or a sign to act on.",budget:"The most self-contained topic in the account. It is narrow, specific and easy to scope and fund on its own.",question:"Is the Turkey to Europe paperboard flow something you are planning against, using, or just watching?",project:"A four to six week mapping of the main Turkish converter routes, the European customers they serve, and the cost and service economics that make the channel work."},
+  {rank:3,title:"Where to place the next growth bets as paper demand splits",decision:"Where to defend the profit pool, where to adapt, and where to grow, across tissue, containerboard, carton board and graphic paper, by region.",budget:"Strategically important, but larger and slower to fund first. Better framed as a focused validation than a full strategy study.",question:"As these paper grades move apart, where should Solenis defend and where should it place the next growth bet?",project:"A focused two-region study that tests two or three specific growth options against real downstream demand, rather than covering everything at once."},
+  {rank:4,title:"How to prioritise Asia growth as the Beihai plant comes on line",decision:"Where, in a contested region, the Solenis advantage still wins as the new plant ramps up, and against which local competitors.",budget:"Tied to capital already committed, so the need is real. Best sold once the European work has proven the relationship.",question:"With the Beihai plant starting up, which parts of western China and Southeast Asia justify the Solenis service model against low-cost local players?",project:"A focused look at which segments in the plant's catchment area to prioritise, run after the European engagement."},
+  {rank:5,title:"Validation for strategy teams outside the core",decision:"Where teams outside Consumer Solutions are making growth decisions without enough validation, and where an outside read would help.",budget:"A later, secondary lane. Worth pursuing only after the core relationship is established.",question:"Beyond Consumer Solutions, which strategy teams are deciding without the validation they need?",project:"A single, contained validation for one named team, scoped only after the first engagement is done."}
+];
+
+var CONTACTS=[
+  {id:"zebst",name:"Christophe Zebst",seat:"Senior innovation marketing, paper and water",status:"send",
+   role:"Decides where the innovation marketing effort goes, and which barrier coating applications are worth pushing.",
+   angle:"Three points come together for him. First, with PFAS most serious suppliers will have compliant coatings by August, so the coating will not decide who wins. Second, the rivals now entering are ink and paint companies with closer converter access, so the contest shifts to that ecosystem. Third, brand-owner commitments to paper packaging are running ahead of real orders, so the question is which segments have actually started buying.",
+   help:"We talk to converters and brand owners directly, in packaging, and map adoption segment by segment.",
+   link:"Connects to wedge 1, barrier coatings in Europe.",
+   subject:"The real PFAS question is which converters can run the coating",
+   inmail:"Hi Christophe, a quick thought on the PFAS switch in food contact packaging. By August most serious suppliers will have compliant coatings, so the coating itself probably will not decide who wins. The harder question is downstream. Which converters can actually run it, and which brand owners are placing real orders rather than waiting out the deadline. That is hard to see from inside a chemistry business, and it is the work we do, mapping adoption converter by converter. Would a 30-minute call in the next couple of weeks be useful?",
+   body:"Hi Christophe,\n\nYou worked through the BPA switch in thermal paper, where the suppliers that had compliant chemistry ready ahead of the deadline took the business. The PFAS switch in food contact packaging looks similar on the surface, but it differs in one important way. By August, most serious suppliers, Solenis included, will have compliant coatings, so the coating itself is unlikely to be what decides who wins this time.\n\nThe decision moves downstream, to which converters can actually qualify and run the coating at a sensible cost, and which brand owners are placing real orders rather than waiting out the deadline. That matters because most of the rivals now entering paper barrier coatings are ink, paint and dispersion companies with closer access to converters and presses than a chemistry supplier usually has. The contest is shifting onto their ground, the converter and press ecosystem, rather than onto the coating spec.\n\nThere is also a gap worth watching between brand-owner ambition and real procurement. Plenty of brands have committed to paper-based packaging, but far fewer are buying it yet. Knowing which segments have actually crossed from intention to orders is what tells you where to put effort now.\n\nThis is the work we do. We talk to converters and brand owners directly, in packaging, and map adoption segment by segment, so innovation marketing can back the places where demand is real rather than promised. If this is useful to explore in the near term, I would welcome a 30-minute conversation at a time that suits you.\n\nBest regards,\n[Your name]\nFutureBridge",
+   sources:[
+     {txt:"Led the Pergafast product line through the BPA switch in thermal paper",src:"Solenis news releases, 2020 and 2021",st:"ok"},
+     {txt:"Rivals entering paper barrier coatings include ink, paint and dispersion companies such as BASF, Michelman, Kuraray, ACTEGA and Siegwerk",src:"Competitor map, public",st:"ok"},
+     {txt:"The gap between brand-owner ambition and real orders is our reading from downstream research, not a stated Solenis fact",src:"FutureBridge interpretation",st:"interp"},
+     {txt:"PFAS limits for EU food contact packaging apply from 12 August 2026. The date is not stated in the email.",src:"EU packaging regulation",st:"ok"}
+   ]},
+  {id:"zhu",name:"James Zhu",seat:"VP Supply Chain and Operations, Asia Pacific",status:"send",
+   role:"Getting the new Asian capacity up to plan without losing existing customers during the switch from imported to local product.",
+   angle:"Three points for the ramp. First, every customer has to requalify the local product per application before switching, and the order sets how fast the plant fills. Second, customers are most exposed to competitor trials during that window, so the sequence manages competitive risk too. Third, local supply can earn a better price from customers who value service and lead time, so the sequence is also where the margin is.",
+   help:"We work with chemical companies localising in Asia, mapping the customer and competitor picture so the ramp follows a plan.",
+   link:"Connects to wedge 4, Asia growth.",
+   subject:"The Beihai ramp will be paced by customer requalification",
+   inmail:"Hi James, a thought on the Beihai ramp. The plant is usually the easy part. The harder part is that every customer has to requalify the local product before they switch, and the order you move them in sets both how fast the plant fills and how exposed you are to competitor trials during the change. We work with chemical companies localising in Asia on exactly that sequence. Would 30 minutes at a time that suits you be worth it in the next week or two?",
+   body:"Hi James,\n\nYou have run paper chemistry supply chains in this region across several owners of the same business, so the move to local production at Beihai will be familiar ground. The plant itself is usually the straightforward part. The harder part is that every customer buying the imported product has to requalify the local one, application by application, before they switch, and the order you put them through that in sets how quickly the plant fills.\n\nThe sequence also decides how exposed you are. While a customer is in the middle of qualifying, a competitor can step in with a trial, which is when accounts are easiest to lose. So the same queue that paces the ramp also manages the competitive risk around it.\n\nThere is an upside in the sequence as well. Local supply can earn a better price from customers who value shorter lead times and closer service, while others will only ever buy on cost. Knowing which customers sit in which group lets you load the plant with the business that actually pays for being local, rather than simply replacing imports at the same margin.\n\nThis is the kind of work we do with chemical companies localising in Asia, mapping the customer and competitor picture so the ramp follows a plan rather than reacting to it. If it would help to talk this through soon, I would be glad to find 30 minutes at a time of your choosing.\n\nBest regards,\n[Your name]\nFutureBridge",
+   sources:[
+     {txt:"Has run paper chemistry supply chains in Asia Pacific across Hercules, Ashland, Kemira and Solenis",src:"ZoomInfo and RocketReach",st:"ok"},
+     {txt:"Beihai plant: 35 million dollars, 60,000 tonnes a year, operations from mid 2027",src:"Solenis news release, April 2026",st:"ok"},
+     {txt:"The pricing and sequencing points are our judgement on how localisation tends to play out, not a stated fact",src:"FutureBridge interpretation",st:"interp"}
+   ]},
+  {id:"luo",name:"Mingxiang Luo",seat:"APAC Marketing Director, Consumer Solutions",status:"send",
+   role:"Positioning premium chemistry in China, where cheaper local alternatives often win on price.",
+   angle:"Three points. First, China paperization is mostly cost-driven, so good-enough local coatings win, except for converters whose customers export to Europe, who from August need compliant documented chemistry. Second, for that group compliance is a requirement their European buyers enforce, so price is not the only lever. Third, that segment is a beachhead, since China's own rules are likely to tighten and the references earned there carry into the wider market.",
+   help:"We identify that group by name, the converters, the applications and the brand relationships behind them.",
+   link:"Connects to wedges 1 and 4.",
+   subject:"The part of the China market that will pay for compliant chemistry",
+   inmail:"Hi Mingxiang, a quick thought on paperization in China. It is mostly a price decision, except for converters whose customers export to Europe. From August they need documented PFAS-compliant chemistry to keep those buyers, so for that group compliance, not price, decides the sale. Identifying those converters by name is the work we do, and it turns a broad price-driven market into a shorter list where premium chemistry has a clear reason to win. Could we find 30 minutes in the next couple of weeks?",
+   body:"Hi Mingxiang,\n\nIn China, paperization is mostly a cost decision, which is why local coatings that are good enough tend to win on price. There is one part of the market where that logic does not hold, and it is worth separating out.\n\nConverters whose end customers sell into Europe will, from August, need PFAS-compliant and documented chemistry to keep those customers. For that group the cheapest local supplier will not work, because their European buyers will not accept undocumented chemistry. Compliance is a requirement there, not a preference, which changes who is able to supply them and takes price out of being the only lever.\n\nThat segment is also a way into the wider market. Once you are qualified with export-facing converters, you have references and proof points that carry weight as China's own packaging rules tighten over the next few years and more of the domestic market starts asking the same questions. The narrow group that has to comply today is a reasonable picture of where the broader market is heading.\n\nIdentifying that group by name, which converters, which applications and which brand relationships, is the work we do, and it can turn a broad, price-driven market into a shorter list where premium chemistry has a clear reason to win. You built the food packaging business in Greater China, so you will have your own read on this. If this is worth a closer look, I would welcome a short meeting, 30 minutes, whenever suits your diary.\n\nBest regards,\n[Your name]\nFutureBridge",
+   sources:[
+     {txt:"Built food packaging business development in Greater China",src:"ZoomInfo",st:"ok"},
+     {txt:"PFAS limits for EU food contact packaging apply from August 2026, referenced as from August",src:"EU packaging regulation",st:"ok"},
+     {txt:"The beachhead point, that today's compliance niche signals the wider market, is our reading, not a stated fact",src:"FutureBridge interpretation",st:"interp"}
+   ]},
+  {id:"verbiest",name:"Paul Verbiest",seat:"VP Marketing, Food and Beverage",status:"check",
+   role:"Using sustainability as a commercial advantage in hygiene and cleaning for food and beverage producers.",
+   angle:"Three points. First, the withdrawn Green Claims Directive did not end the pressure, binding rules still arrive in late September and reach suppliers. Second, when a customer drops an unsupported claim, the replacement evidence sits in the supply chain, so suppliers with verifiable numbers become more useful. Third, over time this shifts what hygiene suppliers compete on, towards the quality and auditability of their data, which is harder to copy than a product claim.",
+   help:"We track how these claims rules turn into actual procurement behaviour across hygiene and processing chemistry.",
+   link:"A separate conversation in the hygiene business.",
+   flag:"Confirm his exact remit before sending. His title points to the Food and Beverage hygiene business, but the latest brief lists him with the Consumer Solutions marketing team. The right angle depends on which is correct. This email assumes the hygiene remit.",
+   subject:"The binding green-claims rules still apply, and they reach suppliers",
+   inmail:"Hi Paul, a thought on environmental claims. Many teams read the withdrawn Green Claims Directive as the pressure easing, but binding rules still arrive in late September, and they reach suppliers, not only brands. When a customer drops a claim it cannot support, the evidence it needs sits in the supply chain, which makes hygiene suppliers with verifiable data more useful. We track how this turns into real procurement behaviour. Would a 30-minute call at a time that suits you be worthwhile?",
+   body:"Hi Paul,\n\nWhen the Green Claims Directive proposal was withdrawn last year, many marketing teams took it as a sign the pressure on environmental claims had eased. The binding rules are still arriving, under different legislation, from late September, and the part that is easy to miss is that the effect reaches suppliers like Solenis, not only the brands.\n\nWhen a food or beverage customer has to drop a claim it cannot support, it needs substantiated numbers to replace it, and much of that evidence sits in the supply chain. Water, energy and chemistry data per cleaning cycle, per plant, per line. Hygiene suppliers who can hand a customer verifiable figures become more useful at that point, and sustainability starts to appear as a line in tenders rather than only in marketing.\n\nOver time this changes what hygiene suppliers compete on. Product performance still matters, but so does the quality and auditability of the data behind it, and that is harder for a competitor to copy quickly than a product claim. The suppliers that build a defensible data position now will be the ones customers lean on as the rules bite.\n\nWe track how these claims rules turn into actual procurement behaviour across hygiene and processing chemistry, and which suppliers are getting ahead of it. Given the work you have done on cleaner chemistry since the Diversey days, this seemed worth putting in front of you. If any of this is useful to take further, I would value 30 minutes at a date and time you choose.\n\nBest regards,\n[Your name]\nFutureBridge",
+   sources:[
+     {txt:"VP Marketing with a Diversey background. Sources place him in either the Food and Beverage hygiene business or the Consumer Solutions marketing team",src:"The Org, RocketReach, LinkedIn, and the 15 June brief",st:"check"},
+     {txt:"Binding environmental-claims rules apply from late September 2026, after the separate Green Claims Directive proposal was withdrawn in 2025",src:"EU consumer-protection legislation",st:"ok"},
+     {txt:"The shift to competing on data and auditability is our interpretation, not a stated fact",src:"FutureBridge interpretation",st:"interp"}
+   ]},
+  {id:"schieck",name:"Kim Schieck",seat:"Logistics and indirect sourcing, North America",status:"send",
+   role:"Running logistics and indirect sourcing for North America, and coordinating globally where it applies. This is freight, warehousing and distribution, plus the goods and services Solenis buys that are not part of the product itself.",
+   angle:"Three points. First, in a business built by acquisition the largest savings sit in the overlap, duplicate lanes, warehouses and indirect categories, not in harder negotiation. Second, that overlap is easiest to remove early, before contracts and routines settle. Third, consolidating across the combined footprint also shows where you are single sourced and which lanes are most exposed to tariffs, which is worth as much as the saving right now.",
+   help:"We give logistics and indirect sourcing teams an outside read of where the overlap and the exposure sit across a North American footprint.",
+   link:"A separate, operational conversation, not the barrier coatings work.",
+   subject:"Where the largest logistics and indirect savings usually sit",
+   inmail:"Hi Kim, a quick thought on logistics and indirect sourcing. In a business built through several acquisitions, the largest savings usually sit in the overlap, duplicate lanes, warehouses and indirect categories, rather than in harder negotiation, and that overlap is easiest to remove early. Consolidating it also shows where you are most exposed to tariffs. We give teams an outside read of where that sits across a North American footprint. Would 30 minutes be useful in the next week or two?",
+   body:"Hi Kim,\n\nMost of the attention in logistics and indirect sourcing goes to negotiating better rates with existing suppliers and carriers. In a business that has grown through several acquisitions, that is rarely where the largest savings sit. They tend to sit in the overlap. Duplicate lanes, warehouses serving the same regions, and the same indirect categories bought separately by each part of the business.\n\nThe reason this matters now is timing. That overlap is easiest to remove in the first year or two, while contracts and routines are still being set. After that it gets built into the operation and is much harder to unpick.\n\nThere is a resilience point alongside the cost one. Consolidating freight and indirect spend across the combined footprint also gives you a clearer view of where you are single sourced and which lanes are most exposed to tariffs and trade shifts. In the current environment that visibility is worth as much as the saving, because it tells you where a disruption would actually hurt.\n\nThis is the work we do with logistics and indirect sourcing teams, an outside read of where the overlap and the exposure sit across a North American footprint, by lane, site and category, and which of it to act on first. If this is timely, I would welcome a 30-minute discussion whenever works for you.\n\nBest regards,\n[Your name]\nFutureBridge",
+   sources:[
+     {txt:"Runs logistics and indirect sourcing for North America, coordinating globally where it applies",src:"LinkedIn profile",st:"ok"},
+     {txt:"The email speaks in general terms about businesses built by acquisition, and does not state any Solenis transaction as news to her",src:"Method check",st:"ok"},
+     {txt:"Tariff and trade volatility as a live pressure is drawn from the account macro context",src:"15 June brief, macro section",st:"ok"}
+   ]}
+];
+
+var PARKED=[
+  {name:"Poul Lishmann Nielsen",verdict:"Did not send",reason:"Based in Copenhagen, with a finance background. His title points to an accounts payable role, not a buyer of advisory work. There is no realistic path from his desk to the kind of project we sell, so an email here would spend credibility for nothing. Confirm the role before considering him again."},
+  {name:"Country manager, Turkey and nearby markets",verdict:"Not a priority",reason:"A regional role covering markets where getting senior people to fund outside advisory work is difficult unless there is a clear push from a central team or a manager who wants to grow the region. Without that, the chance of a meeting turning into funded work is low. Leave this one until there is a reason to think a central mandate exists."}
+];
+
+var SOURCES=[
+  {txt:"Christophe Zebst led the Pergafast product line through the BPA switch in thermal paper",src:"Solenis news releases, 2020 and 2021",st:"ok"},
+  {txt:"Rivals entering paper barrier coatings include ink, paint and dispersion companies such as BASF, Michelman, Kuraray, ACTEGA and Siegwerk",src:"Competitor map, public",st:"ok"},
+  {txt:"James Zhu has run paper chemistry supply chains in Asia Pacific across Hercules, Ashland, Kemira and Solenis",src:"ZoomInfo and RocketReach",st:"ok"},
+  {txt:"Mingxiang Luo built food packaging business development in Greater China",src:"ZoomInfo",st:"ok"},
+  {txt:"Kim Schieck runs logistics and indirect sourcing for North America, coordinating globally where it applies",src:"LinkedIn profile",st:"ok"},
+  {txt:"Paul Verbiest is a VP Marketing with a Diversey background. His exact business unit is unclear and needs checking before send.",src:"The Org, RocketReach, LinkedIn, and the 15 June brief",st:"check"},
+  {txt:"EU packaging rules and PFAS limits for food contact packaging apply from 12 August 2026, at 25 ppb for any single PFAS and 250 ppb for the total",src:"EU packaging regulation",st:"ok"},
+  {txt:"Binding environmental-claims rules apply from late September 2026; the Green Claims Directive proposal was withdrawn in 2025",src:"EU consumer-protection legislation",st:"ok"},
+  {txt:"Beihai plant: 35 million dollars, 60,000 tonnes a year, operations from mid 2027",src:"Solenis news release, April 2026",st:"ok"},
+  {txt:"Owned by Platinum Equity; S&P credit rating on record is B-",src:"Platinum Equity and S&P Global Ratings",st:"ok"},
+  {txt:"Solenis and Heidelberg are working together on press-applied barrier coatings; the partnership is public",src:"Solenis and Heidelberg, 2024 and 2025",st:"ok"},
+  {txt:"The gaps between brand-owner ambition and orders, the value of localisation sequencing, the China beachhead, and the shift to competing on data are our readings, useful as judgement but not public facts",src:"FutureBridge interpretation",st:"interp"},
+  {txt:"Combined revenue is estimated near 7.6 billion dollars. This is an outside estimate, not a company figure, so confirm before quoting a number.",src:"External trade reporting",st:"check"},
+  {txt:"Heidelberg commercial traction is an internal read, not a public fact. Treat it as a discovery question.",src:"Internal intelligence",st:"check"}
+];
+
+var emailEdits=store.getJSON("email_edits",{});
+var approved=store.getJSON("approved",[]);
+var houseStyle=store.get("house_style","");
+var chatHistory=store.getJSON("chat",[]);
+
+function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+function curEmail(c){var e=emailEdits[c.id]||{};return {subject:e.subject!=null?e.subject:c.subject,body:e.body!=null?e.body:c.body,inmail:e.inmail!=null?e.inmail:(c.inmail||""),edited:!!emailEdits[c.id]};}
+function senderName(){var v=(document.getElementById("sender").value||"").trim();return v||"[Your name]";}
+function withSender(body){return String(body).replace("[Your name]",senderName());}
+function isApproved(id){return approved.some(function(a){return a.contactId===id;});}
+function uid(){return "a"+Date.now().toString(36)+Math.random().toString(36).slice(2,6);}
+
+function callClaude(system,messages,maxTokens,tools){
+  var key=(store.get("anthropic_key","")||"").trim();
+  var headers={"Content-Type":"application/json"};
+  if(key){headers["x-api-key"]=key;headers["anthropic-version"]="2023-06-01";headers["anthropic-dangerous-direct-browser-access"]="true";}
+  var bodyObj={model:"claude-sonnet-4-6",max_tokens:maxTokens||1024,messages:messages};
+  if(system)bodyObj.system=system;
+  if(tools&&tools.length)bodyObj.tools=tools;
+  return fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:headers,body:JSON.stringify(bodyObj)})
+    .then(function(r){if(!r.ok)return r.text().then(function(t){throw new Error("API "+r.status+" "+(t||"").slice(0,160));});return r.json();})
+    .then(function(data){return (data.content||[]).filter(function(b){return b.type==="text";}).map(function(b){return b.text;}).join("\n").trim();});
+}
+
+function srcMark(st){
+  if(st==="ok")return '<span class="status"><span class="sq"></span>Confirmed</span>';
+  if(st==="interp")return '<span class="status"><span class="sq grey"></span>Our reading</span>';
+  return '<span class="status attn"><span class="sq"></span>Needs checking</span>';
+}
+function statusMark(status){
+  if(status==="send")return '<span class="status"><span class="sq"></span>Ready to send</span>';
+  return '<span class="status"><span class="sq grey"></span>Send after one check</span>';
+}
+
+function renderWedges(){
+  document.getElementById("wedges").innerHTML=WEDGES.map(function(w){
+    return '<div class="wedge'+(w.rank===1?' top':'')+'" data-wedge><button aria-expanded="false"><span class="rank">'+w.rank+'</span><span class="wt">'+esc(w.title)+'</span><span class="caret"></span></button><div class="body"><div class="row"><p class="label">The decision</p><p>'+esc(w.decision)+'</p></div><div class="row"><p class="label">Why it could have budget</p><p>'+esc(w.budget)+'</p></div><div class="q"><p class="label">Opening question</p><p>'+esc(w.question)+'</p></div><div class="row"><p class="label">A first project</p><p>'+esc(w.project)+'</p></div></div></div>';
+  }).join("");
+  document.querySelectorAll("[data-wedge] > button").forEach(function(b){b.addEventListener("click",function(){var w=b.parentElement;var o=w.classList.toggle("open");b.setAttribute("aria-expanded",o?"true":"false");});});
+}
+
+function renderContacts(){
+  document.getElementById("contactList").innerHTML=CONTACTS.map(function(c){
+    var em=curEmail(c);
+    var srcs=c.sources.map(function(s){return '<div class="sr"><span class="txt">'+esc(s.txt)+' <span class="src">'+esc(s.src)+'</span></span>'+srcMark(s.st)+'</div>';}).join("");
+    var flag=c.flag?'<div class="flag"><b>Check first.</b> '+esc(c.flag)+'</div>':'';
+    var ap=isApproved(c.id);
+    return '<article class="contact" data-status="'+c.status+'" data-id="'+c.id+'">'+
+      '<div class="head" role="button" tabindex="0" aria-expanded="false"><div class="who"><div class="nm">'+esc(c.name)+(ap?' <span class="pill ok">Approved</span>':'')+(em.edited?' <span class="pill">Edited</span>':'')+'</div><div class="seat">'+esc(c.seat)+'</div><div class="role"><b>What they do.</b> '+esc(c.role)+'</div></div>'+statusMark(c.status)+'<span class="caret"></span></div>'+
+      '<div class="detail">'+
+        '<div class="block"><p class="label">The points we make</p><p>'+esc(c.angle)+'</p></div>'+
+        '<div class="block"><p class="label">What we do in their area</p><p>'+esc(c.help)+'</p></div>'+flag+
+        '<div class="email'+(em.edited?' edited':'')+'" data-emailwrap="'+c.id+'">'+
+          '<div class="ehead"><p class="label">The email'+(em.edited?' (edited)':'')+'</p><span class="acts">'+
+            '<button class="btn sm" data-act="edit" data-id="'+c.id+'">Edit</button>'+
+            '<button class="btn sm" data-act="copy-subj" data-id="'+c.id+'">Copy subject</button>'+
+            '<button class="btn sm" data-act="copy-email" data-id="'+c.id+'">Copy email</button>'+
+            (em.edited?'<button class="btn sm ghost" data-act="revert" data-id="'+c.id+'">Reset to original</button>':'')+
+            (ap?'<button class="btn sm" data-act="unapprove" data-id="'+c.id+'">Remove from approved</button>':'<button class="btn sm red" data-act="approve" data-id="'+c.id+'">Approve</button>')+
+            '<button class="btn sm" data-act="discuss" data-id="'+c.id+'">Ask the assistant</button>'+
+          '</span></div>'+
+          '<div class="subj"><b>Subject.</b> <span data-subj="'+c.id+'">'+esc(em.subject)+'</span></div>'+
+          '<div class="bodytext" data-body="'+c.id+'">'+esc(withSender(em.body))+'</div>'+
+          '<div class="subj" style="border-top:1px solid var(--line);margin-top:4px;padding-top:10px;display:flex;justify-content:space-between;align-items:center"><b style="color:var(--ink)">LinkedIn InMail</b> <button class="btn sm" data-act="copy-inmail" data-id="'+c.id+'">Copy InMail</button></div>'+
+          '<div class="bodytext" data-inmail="'+c.id+'">'+esc(withSender(em.inmail))+'</div>'+
+        '</div>'+
+        '<div class="block"><p class="label">Where the facts come from</p><div class="sources">'+srcs+'</div></div>'+
+      '</div></article>';
+  }).join("");
+  document.querySelectorAll(".contact .head").forEach(function(h){
+    function tog(){var c=h.parentElement;var o=c.classList.toggle("open");h.setAttribute("aria-expanded",o?"true":"false");}
+    h.addEventListener("click",function(e){if(e.target.closest("[data-act]"))return;tog();});
+    h.addEventListener("keydown",function(e){if(e.key==="Enter"||e.key===" "){e.preventDefault();tog();}});
+  });
+  document.querySelectorAll("#contactList [data-act]").forEach(function(b){b.addEventListener("click",function(e){e.stopPropagation();handleEmailAct(b.getAttribute("data-act"),b.getAttribute("data-id"),b);});});
+  var f=document.querySelector("#filter button.on");var fv=f?f.getAttribute("data-f"):"all";
+  document.querySelectorAll(".contact").forEach(function(c){c.style.display=(fv==="all"||c.getAttribute("data-status")===fv)?"":"none";});
+  document.getElementById("parkedList").innerHTML=PARKED.map(function(p){return '<div class="card" style="background:var(--soft)"><div style="display:flex;align-items:center;gap:12px;margin-bottom:6px"><span class="status"><span class="sq open"></span>'+esc(p.verdict)+'</span><span style="font-weight:bold;color:var(--ink)">'+esc(p.name)+'</span></div><p style="margin:0;font-size:13.5px;color:var(--grey)">'+esc(p.reason)+'</p></div>';}).join("");
+}
+
+function handleEmailAct(act,id,btn){
+  var c=CONTACTS.find(function(x){return x.id===id;});var em=curEmail(c);
+  if(act==="copy-subj"){copyText(em.subject,btn);return;}
+  if(act==="copy-email"){copyText("Subject: "+em.subject+"\n\n"+withSender(em.body),btn);return;}
+  if(act==="copy-inmail"){copyText(withSender(em.inmail),btn);return;}
+  if(act==="approve"){addApproved(c);renderContacts();reopen(id);renderApproved();updateCounts();return;}
+  if(act==="unapprove"){removeApprovedByContact(id);renderContacts();reopen(id);renderApproved();updateCounts();return;}
+  if(act==="revert"){delete emailEdits[id];store.setJSON("email_edits",emailEdits);renderContacts();reopen(id);return;}
+  if(act==="discuss"){document.getElementById("asstTarget").value=id;switchPanel("assistant");return;}
+  if(act==="edit"){openEditor(id);return;}
+}
+
+function openEditor(id){
+  var c=CONTACTS.find(function(x){return x.id===id;});var em=curEmail(c);
+  var wrap=document.querySelector('[data-emailwrap="'+id+'"]');
+  wrap.querySelector(".subj").style.display="none";wrap.querySelector(".bodytext").style.display="none";
+  var ed=document.createElement("div");ed.className="edit-area";
+  ed.innerHTML='<label>Subject</label><input type="text" data-edit-subj /><label>Body</label><textarea data-edit-body rows="14"></textarea><label>LinkedIn InMail</label><textarea data-edit-inmail rows="6"></textarea><div style="display:flex;gap:8px"><button class="btn red sm" data-edit-save>Save</button><button class="btn sm" data-edit-cancel>Cancel</button></div><p class="note">Keep [Your name] in the sign-off. It is replaced with your name automatically.</p>';
+  wrap.appendChild(ed);
+  ed.querySelector("[data-edit-subj]").value=em.subject;
+  ed.querySelector("[data-edit-body]").value=em.body;
+  ed.querySelector("[data-edit-inmail]").value=em.inmail;
+  ed.querySelector("[data-edit-save]").addEventListener("click",function(){
+    emailEdits[id]={subject:ed.querySelector("[data-edit-subj]").value,body:ed.querySelector("[data-edit-body]").value,inmail:ed.querySelector("[data-edit-inmail]").value};
+    store.setJSON("email_edits",emailEdits);syncApprovedFromContact(id);renderContacts();reopen(id);renderApproved();
+  });
+  ed.querySelector("[data-edit-cancel]").addEventListener("click",function(){renderContacts();reopen(id);});
+}
+function reopen(id){var el=document.querySelector('.contact[data-id="'+id+'"]');if(el){el.classList.add("open");var h=el.querySelector(".head");if(h)h.setAttribute("aria-expanded","true");}}
+
+function guessEmail(name){var p=String(name).trim().split(/\s+/);var f=(p[0]||"").toLowerCase();var l=(p.slice(1).join("")||"").toLowerCase();if(!f||!l)return "";return f+"."+l+"@solenis.com";}
+function addApproved(c){if(isApproved(c.id))return;var em=curEmail(c);approved.push({id:uid(),contactId:c.id,name:c.name,seat:c.seat,email:guessEmail(c.name),subject:em.subject,body:em.body,inmail:em.inmail,ts:Date.now()});store.setJSON("approved",approved);}
+function addApprovedCustom(name,seat,subject,body,inmail){approved.push({id:uid(),contactId:"custom-"+uid(),name:name,seat:seat,email:guessEmail(name),subject:subject,body:body,inmail:inmail||"",ts:Date.now()});store.setJSON("approved",approved);updateCounts();}
+function removeApprovedByContact(id){approved=approved.filter(function(a){return a.contactId!==id;});store.setJSON("approved",approved);}
+function removeApprovedById(aid){approved=approved.filter(function(a){return a.id!==aid;});store.setJSON("approved",approved);}
+function syncApprovedFromContact(id){var c=CONTACTS.find(function(x){return x.id===id;});if(!c)return;var em=curEmail(c);approved.forEach(function(a){if(a.contactId===id){a.subject=em.subject;a.body=em.body;a.inmail=em.inmail;}});store.setJSON("approved",approved);}
+function updateCounts(){document.getElementById("approvedCount").textContent=approved.length;}
+
+function renderApproved(){
+  var list=document.getElementById("approvedList");
+  if(!approved.length){list.innerHTML='<div class="empty">No approved emails yet. Approve an email on the Contacts tab and it will appear here, and stay here when you refresh.</div>';updateCounts();return;}
+  list.innerHTML=approved.map(function(a){
+    return '<div class="approved-item" data-aid="'+a.id+'"><div class="top"><div><div class="nm">'+esc(a.name)+'</div><div class="seat">'+esc(a.seat||"")+'</div></div><span class="acts" style="display:flex;gap:7px"><button class="btn sm" data-aedit="'+a.id+'">Edit</button><button class="btn sm" data-acopy="'+a.id+'">Copy</button><button class="btn sm ghost" data-aremove="'+a.id+'">Remove</button></span></div><div class="addr"><label>Email address</label><input type="text" data-aemail="'+a.id+'" value="'+esc(a.email||"").replace(/"/g,"&quot;")+'" placeholder="name@solenis.com" /><span class="note" style="margin:0">Verify before sending.</span></div><div class="em"><div class="s"><b>Subject.</b> <span>'+esc(a.subject)+'</span></div><div class="bd" data-abody="'+a.id+'">'+esc(withSender(a.body))+'</div>'+(a.inmail?'<div class="s" style="border-top:1px solid var(--line-2);margin-top:10px;padding-top:10px;display:flex;justify-content:space-between;align-items:center"><b>LinkedIn InMail.</b> <button class="btn sm" data-aicopy="'+a.id+'">Copy InMail</button></div><div class="bd" data-ainmail="'+a.id+'">'+esc(withSender(a.inmail))+'</div>':'')+'</div></div>';
+  }).join("");
+  list.querySelectorAll("[data-aemail]").forEach(function(inp){inp.addEventListener("change",function(){var it=approved.find(function(x){return x.id===inp.getAttribute("data-aemail");});if(it){it.email=inp.value.trim();store.setJSON("approved",approved);}});});
+  list.querySelectorAll("[data-aremove]").forEach(function(b){b.addEventListener("click",function(){removeApprovedById(b.getAttribute("data-aremove"));renderApproved();renderContacts();updateCounts();});});
+  list.querySelectorAll("[data-acopy]").forEach(function(b){b.addEventListener("click",function(){var a=approved.find(function(x){return x.id===b.getAttribute("data-acopy");});copyText("Subject: "+a.subject+"\n\n"+withSender(a.body),b);});});
+  list.querySelectorAll("[data-aicopy]").forEach(function(b){b.addEventListener("click",function(){var a=approved.find(function(x){return x.id===b.getAttribute("data-aicopy");});copyText(withSender(a.inmail||""),b);});});
+  list.querySelectorAll("[data-aedit]").forEach(function(b){b.addEventListener("click",function(){openApprovedEditor(b.getAttribute("data-aedit"));});});
+  updateCounts();
+}
+function openApprovedEditor(aid){
+  var a=approved.find(function(x){return x.id===aid;});if(!a)return;
+  var item=document.querySelector('.approved-item[data-aid="'+aid+'"] .em');
+  item.innerHTML='<div class="edit-area" style="padding:0"><label>Subject</label><input type="text" data-es /><label>Body</label><textarea data-eb rows="12"></textarea><label>LinkedIn InMail</label><textarea data-ei rows="6"></textarea><div style="display:flex;gap:8px"><button class="btn red sm" data-esave>Save</button><button class="btn sm" data-ecancel>Cancel</button></div></div>';
+  item.querySelector("[data-es]").value=a.subject;item.querySelector("[data-eb]").value=a.body;item.querySelector("[data-ei]").value=a.inmail||"";
+  item.querySelector("[data-esave]").addEventListener("click",function(){a.subject=item.querySelector("[data-es]").value;a.body=item.querySelector("[data-eb]").value;a.inmail=item.querySelector("[data-ei]").value;store.setJSON("approved",approved);renderApproved();});
+  item.querySelector("[data-ecancel]").addEventListener("click",renderApproved);
+}
+
+function toCSV(rows){return rows.map(function(r){return r.map(function(c){c=c==null?"":String(c);if(/[",\n\r]/.test(c))c='"'+c.replace(/"/g,'""')+'"';return c;}).join(",");}).join("\r\n");}
+function download(name,text,mime){var blob=new Blob([text],{type:mime||"text/plain;charset=utf-8"});var url=URL.createObjectURL(blob);var a=document.createElement("a");a.href=url;a.download=name;document.body.appendChild(a);a.click();setTimeout(function(){document.body.removeChild(a);URL.revokeObjectURL(url);},120);}
+function showApprovedMsg(m){var e=document.getElementById("approvedMsg");e.textContent=m;e.classList.add("show");document.getElementById("approvedErr").classList.remove("show");setTimeout(function(){e.classList.remove("show");},6000);}
+function showApprovedErr(m){var e=document.getElementById("approvedErr");e.innerHTML=m;e.classList.add("show");document.getElementById("approvedMsg").classList.remove("show");}
+
+document.getElementById("exportCsv").addEventListener("click",function(){
+  if(!approved.length){showApprovedErr("There are no approved emails to export yet.");return;}
+  var rows=[["First name","Last name","Email","Company","Job title","Subject","Email body","LinkedIn InMail","Status"]];
+  approved.forEach(function(a){var p=String(a.name).trim().split(/\s+/);rows.push([p[0]||"",p.slice(1).join(" "),a.email||"","Solenis",a.seat||"",a.subject,withSender(a.body),withSender(a.inmail||""),"Approved"]);});
+  download("solenis_approved_emails.csv",toCSV(rows),"text/csv;charset=utf-8");
+  showApprovedMsg("CSV exported. It carries the full email text for each person, ready to import into HubSpot or a mail-merge.");
+});
+
+document.getElementById("pushHubspot").addEventListener("click",function(){
+  var btn=this;
+  if(!approved.length){showApprovedErr("There are no approved emails to send yet.");return;}
+  var token=(store.get("hubspot_token","")||"").trim();
+  if(!token){showApprovedErr("Add a HubSpot private app token in Settings first. If your HubSpot blocks direct browser requests, use Export CSV instead, which always works.");switchPanel("settings");return;}
+  var missing=approved.filter(function(a){return !a.email;});
+  if(missing.length){showApprovedErr("Add an email address for every approved person before sending to HubSpot. "+missing.length+" still need one.");return;}
+  var inputs=approved.map(function(a){var p=String(a.name).trim().split(/\s+/);return {idProperty:"email",id:a.email,properties:{email:a.email,firstname:p[0]||"",lastname:p.slice(1).join(" "),company:"Solenis",jobtitle:a.seat||""}};});
+  btn.disabled=true;var lbl=btn.textContent;btn.innerHTML='<span class="spinner"></span>Sending';
+  fetch("https://api.hubapi.com/crm/v3/objects/contacts/batch/upsert",{method:"POST",headers:{"Authorization":"Bearer "+token,"Content-Type":"application/json"},body:JSON.stringify({inputs:inputs})})
+    .then(function(r){return r.text().then(function(t){if(!r.ok)throw new Error("HubSpot "+r.status+" "+t.slice(0,200));return t;});})
+    .then(function(){showApprovedMsg("Created or updated "+approved.length+" contacts in HubSpot, ready to enrol in a sequence. The email text travels with the CSV; the actual send is run from a HubSpot sequence or workflow.");})
+    .catch(function(err){showApprovedErr("HubSpot did not accept the request. This usually means the browser blocked the call for security reasons, or the token lacks contact-write permission. Use Export CSV instead, which always works, then import it into HubSpot. ("+esc(String(err.message||err))+")");})
+    .finally(function(){btn.disabled=false;btn.textContent=lbl;});
+});
+
+function renderSources(){document.getElementById("sourcesList").innerHTML=SOURCES.map(function(s){return '<div class="sr"><span class="txt">'+esc(s.txt)+' <span class="src">'+esc(s.src)+'</span></span>'+srcMark(s.st)+'</div>';}).join("");}
+
+function copyText(text,btn){
+  var done=function(){var t=btn.textContent;btn.textContent="Copied";setTimeout(function(){btn.textContent=t;},1200);};
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(text).then(done).catch(function(){fb();done();});}else{fb();done();}
+  function fb(){var ta=document.createElement("textarea");ta.value=text;ta.style.position="fixed";ta.style.left="-9999px";document.body.appendChild(ta);ta.select();try{document.execCommand("copy");}catch(e){}document.body.removeChild(ta);}
+}
+
+function switchPanel(id){
+  document.querySelectorAll("#nav button").forEach(function(x){x.classList.toggle("active",x.getAttribute("data-p")===id);});
+  document.querySelector(".settings-link").classList.toggle("active",id==="settings");
+  document.querySelectorAll(".panel").forEach(function(p){p.classList.toggle("show",p.id===id);});
+  if(id==="assistant")renderChat();
+  if(id==="approved")renderApproved();
+  window.scrollTo(0,0);
+}
+document.getElementById("nav").addEventListener("click",function(e){var b=e.target.closest("button[data-p]");if(!b)return;switchPanel(b.getAttribute("data-p"));});
+document.querySelector(".settings-link").addEventListener("click",function(){switchPanel("settings");});
+
+document.getElementById("filter").addEventListener("click",function(e){var b=e.target.closest("button");if(!b)return;document.querySelectorAll("#filter button").forEach(function(x){x.classList.remove("on");});b.classList.add("on");var f=b.getAttribute("data-f");document.querySelectorAll(".contact").forEach(function(c){c.style.display=(f==="all"||c.getAttribute("data-status")===f)?"":"none";});});
+
+var senderEl=document.getElementById("sender");
+senderEl.value=store.get("sender","");
+function refreshBodies(){
+  document.querySelectorAll("[data-body]").forEach(function(el){var c=CONTACTS.find(function(x){return x.id===el.getAttribute("data-body");});if(c)el.textContent=withSender(curEmail(c).body);});
+  document.querySelectorAll("[data-abody]").forEach(function(el){var a=approved.find(function(x){return x.id===el.getAttribute("data-abody");});if(a)el.textContent=withSender(a.body);});
+  document.querySelectorAll("[data-inmail]").forEach(function(el){var c=CONTACTS.find(function(x){return x.id===el.getAttribute("data-inmail");});if(c)el.textContent=withSender(curEmail(c).inmail);});
+  document.querySelectorAll("[data-ainmail]").forEach(function(el){var a=approved.find(function(x){return x.id===el.getAttribute("data-ainmail");});if(a)el.textContent=withSender(a.inmail||"");});
+}
+senderEl.addEventListener("input",function(){store.set("sender",senderEl.value);refreshBodies();});
+
+var GATE={role:null,anchor:null,buy:null,angle:null};
+var FAIL={role:"You cannot yet describe this person's job in one sentence. Until that is clear, the email will not land on what they care about. Do the profile work first, or leave this one.",anchor:"There is no confirmed personal detail to write to. Without it, the email reads as written to the company, not the person. Confirm a real detail first, or leave this one.",buy:"This person cannot influence the kind of work we sell, and there is no clear path to someone who can. A good email here would be wasted effort.",angle:"You do not yet have points that are fresh to them. Find two or three consequences for their job they may not have drawn, then come back."};
+function evalGate(){
+  var v=document.getElementById("verdict"),btn=document.getElementById("composeBtn"),note=document.getElementById("composeNote");
+  var keys=["role","anchor","buy","angle"];
+  if(!keys.every(function(k){return GATE[k]!==null;})){v.className="verdict";btn.disabled=true;note.textContent="Answer the four questions above to turn this on.";return;}
+  var fail=keys.find(function(k){return GATE[k]===false;});
+  if(fail){v.className="verdict fail show";v.innerHTML='<b>Better to leave this one.</b> '+esc(FAIL[fail]);btn.disabled=true;note.textContent="The check says to leave this person, so writing is turned off.";}
+  else{v.className="verdict pass show";v.innerHTML='<b>This person is worth emailing.</b> Fill in what you have confirmed below, then write a draft. The draft step does the same check on what you enter.';btn.disabled=false;note.textContent="";}
+}
+document.querySelectorAll("#gate .toggle").forEach(function(t){t.addEventListener("click",function(e){var b=e.target.closest("button");if(!b)return;var key=t.getAttribute("data-g"),val=b.getAttribute("data-v")==="y";GATE[key]=val;t.querySelectorAll("button").forEach(function(x){x.classList.remove("yes","no");});b.classList.add(val?"yes":"no");evalGate();});});
+
+function styleClause(){return houseStyle?("\n\nHOUSE STYLE TO FOLLOW (set by the user):\n"+houseStyle):"";}
+function composeSystem(){return [
+"You write one short prospecting email for FutureBridge, an advisory firm, to one named senior person at Solenis. You write in plain, natural, clear English, the way a thoughtful colleague would write. You never invent facts. You only use what the user gives you.",
+"",
+"THE MAIN RULE: the email shows that we understand the person's job and the decisions they are working on, and that we have real depth in their area. It does not repeat facts about their company that they already know.",
+"",
+"HOW TO WRITE:",
+"1. Make two or three connected points, each tied to part of what this person is responsible for, so the email shows range and depth.",
+"2. Do not repeat their own company facts. Only mention a regulation if it carries a consequence they may not have drawn.",
+"3. Tie the points to the confirmed detail about them, so it is clear the email was written for them.",
+"4. Include one plain line establishing what we do in their area. State it as something we do, not as a boast or a promise. Never say we will prove or show them something.",
+"5. Three or four short paragraphs. Every line clear on the first read.",
+"6. Close with a confident, easy-to-accept request for a short meeting, around 30 minutes, at a time that suits them. Do not say compare notes or showcase.",
+"7. Also write one LinkedIn InMail of 70 to 100 words. Same plain tone. One or two of the sharpest points, then the same kind of 30-minute meeting request. No subject line and no formal sign-off block, since LinkedIn shows the sender name.",
+"",
+"STYLE: plain and natural. No dramatic lines, no clever one-liners, no metaphors, no neat reversals such as not X but Y, no marketing language. Use straight apostrophes and full stops only. No dashes, no special characters. Sign off as Best regards, then [Your name] on its own line, then FutureBridge on its own line.",
+"",
+"SUBJECT LINE: write it last. Say the main point in plain words so the person can see why it is worth opening.",
+"",
+"IF THE INPUTS ARE TOO THIN (the detail is really a company fact, or the points only restate what they know, or the job is too vague), do not write the email. Return a short reason to leave this person instead.",
+"",
+"OUTPUT: return only valid JSON, no markdown fences, with exactly these keys:",
+'{"decision":"send or leave","reason":"one short sentence, only if leave","subject":"plain subject line","email":"full email including greeting and sign-off","inmail":"70 to 100 word LinkedIn InMail","check":"two or three short plain lines on what the email does and does not do"}',
+styleClause()
+].join("\n");}
+function bMsg(){function g(id){return (document.getElementById(id).value||"").trim();}return ["Write one email to this person, following the rules.","","Name: "+(g("b-name")||"not given"),"Job title and business unit: "+(g("b-seat")||"not given"),"Their job in one sentence: "+(g("b-role")||"not given"),"A confirmed detail about them: "+(g("b-anchor")||"not given"),"Two or three points: "+(g("b-angle")||"not given"),"What we do in their area: "+(g("b-help")||"not given"),"","Return only the JSON object."].join("\n");}
+function bReady(){return ["b-name","b-seat","b-role","b-anchor","b-angle","b-help"].every(function(id){return (document.getElementById(id).value||"").trim().length>0;});}
+function renderBuilderResult(obj){
+  var out=document.getElementById("builderOut"),box=document.getElementById("builderResult");
+  if(obj.decision==="leave"){box.innerHTML='<div class="verdict fail show" style="margin-top:0"><b>Better to leave this one.</b> '+esc(obj.reason||"One of the inputs was too thin to write a good email.")+'</div>';out.classList.add("show");out.scrollIntoView({behavior:"smooth",block:"start"});return;}
+  var email=withSender(obj.email||"");
+  var nm=(document.getElementById("b-name").value||"").trim()||"New contact";
+  var seat=(document.getElementById("b-seat").value||"").trim();
+  var check=(obj.check||"").split(/\n+/).filter(Boolean).map(function(n){return '<p style="margin:0 0 4px;font-size:13.5px;color:var(--grey)">'+esc(n.replace(/^[-*]\s*/,""))+'</p>';}).join("");
+  box.innerHTML='<div class="email"><div class="ehead"><p class="label">The draft</p><span class="acts"><button class="btn sm" id="bSubj">Copy subject</button><button class="btn sm" id="bEmail">Copy email</button><button class="btn sm" id="bInmail">Copy InMail</button><button class="btn sm red" id="bApprove">Approve and store</button></span></div><div class="subj"><b>Subject.</b> '+esc(obj.subject||"")+'</div><div class="bodytext">'+esc(email)+'</div><div class="subj" style="border-top:1px solid var(--line);margin-top:4px;padding-top:10px"><b style="color:var(--ink)">LinkedIn InMail</b></div><div class="bodytext">'+esc(withSender(obj.inmail||""))+'</div></div><div class="block"><p class="label">What this email does and does not do</p>'+check+'</div><p class="note">Read it against the rules before it goes out, and confirm the person\'s details. The draft only uses what you entered.</p>';
+  out.classList.add("show");
+  document.getElementById("bSubj").addEventListener("click",function(){copyText(obj.subject||"",this);});
+  document.getElementById("bEmail").addEventListener("click",function(){copyText("Subject: "+(obj.subject||"")+"\n\n"+email,this);});
+  document.getElementById("bInmail").addEventListener("click",function(){copyText(withSender(obj.inmail||""),this);});
+  document.getElementById("bApprove").addEventListener("click",function(){addApprovedCustom(nm,seat,obj.subject||"",obj.email||"",obj.inmail||"");this.textContent="Stored in Approved";this.disabled=true;renderApproved();});
+  out.scrollIntoView({behavior:"smooth",block:"start"});
+}
+document.getElementById("composeBtn").addEventListener("click",function(){
+  var errEl=document.getElementById("builderErr");errEl.classList.remove("show");document.getElementById("builderOut").classList.remove("show");
+  if(!bReady()){errEl.innerHTML="Some details are missing. Fill in the name, job title, job in one sentence, confirmed detail, points and what we do.";errEl.classList.add("show");return;}
+  var btn=this,label=btn.textContent;btn.disabled=true;btn.innerHTML='<span class="spinner"></span>Writing';
+  callClaude(composeSystem(),[{role:"user",content:bMsg()}],1100).then(function(text){
+    var clean=text.replace(/```json/gi,"").replace(/```/g,"").trim();var a=clean.indexOf("{"),b=clean.lastIndexOf("}");if(a>-1&&b>-1)clean=clean.slice(a,b+1);
+    renderBuilderResult(JSON.parse(clean));
+  }).catch(function(err){
+    errEl.innerHTML="The draft writer did not return an email. It needs the Anthropic API. Inside the Claude preview it works without a key. If you are running this on your own host, add your Anthropic API key in Settings. You can also write the email by hand from the points above. ("+esc(String(err.message||err))+")";errEl.classList.add("show");
+  }).finally(function(){btn.disabled=false;btn.textContent=label;evalGate();});
+});
+
+function targetSelectInit(){var sel=document.getElementById("asstTarget");CONTACTS.forEach(function(c){var o=document.createElement("option");o.value=c.id;o.textContent="Email to "+c.name;sel.appendChild(o);});}
+function assistantSystem(){
+  var emails=CONTACTS.map(function(c){var em=curEmail(c);return "["+c.name+" | "+c.seat+"]\nSubject: "+em.subject+"\n"+em.body;}).join("\n\n");
+  var target=document.getElementById("asstTarget").value;var targetLine;
+  if(target==="none")targetLine="The user has not selected a specific email. Give advice or answer the question. If they ask you to rewrite an email, ask which one, or rewrite the one they name.";
+  else if(target==="style")targetLine="The user is editing the HOUSE STYLE that applies to all emails. When they ask for a change, output the full new house-style instruction between ===STYLE=== and ===END=== markers, then a one-line summary.";
+  else{var c=CONTACTS.find(function(x){return x.id===target;});var em=curEmail(c);targetLine="The user is working on the email to "+c.name+" ("+c.seat+").\nCurrent subject: "+em.subject+"\nCurrent body:\n"+em.body+"\nWhen they ask you to rewrite or adjust this email, give a one or two line explanation, then output the full revised email between ===EMAIL=== and ===END=== markers, with SUBJECT: on the first line and BODY: before the body.";}
+  return [
+"You are an assistant inside a sales tool used by FutureBridge to reach senior people at Solenis. You help improve outreach emails and answer questions about the account. You are plain-spoken, practical and brief.",
+"",
+"HOW EMAILS MUST READ: plain, natural, clear on first read. Two or three connected insights tied to the person's job. One plain line on what FutureBridge does in their area, never a promise. A confident, easy-to-accept request for a short 30-minute meeting at the close. No dashes, no special characters, no dramatic lines, no marketing language, straight apostrophes only. Sign-off: Best regards, then [Your name], then FutureBridge.",
+houseStyle?("CURRENT HOUSE STYLE:\n"+houseStyle):"No house style is set yet.",
+"",
+"ACCOUNT IN BRIEF: Solenis is a leveraged, budget-disciplined specialty chemicals company owned by Platinum Equity. Its profit core is pulp, paper and packaging chemistry (Consumer Solutions). The live opportunity is barrier-coating adoption in Europe, anchored to the 12 August 2026 PFAS limits. The value we add is downstream converter and brand-owner intelligence, not databases or sustainability reporting. Procurement and the hygiene, pool and Diversey businesses are not the paper-story audience.",
+"",
+"THE CURRENT EMAILS:",
+emails,
+"",
+"WHAT THE USER IS WORKING ON:",
+targetLine,
+"",
+"For questions about the account intelligence, the layout, or the overall design, give clear advice and, if helpful, draft the new wording, but explain that those structural changes are applied by taking the request to the main build. Only the email rewrites and the house style can be applied directly here."
+  ].join("\n");
+}
+function renderChat(){
+  var s=document.getElementById("chatScroll");
+  if(!chatHistory.length){s.innerHTML='<div class="msg sys">Ask for a change in plain words. Pick a contact above to rewrite their email, or choose The house style to set rules for every email. For changes to the account intelligence or the design, the assistant will draft them and explain how they get applied.</div>';return;}
+  s.innerHTML=chatHistory.map(function(m){
+    if(m.role==="user")return '<div class="msg user">'+esc(m.text)+'</div>';
+    var html='<div class="msg bot">'+esc(m.display||m.text)+'</div>';
+    if(m.apply){html+='<div class="apply-bar">'+(m.apply.type==="email"?'<button class="btn red sm" data-apply="'+m.id+'">Apply to '+esc(m.apply.name)+'</button>':'<button class="btn red sm" data-apply="'+m.id+'">Save as house style</button>')+'</div>';}
+    return html;
+  }).join("");
+  s.querySelectorAll("[data-apply]").forEach(function(b){b.addEventListener("click",function(){applyFromMsg(b.getAttribute("data-apply"),b);});});
+  s.scrollTop=s.scrollHeight;
+}
+function parseAssistant(text,target){
+  var out={display:text.trim(),apply:null};
+  var em=text.match(/===EMAIL===([\s\S]*?)===END===/);
+  if(em&&target&&target!=="none"&&target!=="style"){
+    var blk=em[1].trim();var sm=blk.match(/SUBJECT:\s*([^\n]*)/i);var bm=blk.match(/BODY:\s*([\s\S]*)/i);
+    var subj=sm?sm[1].trim():"";var body=bm?bm[1].trim():blk;
+    var c=CONTACTS.find(function(x){return x.id===target;});
+    out.apply={type:"email",id:target,name:c?c.name:"",subject:subj,body:body};
+    out.display=text.replace(/===EMAIL===[\s\S]*?===END===/,"").trim()||("Here is a revised email for "+(c?c.name:"the contact")+".");
+  }
+  var st=text.match(/===STYLE===([\s\S]*?)===END===/);
+  if(st&&target==="style"){out.apply={type:"style",text:st[1].trim()};out.display=text.replace(/===STYLE===[\s\S]*?===END===/,"").trim()||"Here is the updated house style.";}
+  return out;
+}
+function applyFromMsg(mid,btn){
+  var m=chatHistory.find(function(x){return x.id===mid;});if(!m||!m.apply)return;
+  if(m.apply.type==="email"){
+    emailEdits[m.apply.id]={subject:m.apply.subject,body:m.apply.body};store.setJSON("email_edits",emailEdits);
+    syncApprovedFromContact(m.apply.id);renderContacts();renderApproved();
+    btn.textContent="Applied to "+m.apply.name;btn.disabled=true;
+  } else {
+    houseStyle=m.apply.text;store.set("house_style",houseStyle);var sEl=document.getElementById("set-style");if(sEl)sEl.value=houseStyle;
+    btn.textContent="Saved as house style";btn.disabled=true;
+  }
+}
+function persistChat(){store.setJSON("chat",chatHistory.slice(-40));}
+function autosize(t){if(!t)return;t.style.height="auto";t.style.height=Math.min(t.scrollHeight,140)+"px";}
+function sendChat(){
+  var inp=document.getElementById("chatInput");var text=(inp.value||"").trim();if(!text)return;
+  var target=document.getElementById("asstTarget").value;
+  chatHistory.push({role:"user",text:text});inp.value="";autosize(inp);renderChat();persistChat();
+  var msgs=chatHistory.filter(function(m){return m.role==="user"||m.role==="bot";}).slice(-12).map(function(m){return {role:m.role==="bot"?"assistant":"user",content:m.text};});
+  var sendBtn=document.getElementById("chatSend");sendBtn.disabled=true;var lbl=sendBtn.textContent;sendBtn.innerHTML='<span class="spinner"></span>';
+  var thinking={role:"bot",id:uid(),text:"",display:"Thinking..."};chatHistory.push(thinking);renderChat();
+  callClaude(assistantSystem(),msgs,1300).then(function(resp){
+    chatHistory=chatHistory.filter(function(m){return m!==thinking;});
+    var parsed=parseAssistant(resp,target);
+    chatHistory.push({role:"bot",id:uid(),text:resp,display:parsed.display,apply:parsed.apply});
+    renderChat();persistChat();
+  }).catch(function(err){
+    chatHistory=chatHistory.filter(function(m){return m!==thinking;});
+    chatHistory.push({role:"bot",id:uid(),text:"",display:"I could not reach the model. Inside the Claude preview the assistant works without a key. If you are running this on your own host, add your Anthropic API key in Settings. ("+String(err.message||err)+")"});
+    renderChat();persistChat();
+  }).finally(function(){sendBtn.disabled=false;sendBtn.textContent=lbl;});
+}
+document.getElementById("chatSend").addEventListener("click",sendChat);
+document.getElementById("chatInput").addEventListener("input",function(){autosize(this);});
+document.getElementById("chatInput").addEventListener("keydown",function(e){if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();sendChat();}});
+document.getElementById("asstClear").addEventListener("click",function(){chatHistory=[];persistChat();renderChat();});
+document.getElementById("asstChips").addEventListener("click",function(e){var c=e.target.closest(".chip");if(!c)return;var inp=document.getElementById("chatInput");inp.value=c.getAttribute("data-q");autosize(inp);inp.focus();});
+document.getElementById("asstTarget").addEventListener("change",renderChat);
+
+document.getElementById("set-key").value=store.get("anthropic_key","");
+document.getElementById("set-hub").value=store.get("hubspot_token","");
+document.getElementById("set-style").value=houseStyle;
+document.getElementById("saveSettings").addEventListener("click",function(){
+  store.set("anthropic_key",(document.getElementById("set-key").value||"").trim());
+  store.set("hubspot_token",(document.getElementById("set-hub").value||"").trim());
+  houseStyle=(document.getElementById("set-style").value||"").trim();store.set("house_style",houseStyle);
+  var m=document.getElementById("settingsMsg");m.textContent="Saved.";setTimeout(function(){m.textContent="";},2500);
+});
+document.getElementById("resetAll").addEventListener("click",function(){
+  if(!window.confirm("This removes all saved edits, approved emails, keys and house style from this browser. Continue?"))return;
+  store.clearAll();location.reload();
+});
+
+/* ===================== UPLOAD CONTACTS PIPELINE ===================== */
+var uploaded=store.getJSON("uploaded",[]);
+function persistUploaded(){store.setJSON("uploaded",uploaded);}
+
+function parseCSV(text){
+  var rows=[],row=[],field="",i=0,inQ=false;
+  text=String(text).replace(/\r\n/g,"\n").replace(/\r/g,"\n");
+  while(i<text.length){
+    var ch=text[i];
+    if(inQ){
+      if(ch==='"'){if(text[i+1]==='"'){field+='"';i+=2;continue;}inQ=false;i++;continue;}
+      field+=ch;i++;continue;
+    }
+    if(ch==='"'){inQ=true;i++;continue;}
+    if(ch===','){row.push(field);field="";i++;continue;}
+    if(ch==='\n'){row.push(field);rows.push(row);row=[];field="";i++;continue;}
+    field+=ch;i++;
+  }
+  if(field.length||row.length){row.push(field);rows.push(row);}
+  return rows.filter(function(r){return r.some(function(c){return String(c).trim()!=="";});});
+}
+function colIndex(headers,names){for(var i=0;i<headers.length;i++){var h=headers[i].trim().toLowerCase();for(var j=0;j<names.length;j++){if(h===names[j])return i;}}return -1;}
+function importCSV(text){
+  var rows=parseCSV(text);
+  if(!rows.length){showUploadErr("That file looks empty. Check it has a header row and at least one contact.");return;}
+  var head=rows[0].map(function(h){return String(h).trim();});
+  var iName=colIndex(head,["name","full name","contact","contact name"]);
+  var iFirst=colIndex(head,["first name","firstname","first"]);
+  var iLast=colIndex(head,["last name","lastname","last","surname"]);
+  var iTitle=colIndex(head,["title","job title","designation","role","position"]);
+  var iCompany=colIndex(head,["company","employer","organisation","organization"]);
+  var iEmail=colIndex(head,["email","email address","e-mail"]);
+  var iLink=colIndex(head,["linkedin","linkedin url","linkedin profile","profile"]);
+  var iUnit=colIndex(head,["business unit","unit","division","segment","department"]);
+  var iCtx=colIndex(head,["context","notes","note","comments"]);
+  if(iName<0&&iFirst<0){showUploadErr("No name column found. The file needs a column called name, or first name and last name.");return;}
+  var added=0;
+  rows.slice(1).forEach(function(r){
+    function g(idx){return idx>=0&&r[idx]!=null?String(r[idx]).trim():"";}
+    var name=iName>=0?g(iName):((g(iFirst)+" "+g(iLast)).trim());
+    if(!name)return;
+    uploaded.push({id:uid(),name:name,title:g(iTitle),company:g(iCompany)||"Solenis",email:g(iEmail),linkedin:g(iLink),unit:g(iUnit),context:g(iCtx),status:"pending",liVerified:false,research:null,gen:null});
+    added++;
+  });
+  persistUploaded();renderUploaded();
+  if(added)showUploadOk();else showUploadErr("No contacts were read from that file.");
+}
+function showUploadErr(m){var e=document.getElementById("uploadErr");e.textContent=m;e.classList.add("show");}
+function showUploadOk(){document.getElementById("uploadErr").classList.remove("show");}
+
+function vlinks(name){
+  var n=encodeURIComponent(name);
+  var nq=encodeURIComponent('"'+name+'"');
+  function g(q){return "https://www.google.com/search?q="+encodeURIComponent(q);}
+  return [
+    {label:"LinkedIn profile search",url:"https://www.linkedin.com/search/results/people/?keywords="+encodeURIComponent(name+" Solenis"),li:true},
+    {label:"Find LinkedIn via Google",url:g('site:linkedin.com/in "'+name+'" Solenis')},
+    {label:"ZoomInfo",url:g('site:zoominfo.com "'+name+'" Solenis')},
+    {label:"RocketReach",url:g('site:rocketreach.co "'+name+'" Solenis')},
+    {label:"The Org",url:g('site:theorg.com "'+name+'" Solenis')},
+    {label:"Solenis site",url:g('site:solenis.com "'+name+'"')},
+    {label:"General web",url:g('"'+name+'" Solenis')}
+  ];
+}
+var UP_STATUS={pending:{c:"pend",t:"Not researched"},working:{c:"work",t:"Researching"},in_company:{c:"inco",t:"In company"},left_company:{c:"left",t:"Left the company"},uncertain:{c:"unc",t:"Could not confirm"},error:{c:"unc",t:"Research failed"}};
+
+function renderUploaded(){
+  var list=document.getElementById("uploadList");
+  var has=uploaded.length>0;
+  document.getElementById("upHeading").style.display=has?"":"none";
+  document.getElementById("upToolbar").style.display=has?"":"none";
+  if(!has){list.innerHTML="";return;}
+  list.innerHTML=uploaded.map(function(u){
+    var st=UP_STATUS[u.status]||UP_STATUS.pending;
+    var links=vlinks(u.name);
+    if(u.research&&u.research.linkedin_url){links=[{label:"LinkedIn profile (found)",url:u.research.linkedin_url,li:true}].concat(links.slice(1));}
+    var linkHtml=links.map(function(l){return '<a class="vlink'+(l.li?' li':'')+'" href="'+esc(l.url)+'" target="_blank" rel="noopener">'+esc(l.label)+'</a>';}).join("");
+    var srcHtml="";
+    if(u.research&&u.research.sources&&u.research.sources.length){srcHtml=u.research.sources.map(function(x){return '<a class="vlink" href="'+esc(x.url)+'" target="_blank" rel="noopener">'+esc(x.label||"source")+'</a>';}).join("");}
+    var intel="";
+    if(u.research){
+      var R=u.research;
+      if(u.status==="in_company"){
+        var pts=(R.points||[]).map(function(p){return '<li>'+esc(p.text)+(p.source?' <a href="'+esc(p.source)+'" target="_blank" rel="noopener">source</a>':'')+'</li>';}).join("");
+        intel='<div class="intel">'+
+          (R.corrected_title?'<div class="row"><b>Confirmed title.</b> '+esc(R.corrected_title)+(R.business_unit?', '+esc(R.business_unit):'')+'</div>':'')+
+          (R.summary?'<div class="row"><b>What they do.</b> '+esc(R.summary)+'</div>':'')+
+          (pts?'<div class="row"><b>Contact intelligence.</b><ul>'+pts+'</ul></div>':'')+
+          (R.relevance?'<div class="row"><b>Fit for our work.</b> '+esc(R.relevance.fit||"")+'. '+esc(R.relevance.reason||"")+'</div>':'')+
+          (R.confidence?'<div class="row faint" style="font-size:12.5px">Confidence: '+esc(R.confidence)+'. Confirm the LinkedIn profile before sending.</div>':'')+
+          (srcHtml?'<div class="row"><b>Sources used.</b><div class="vlinks">'+srcHtml+'</div></div>':'')+
+        '</div>';
+      } else {
+        intel='<div class="intel"><div class="row"><b>'+esc(st.t)+'.</b> '+esc(R.note||(R.current_employer?("Current employer appears to be "+R.current_employer+"."):"No further research was done."))+'</div>'+
+          (R.summary&&u.status==="uncertain"?'<div class="row">'+esc(R.summary)+'</div>':'')+
+          (srcHtml?'<div class="row"><b>Sources checked.</b><div class="vlinks">'+srcHtml+'</div></div>':'')+
+          '<div class="row faint" style="font-size:12.5px">No email is generated for someone who has left or cannot be confirmed. Use the links above to check, then research again if needed.</div></div>';
+      }
+    }
+    var gen="";
+    if(u.gen){
+      gen='<div class="email" style="margin-top:14px"><div class="ehead"><p class="label">Draft email and InMail</p><span class="acts">'+
+        '<button class="btn sm" data-ucopy-subj="'+u.id+'">Copy subject</button>'+
+        '<button class="btn sm" data-ucopy-email="'+u.id+'">Copy email</button>'+
+        '<button class="btn sm" data-ucopy-inmail="'+u.id+'">Copy InMail</button>'+
+        '<button class="btn sm red" data-uapprove="'+u.id+'">Approve and store</button></span></div>'+
+        '<div class="subj"><b>Subject.</b> '+esc(u.gen.subject||"")+'</div><div class="bodytext">'+esc(withSender(u.gen.email||""))+'</div>'+
+        '<div class="subj" style="border-top:1px solid var(--line);margin-top:4px;padding-top:10px"><b style="color:var(--ink)">LinkedIn InMail</b></div><div class="bodytext">'+esc(withSender(u.gen.inmail||""))+'</div></div>';
+    }
+    var canGen=u.status==="in_company";
+    var genBtn=canGen?'<button class="btn red sm" data-ugen="'+u.id+'">'+(u.gen?"Rewrite email and InMail":"Generate email and InMail")+'</button>':"";
+    var researchBtn='<button class="btn sm" data-uresearch="'+u.id+'">'+(u.research?"Research again":"Verify and research")+'</button>';
+    return '<div class="upcard" data-uid="'+u.id+'">'+
+      '<div class="uphead"><div><div class="un">'+esc(u.name)+'</div><div class="ut">'+esc([u.title,u.unit,u.company].filter(Boolean).join(", "))+'</div></div><span class="upstatus '+st.c+'">'+esc(st.t)+'</span></div>'+
+      '<div class="vlinks">'+linkHtml+'</div>'+
+      '<div class="liverify"><label style="display:flex;align-items:center;gap:8px;cursor:pointer"><input type="checkbox" data-uli="'+u.id+'" '+(u.liVerified?"checked":"")+' /> I have opened the LinkedIn profile and confirmed this is the right person</label>'+(u.liVerified?'<span class="status"><span class="sq"></span>LinkedIn confirmed</span>':'')+'</div>'+
+      '<details class="ctxbox"'+(u.context?' open':'')+'><summary>Add context for this person (optional)</summary><textarea data-uctx="'+u.id+'" rows="3" placeholder="Anything you already know that should shape the email. Leave blank and the tool researches from trusted sources on its own.">'+esc(u.context||"")+'</textarea></details>'+
+      intel+
+      '<div class="upacts">'+researchBtn+genBtn+'<button class="btn sm ghost" data-uremove="'+u.id+'">Remove</button></div>'+
+      gen+
+    '</div>';
+  }).join("");
+
+  list.querySelectorAll("[data-uctx]").forEach(function(t){t.addEventListener("change",function(){var u=upFind(t.getAttribute("data-uctx"));if(u){u.context=t.value;persistUploaded();}});});
+  list.querySelectorAll("[data-uli]").forEach(function(b){b.addEventListener("change",function(){var u=upFind(b.getAttribute("data-uli"));if(u){u.liVerified=b.checked;persistUploaded();renderUploaded();}});});
+  list.querySelectorAll("[data-uremove]").forEach(function(b){b.addEventListener("click",function(){uploaded=uploaded.filter(function(x){return x.id!==b.getAttribute("data-uremove");});persistUploaded();renderUploaded();});});
+  list.querySelectorAll("[data-uresearch]").forEach(function(b){b.addEventListener("click",function(){researchOne(b.getAttribute("data-uresearch"),b);});});
+  list.querySelectorAll("[data-ugen]").forEach(function(b){b.addEventListener("click",function(){generateOne(b.getAttribute("data-ugen"),b);});});
+  list.querySelectorAll("[data-ucopy-subj]").forEach(function(b){b.addEventListener("click",function(){var u=upFind(b.getAttribute("data-ucopy-subj"));copyText(u.gen.subject||"",b);});});
+  list.querySelectorAll("[data-ucopy-email]").forEach(function(b){b.addEventListener("click",function(){var u=upFind(b.getAttribute("data-ucopy-email"));copyText("Subject: "+(u.gen.subject||"")+"\n\n"+withSender(u.gen.email||""),b);});});
+  list.querySelectorAll("[data-ucopy-inmail]").forEach(function(b){b.addEventListener("click",function(){var u=upFind(b.getAttribute("data-ucopy-inmail"));copyText(withSender(u.gen.inmail||""),b);});});
+  list.querySelectorAll("[data-uapprove]").forEach(function(b){b.addEventListener("click",function(){var u=upFind(b.getAttribute("data-uapprove"));addApprovedCustom(u.name,[u.research&&u.research.corrected_title||u.title,u.research&&u.research.business_unit||u.unit].filter(Boolean).join(", "),u.gen.subject||"",u.gen.email||"",u.gen.inmail||"");b.textContent="Stored in Approved";b.disabled=true;renderApproved();});});
+}
+function upFind(id){return uploaded.find(function(x){return x.id===id;});}
+
+function researchSystem(){return [
+"You verify a person's current role and gather professional intelligence for a B2B outreach tool used by FutureBridge to reach people at Solenis, a specialty chemicals company. Use web search to find current, accurate information from trustworthy public sources such as LinkedIn, the company website and press releases, reputable news, ZoomInfo, RocketReach, The Org and conference biographies.",
+"",
+"Steps:",
+"1. Find the person's current employer and job title.",
+"2. Decide status. Use in_company if they currently work at Solenis. Use left_company if they have clearly moved to a different employer. Use uncertain if you cannot confirm with reasonable confidence.",
+"3. If status is left_company or uncertain, do not gather deep intelligence. Note the current employer if known and the source, and stop.",
+"4. If status is in_company, gather: the corrected job title, the business unit, a one sentence plain summary of what they are responsible for, and three to five intelligence points about their responsibilities, what they appear to be driving, relevant background, and any recent public activity. Tie points to a source URL where you can.",
+"5. Assess fit for FutureBridge work, which is downstream packaging and barrier coating adoption, pulp and paper growth, supply chain and operations, and strategy or marketing in the Consumer Solutions business. People who are procurement only, plant operations only, or in an unrelated business unit are usually a lower fit. Return fit as high, medium or low with a one line reason.",
+"6. Provide a linkedin_url only if you find a confident match.",
+"7. List the key sources you used as objects with label and url.",
+"",
+"Be accurate and do not invent. Plain language. Return ONLY strict JSON, no markdown, with keys: status, current_employer, corrected_title, business_unit, summary, points (array of objects with text and source), relevance (object with fit and reason), linkedin_url, sources (array of objects with label and url), confidence, note."
+].join("\n");}
+function researchMsg(u){return ["Verify and research this person.","","Name: "+u.name,"Company we expect: "+(u.company||"Solenis"),"Title given to us: "+(u.title||"not given"),"LinkedIn given to us: "+(u.linkedin||"not given"),"Business unit given: "+(u.unit||"not given"),(u.context?("Context from our team: "+u.context):"No extra context was given. Research from trusted public sources."),"","Return only the JSON object."].join("\n");}
+function parseJSON(text){var clean=String(text).replace(/```json/gi,"").replace(/```/g,"").trim();var a=clean.indexOf("{"),b=clean.lastIndexOf("}");if(a>-1&&b>-1)clean=clean.slice(a,b+1);return JSON.parse(clean);}
+
+function researchOne(id,btn){
+  var u=upFind(id);if(!u)return;
+  var lbl=btn?btn.textContent:"";if(btn){btn.disabled=true;btn.innerHTML='<span class="spinner"></span>Researching';}
+  u.status="working";renderUploaded();
+  return callClaude(researchSystem(),[{role:"user",content:researchMsg(u)}],1600,[{type:"web_search_20250305",name:"web_search",max_uses:5}]).then(function(text){
+    var r=parseJSON(text);
+    u.research=r;
+    u.status=(r.status==="in_company"||r.status==="left_company"||r.status==="uncertain")?r.status:"uncertain";
+    persistUploaded();renderUploaded();
+  }).catch(function(err){
+    u.status="error";u.research={note:"Research did not complete. This step needs the Anthropic API with web search. Inside the Claude preview it works without a key. If you host this yourself, add your Anthropic API key in Settings. ("+String(err.message||err)+")"};
+    persistUploaded();renderUploaded();
+  });
+}
+function researchAll(){
+  var pending=uploaded.filter(function(u){return u.status==="pending"||u.status==="error";});
+  var btn=document.getElementById("researchAll");var lbl=btn.textContent;btn.disabled=true;btn.innerHTML='<span class="spinner"></span>Researching '+pending.length;
+  (function next(i){
+    if(i>=pending.length){btn.disabled=false;btn.textContent=lbl;return;}
+    researchOne(pending[i].id,null).then(function(){next(i+1);});
+  })(0);
+}
+
+function genSystem(){return [
+"You write a hyperpersonal prospecting email and a LinkedIn InMail for FutureBridge, an advisory firm, to one named senior person at Solenis. You are given verified intelligence about the person. Use it. Do not invent anything beyond it.",
+"",
+"ACCOUNT IN BRIEF: Solenis is a leveraged, budget-disciplined specialty chemicals company owned by Platinum Equity. Its profit core is pulp, paper and packaging chemistry, the Consumer Solutions business. The live opportunity is barrier-coating adoption in Europe, anchored to the 12 August 2026 PFAS limits. The value FutureBridge adds is downstream converter and brand-owner intelligence, supply chain and operations sequencing, and growth prioritisation, not databases or sustainability reporting.",
+"",
+"HOW TO WRITE THE EMAIL:",
+"1. From the intelligence, derive two or three connected insights, each tied to part of what this person is responsible for, so the email shows real depth in their area.",
+"2. Do not repeat their own company facts back to them. Only mention a regulation if it carries a consequence for their job.",
+"3. Tie the insights to a real, verified detail about them.",
+"4. Include one plain line on what FutureBridge does in their area. State it as something we do, never a promise.",
+"5. Three or four short paragraphs. Every line clear on the first read.",
+"6. Close with a confident, easy-to-accept request for a short 30-minute meeting at a time that suits them. Do not say compare notes or showcase.",
+"",
+"THE INMAIL: 70 to 100 words. Same plain tone. One or two sharpest insights then the same kind of 30-minute meeting request. No subject line, no formal sign-off block.",
+"",
+"STYLE: plain and natural. No dashes, no special characters, no dramatic lines, no marketing language, straight apostrophes only. Email sign-off: Best regards, then [Your name], then FutureBridge.",
+"",
+"If the person is a poor fit for our work, or the intelligence is too thin to say anything specific, set decision to leave and give a one line reason instead of writing.",
+"",
+"Return ONLY strict JSON, no markdown, with keys: decision (send or leave), reason, subject, email, inmail, check."
+].join("\n")+styleClause();}
+function genMsg(u){
+  var R=u.research||{};
+  var pts=(R.points||[]).map(function(p){return "- "+p.text;}).join("\n");
+  return ["Write the email and InMail for this person.","","Name: "+u.name,"Confirmed title: "+(R.corrected_title||u.title||"not confirmed"),"Business unit: "+(R.business_unit||u.unit||"not given"),"What they do: "+(R.summary||"not given"),"Intelligence:\n"+(pts||"none gathered"),"Fit: "+(R.relevance?(R.relevance.fit+", "+R.relevance.reason):"not assessed"),(u.context?("Extra context from our team: "+u.context):"No extra context was given."),"","Return only the JSON object."].join("\n");
+}
+function generateOne(id,btn){
+  var u=upFind(id);if(!u)return;
+  var lbl=btn.textContent;btn.disabled=true;btn.innerHTML='<span class="spinner"></span>Writing';
+  callClaude(genSystem(),[{role:"user",content:genMsg(u)}],1300).then(function(text){
+    var g=parseJSON(text);
+    if(g.decision==="leave"){u.gen=null;u.genNote=g.reason||"";renderUploaded();alert("Better to leave this one. "+(g.reason||""));return;}
+    u.gen={subject:g.subject||"",email:g.email||"",inmail:g.inmail||""};persistUploaded();renderUploaded();
+  }).catch(function(err){
+    alert("The writer did not return a draft. This step needs the Anthropic API. Inside the Claude preview it works without a key. If you host this yourself, add your Anthropic API key in Settings. ("+String(err.message||err)+")");
+  }).finally(function(){btn.disabled=false;btn.textContent=lbl;});
+}
+
+function csvTemplate(){
+  var rows=[["name","title","company","email","linkedin","business unit","context"],["Jane Doe","Director of Marketing","Solenis","","","Consumer Solutions","Met at Fachpack, interested in barrier coatings"]];
+  download("solenis_contacts_template.csv",toCSV(rows),"text/csv;charset=utf-8");
+}
+document.getElementById("csvPick").addEventListener("click",function(){document.getElementById("csvFile").click();});
+document.getElementById("csvFile").addEventListener("change",function(e){var file=e.target.files&&e.target.files[0];if(!file)return;var rd=new FileReader();rd.onload=function(){importCSV(rd.result);};rd.readAsText(file);e.target.value="";});
+document.getElementById("csvTemplate").addEventListener("click",csvTemplate);
+document.getElementById("addManual").addEventListener("click",function(){var name=window.prompt("Name of the person at Solenis");if(!name||!name.trim())return;uploaded.push({id:uid(),name:name.trim(),title:"",company:"Solenis",email:"",linkedin:"",unit:"",context:"",status:"pending",liVerified:false,research:null,gen:null});persistUploaded();renderUploaded();});
+document.getElementById("researchAll").addEventListener("click",researchAll);
+document.getElementById("clearUploaded").addEventListener("click",function(){if(!uploaded.length)return;if(!window.confirm("Remove all uploaded contacts from this list?"))return;uploaded=[];persistUploaded();renderUploaded();});
+var dropEl=document.getElementById("drop");
+["dragenter","dragover"].forEach(function(ev){dropEl.addEventListener(ev,function(e){e.preventDefault();dropEl.classList.add("over");});});
+["dragleave","drop"].forEach(function(ev){dropEl.addEventListener(ev,function(e){e.preventDefault();dropEl.classList.remove("over");});});
+dropEl.addEventListener("drop",function(e){var file=e.dataTransfer&&e.dataTransfer.files&&e.dataTransfer.files[0];if(!file)return;var rd=new FileReader();rd.onload=function(){importCSV(rd.result);};rd.readAsText(file);});
+
+renderWedges();
+targetSelectInit();
+renderContacts();
+renderSources();
+renderApproved();
+updateCounts();
+refreshBodies();
+renderChat();
+autosize(document.getElementById("chatInput"));
+renderUploaded();
+</script>
+</body>
+</html>
