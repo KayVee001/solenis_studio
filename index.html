@@ -156,6 +156,66 @@
   .upstatus{display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:bold;border-radius:999px;padding:4px 11px}
   .upstatus.pend{background:var(--soft);color:var(--grey)} .upstatus.inco{background:#eaf6ef;color:#1d6b41} .upstatus.left{background:var(--red-soft);color:#b3303c} .upstatus.unc{background:#fff4e5;color:#a4631a} .upstatus.work{background:#eef;color:#3a3aa0}
   .upacts{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:6px 0 8px}
+  @media(max-width:880px){.stats{grid-template-columns:repeat(2,1fr)}}
+  .stat{background:var(--soft);border:1px solid var(--line);border-radius:11px;padding:15px 16px}
+  .stat .big{font-size:23px;font-weight:bold;color:var(--ink);line-height:1.08}
+  .stat .lab{font-size:12px;color:var(--grey-2);margin-top:5px;line-height:1.35}
+  .implication{border-left:3px solid var(--ink);background:var(--soft);border-radius:0 9px 9px 0;padding:11px 16px;margin-top:14px;font-size:14px;color:var(--body)} .implication b{color:var(--ink)}
+  .srcline{font-size:11.5px;color:var(--faint);margin-top:9px}
+  .mna{margin-top:6px}
+  .mna-row{display:grid;grid-template-columns:58px 1fr;gap:14px;align-items:start;padding:13px 0;border-bottom:1px solid var(--line)} .mna-row:last-child{border-bottom:0}
+  .mna-yr{font-weight:bold;color:var(--ink);font-size:14px}
+  .mna-main .t{font-size:14px;color:var(--ink);font-weight:bold} .mna-main .d{font-size:13px;color:var(--grey);margin-top:2px}
+  .mna-track{margin-top:8px;height:15px;background:var(--soft-2);border-radius:4px;overflow:hidden;max-width:520px}
+  .mna-fill{height:100%;background:var(--grey)} .mna-fill.red{background:var(--red)}
+  .mna-fill.nd{background:repeating-linear-gradient(45deg,#dadade,#dadade 5px,#ececef 5px,#ececef 10px)}
+  .mna-val{font-size:12px;color:var(--grey-2);margin-top:5px}
+  .seg{display:grid;grid-template-columns:210px 1fr 96px;gap:14px;align-items:center;padding:11px 0;border-bottom:1px solid var(--line)} .seg:last-child{border-bottom:0}
+  .seg .nm{font-size:14px;font-weight:bold;color:var(--ink)} .seg .nm small{display:block;font-weight:normal;color:var(--grey);font-size:12px;margin-top:2px;line-height:1.4}
+  .seg-track{height:13px;background:var(--soft-2);border-radius:4px;overflow:hidden} .seg-fill{height:100%;background:var(--grey)} .seg-fill.core{background:var(--red)}
+  .seg-tag{font-size:10.5px;font-weight:bold;text-align:center;border-radius:999px;padding:4px 6px}
+  .seg-tag.focus{background:var(--red-soft);color:var(--red-text)} .seg-tag.sel{background:#fff4e5;color:#a4631a} .seg-tag.avoid{background:var(--soft);color:var(--grey)}
+  @media(max-width:760px){.seg{grid-template-columns:1fr;gap:7px}.seg-tag{justify-self:start;padding:4px 12px}}
+  .sig{display:grid;grid-template-columns:1fr 116px 132px;gap:14px;align-items:center;padding:11px 0;border-bottom:1px solid var(--line);font-size:13px} .sig:last-child{border-bottom:0}
+  .sig .s{color:var(--body)} .sig .s small{display:block;color:var(--grey-2);font-size:12px;margin-top:2px}
+  .sig .m{font-size:12px;color:var(--grey)} .bar2{height:6px;border-radius:3px;background:var(--soft-2);overflow:hidden;margin-top:5px;max-width:108px} .bar2 i{display:block;height:100%;background:var(--ink)}
+  @media(max-width:760px){.sig{grid-template-columns:1fr;gap:5px}}
+  .pill.warn{background:#a4631a}
+  .coreblk{border:1.5px solid var(--red);border-radius:12px;background:var(--red-soft);padding:17px 20px;margin-bottom:12px}
+  .coreblk .h{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+  .coreblk .nm{font-size:17px;font-weight:bold;color:var(--ink)}
+  .coreblk .ct{font-size:11px;font-weight:bold;color:#fff;background:var(--red);border-radius:999px;padding:4px 12px;white-space:nowrap}
+  .coreblk p{margin:8px 0 0;font-size:14px;color:var(--body)}
+  .seggrid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+  @media(max-width:760px){.seggrid{grid-template-columns:1fr}}
+  .segc{border:1px solid var(--line);border-radius:11px;background:var(--surface);padding:14px 16px;display:flex;flex-direction:column}
+  .segc .top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+  .segc .nm{font-size:14px;font-weight:bold;color:var(--ink)}
+  .segc .src{font-size:11.5px;color:var(--faint);margin-top:2px}
+  .segc p{margin:7px 0 0;font-size:13px;color:var(--grey);flex:1}
+  .segc .ct{font-size:10.5px;font-weight:bold;border-radius:999px;padding:3px 10px;white-space:nowrap;align-self:flex-start}
+  .ct.sel{background:#fff4e5;color:#a4631a} .ct.avoid{background:var(--soft);color:var(--grey)} .ct.later{background:#ececf7;color:#3a3aa0}
+  .vcheck{margin-top:14px;background:var(--soft);border:1px solid var(--line);border-radius:9px;padding:11px 14px;font-size:13px;color:var(--body)} .vcheck b{color:var(--ink)} .vcheck .src{display:block;color:var(--faint);font-size:11.5px;margin-top:5px}
+  .desigtag{margin-top:10px;font-size:12.5px;display:flex;align-items:center;gap:8px;flex-wrap:wrap} .desigtag .what{color:var(--grey)}
+  .tl{position:relative}
+  .tl-row{position:relative;padding:0 0 20px 26px}
+  .tl-row::before{content:"";position:absolute;left:6px;top:15px;bottom:0;width:1.5px;background:var(--line-2)}
+  .tl-row:last-child::before{display:none}
+  .tl-row .dot{position:absolute;left:0;top:3px;width:13px;height:13px;border-radius:50%;background:#fff;border:2.5px solid var(--grey)}
+  .tl-row .dot.red{border-color:var(--red)}
+  .tl-row .yr{font-size:12px;font-weight:bold;color:var(--grey-2)}
+  .tl-row .t{font-size:14.5px;font-weight:bold;color:var(--ink);margin-top:2px}
+  .tl-row .d{font-size:13.5px;color:var(--grey);margin-top:3px;max-width:74ch}
+  .tl-row .chip{display:inline-block;margin-top:9px;font-size:12px;font-weight:bold;border-radius:999px;padding:4px 13px;background:var(--soft);border:1px solid var(--line-2);color:var(--ink)}
+  .tl-row .chip.red{background:var(--red);color:#fff;border-color:var(--red)}
+  .tl-row .chip.nd{color:var(--grey-2);border-style:dashed;background:#fff}
+  details.segc{display:block;cursor:pointer} details.coreblk{cursor:pointer}
+  details.segc>summary,details.coreblk>summary{list-style:none;display:block;outline:none} details.segc>summary::-webkit-details-marker,details.coreblk>summary::-webkit-details-marker{display:none}
+  .more{display:inline-flex;align-items:center;gap:7px;margin-top:11px;font-size:12px;font-weight:bold;color:var(--red-text)}
+  .more .cv{width:6px;height:6px;border-right:1.6px solid var(--red-text);border-bottom:1.6px solid var(--red-text);transform:rotate(45deg);transition:transform .2s}
+  details[open] .more .cv{transform:rotate(-135deg)}
+  .why{margin-top:11px;padding-top:11px;border-top:1px solid var(--line);font-size:13px;color:var(--body);line-height:1.55} .coreblk .why{border-top-color:#f1c9cd}
   @media(max-width:760px){
     .wrap{grid-template-columns:1fr}
     .rail{position:static;height:auto;border-right:0;border-bottom:1px solid var(--line)}
@@ -196,33 +256,125 @@
 
     <section class="panel show" id="account">
       <h1>Account summary</h1>
-      <p class="lead">Solenis is a large specialty chemicals company. Its core business, and its main source of profit, is the chemistry used to make pulp, paper and packaging. That core market is changing. Some grades of paper are in decline, others are growing, and the picture varies by region. At the same time Solenis is trying to grow a newer line, barrier coatings, which let paper packaging replace plastic. The chemistry works. The open question is whether converters and brand owners will buy it at scale, and how quickly. The gap between a product that works and customers who are ready to buy is where we can help.</p>
-      <h2>What Solenis will and will not pay for</h2>
-      <p class="muted">Solenis is privately owned by Platinum Equity and carries a lot of debt, so budgets are tight and spending is disciplined. It is not in trouble, but it does not have easy growth carrying it either. In that situation, a company like this does not pay for general intelligence. It pays for work that protects profit in the core business, helps it decide where to grow next, or reduces the risk on money it has already committed. The right offer is small, fast and tied to a clear decision, with a plain yes or no at the end.</p>
+      <p class="lead">Solenis makes the chemicals that paper mills use to turn wood pulp into paper, tissue, cardboard and packaging. That is its main business and where it earns most of its money. Over the last few years it has bought several other companies and grown fast, paying for those deals partly with borrowed money. So today it is a large, confident company that is also careful with cash. Its core paper market is changing, and its main new bet, special coatings that let paper replace plastic, works in the lab but is not yet selling at scale. Helping it work out who will actually buy, and how quickly, is where we come in.</p>
+
+      <div class="stats">
+        <div class="stat"><div class="big">~23,000</div><div class="lab">people, working in 78 factories across more than 160 countries, after it bought NCH in November 2025</div></div>
+        <div class="stat"><div class="big">~$7.5 to 8bn</div><div class="lab">a rough guess at yearly sales. Solenis is private and does not publish real figures, and outside trackers disagree, so treat this as a ballpark</div></div>
+        <div class="stat"><div class="big">5 businesses</div><div class="lab">paper (Consumer Solutions), cleaning, factory water, food and beverage, and pool, plus the NCH business it is still absorbing</div></div>
+        <div class="stat"><div class="big">B-</div><div class="lab">its credit score from S&amp;P. It means lenders will still lend, but the company carries a lot of debt and has to watch its costs</div></div>
+      </div>
+      <p class="srcline">Sources. Company releases, November 2025 and May 2026. S&amp;P Global Ratings. The sales figure is an outside estimate, not a company number, and should be confirmed before any figure is quoted.</p>
+
+      <h2>The company is careful with money, and here is why</h2>
+      <p class="muted">Solenis is owned by Platinum Equity, an investment firm that buys companies, improves them and later sells them on. To buy Solenis and the businesses added since, it borrowed heavily, and that debt has to be paid down. That is why S&amp;P gives it a B- score, and why in September 2025 one of its companies raised about $2.55bn of new debt to help pay for NCH. None of this means trouble. Solenis is profitable and has been named a US Best Managed Company by Deloitte and the Wall Street Journal for six years running. But it does not have easy growth pulling it along, and in Europe high energy costs have squeezed its profit to somewhere around 8% to 12% by our reading.</p>
+      <div class="implication"><b>What this means for us.</b> Solenis watches every pound it spends. It will not pay for broad research or open-ended advice. It pays for small, fast work that protects its profit, helps it make one clear decision, or lowers the risk on money it has already spent. So our first offer should be small, quick, and end in a plain yes or no.</div>
+      <p class="srcline">Sources. Platinum Equity. S&amp;P Global Ratings, B- rating and the September 2025 financing. Deloitte Private and The Wall Street Journal, US Best Managed Company, 2021 to 2026. The 8% to 12% profit range is our own reading, not a published figure.</p>
+
+      <h2>How Solenis got this big, by buying other companies</h2>
+      <p class="muted">The simple story is a paper-chemicals specialist that kept its paper business at the centre and bought its way into cleaning and water around it. Each purchase made the company bigger and added more debt at the same time. The list below is in date order. The price is shown where the company announced it, and where a price was never made public it says so plainly rather than guess.</p>
+      <div class="card" style="padding:16px 24px 8px"><div class="tl">
+        <div class="tl-row"><span class="dot"></span><div><div class="yr">2019</div><div class="t">Bought BASF's paper-chemicals business</div><div class="d">Made Solenis stronger inside the mill, where the chemistry actually goes in.</div><span class="chip nd">Price not disclosed</span></div></div>
+        <div class="tl-row"><span class="dot red"></span><div><div class="yr">2021</div><div class="t">Platinum Equity bought all of Solenis and added a pool business</div><div class="d">This is the deal that set today's owner and its borrow-and-grow approach.</div><span class="chip red">About $5.25bn</span></div></div>
+        <div class="tl-row"><span class="dot"></span><div><div class="yr">2023</div><div class="t">Bought Diversey, a cleaning and hygiene company</div><div class="d">Turned a paper-chemicals firm into a much broader water and hygiene group.</div><span class="chip">About $4.6bn</span></div></div>
+        <div class="tl-row"><span class="dot"></span><div><div class="yr">2025</div><div class="t">Bought NCH, closed 3 November</div><div class="d">Added water treatment for factories and a small data-center cooling line. NCH's family owners and the investor Bain Capital kept minority stakes.</div><span class="chip nd">Price not disclosed. NCH's sales top $1bn a year</span></div></div>
+        <div class="tl-row"><span class="dot"></span><div><div class="yr">2026</div><div class="t">Started building a new factory in China</div><div class="d">A plant in Beihai to make paper chemicals closer to Asian customers, opening in 2027.</div><span class="chip">$35m to build, not a purchase</span></div></div>
+      </div></div>
+      <div class="implication"><b>What this means for us.</b> Four big takeovers in six years, paid for with debt, is what makes the company watch its costs so closely. It also leaves two openings for us. There are overlapping costs to strip out, and new bets to check before the company spends more.</div>
+      <p class="srcline">Sources. Company releases. Wikipedia and Delaware Business Times for the 2021 and 2023 prices. Where a deal price was never announced, it is marked Price not disclosed rather than estimated.</p>
+
+      <h2>Five businesses, but only one really makes the money</h2>
+      <p class="muted">Solenis runs five businesses, plus the NCH one it is still absorbing. It does not say how much each earns, so we cannot show a real split. The point is simple. One business, the paper one, is the engine, and it is the only one our work fits. The others were bought to add size, and are not our lane. Click any box to see why it has the tag it does.</p>
+      <details class="coreblk">
+        <summary>
+          <div class="h"><span class="nm">Consumer Solutions, the paper business</span><span class="ct">The profit engine. This is where we work.</span></div>
+          <p>Chemicals for pulp, tissue, cardboard and printing paper, plus the new barrier coatings for packaging. This is the original Solenis, its main source of profit, and where the people we want to email sit.</p>
+          <span class="more"><span class="lbl">Why this is our focus</span><span class="cv"></span></span>
+        </summary>
+        <div class="why">This is the oldest part of Solenis and still where most of the profit comes from. The decisions we can actually help with all live here. Where to grow as paper demand shifts, and how to get the new coatings selling. The people we want to reach work in this business. So everything points to starting here, and nowhere else.</div>
+      </details>
+      <div class="seggrid">
+        <details class="segc">
+          <summary><div class="top"><div><div class="nm">Institutional</div><div class="src">Diversey, bought 2023</div></div><span class="ct avoid">Not our lane</span></div><p>Cleaning and hygiene for hotels, hospitals and food service.</p><span class="more"><span class="lbl">Why this tag</span><span class="cv"></span></span></summary>
+          <div class="why">This is the Diversey cleaning business. It sells to hotels, hospitals and restaurants, and those buyers think about hygiene, not paper. Our story is about paper, packaging and coatings, which means nothing to them. Taking it here would show we have not understood the company, so we leave it alone.</div>
+        </details>
+        <details class="segc">
+          <summary><div class="top"><div><div class="nm">NCH and Chem-Aqua</div><div class="src">Bought 2025, still absorbing</div></div><span class="ct later">Maybe later</span></div><p>Water treatment for factories, and a new data-center cooling line.</p><span class="more"><span class="lbl">Why this tag</span><span class="cv"></span></span></summary>
+          <div class="why">Solenis only bought NCH in late 2025 and is still merging it in. It treats water for factories and data centers, which is close enough to our world to matter one day, but it is not where the urgent decisions sit right now. The sensible move is to win the first piece of work on the paper side, then come back to this once we have a relationship.</div>
+        </details>
+        <details class="segc">
+          <summary><div class="top"><div><div class="nm">Industrial</div><div class="src">Long-standing</div></div><span class="ct sel">Only if it comes up</span></div><p>Water treatment for heavy industry and mining.</p><span class="more"><span class="lbl">Why this tag</span><span class="cv"></span></span></summary>
+          <div class="why">This is water treatment for heavy industry and mining. It is a real business, but it has nothing to do with paper, packaging or the coatings story we lead with. We would only talk about it if a customer raised a specific water or minerals question, never as a reason to get in the door.</div>
+        </details>
+        <details class="segc">
+          <summary><div class="top"><div><div class="nm">Food and Beverage</div><div class="src">Long-standing</div></div><span class="ct sel">Only if it comes up</span></div><p>Cleaning, hygiene and water for food and drink makers.</p><span class="more"><span class="lbl">Why this tag</span><span class="cv"></span></span></summary>
+          <div class="why">This team keeps food and drink factories clean and their water safe. It is a separate business with its own buyers. We would only engage on a precise food-safety or water question, and never with paper or coatings language, which would not land here.</div>
+        </details>
+        <details class="segc">
+          <summary><div class="top"><div><div class="nm">Pool</div><div class="src">From Sigura, 2021</div></div><span class="ct avoid">Not our lane</span></div><p>Chemicals for swimming pools and spas.</p><span class="more"><span class="lbl">Why this tag</span><span class="cv"></span></span></summary>
+          <div class="why">This sells chemicals for swimming pools and spas, picked up with the Sigura deal in 2021. It is the furthest from anything we do. There is no sensible reason to take our paper and packaging story here, so we leave it alone.</div>
+        </details>
+      </div>
+      <div class="implication"><b>What this means for us.</b> Everything about paper, packaging and the new coatings belongs with the paper business. Taking that story to the cleaning, pool or factory-water teams would show we do not understand the company, so we keep it to the core.</div>
+      <p class="srcline">Sources. Company segment reporting and the CNR brief. Solenis does not publish how much each business earns, so we do not guess a split. Treat the size of each business, and how profitable the paper one is, as things to learn in conversation, not facts to state.</p>
+
+      <h2>The chemistry works. The hard part is getting customers to buy it</h2>
+      <p class="muted">Solenis does not say how much it spends on research, but it clearly invents a lot. It holds more than 2,000 patents, opened new labs in Delaware at the end of 2025, and has built real products in the new coatings area. So the question is not whether the chemistry is good. It is whether enough customers will switch to it, and how quickly.</p>
+      <div class="grid3">
+        <div class="card kv"><p class="label">It can invent</p><p class="big">2,000+ patents</p><p>Plus new research labs opened in Delaware at the end of 2025. The company is good at making new things.</p></div>
+        <div class="card kv"><p class="label">Its big new bet</p><p class="big">Barrier coatings</p><p>PFAS-free coatings, the TopScreen and Contour ranges, that let paper replace plastic. They are applied on the printing press with the partner Heidelberg.</p></div>
+        <div class="card kv"><p class="label">Beyond chemistry</p><p class="big">Software and partners</p><p>It sells mill software called OPTIX, and teams up with others, such as a PhaBuilder tie-up on new bio-based materials, when it lacks something itself.</p></div>
+      </div>
+      <div class="implication"><b>What this means for us.</b> Do not offer them sustainability reports or another market database. They already have both. The useful thing we can add is the one thing they cannot see from inside. Whether real customers are buying these coatings yet, and which ones.</div>
+      <p class="srcline">Sources. Company releases, 2021 to 2026, for the patents, the new labs, the TopScreen and Contour coatings, OPTIX and the Heidelberg and PhaBuilder partnerships. No research-spend figure is made public.</p>
+
+      <h2>Who already helps Solenis, and where we fit</h2>
+      <p class="muted">It helps to know who is already advising the company. Deloitte has worked with Solenis for six years through a programme that reviews how well the company is run. Two big banks, BofA and Goldman Sachs, handled the NCH deal. And Platinum Equity has its own team that helps run the businesses it owns. What none of them is doing is answering the question that matters most for the new coatings. Will customers actually buy, and who first. That question is wide open.</p>
+      <div class="grid2">
+        <div class="card kv"><p class="label">Already helping</p><p class="big">Deloitte and the deal banks</p><p>Deloitte through the six-year review of how the company is run, the banks on the takeovers, and Platinum's own people on the day-to-day.</p></div>
+        <div class="card kv"><p class="label">Nobody owns this yet</p><p class="big">Who actually buys</p><p>Whether printers and brands are really buying coated paper, what they will pay, what is stopping them, and the network of printers and ink makers Solenis cannot see from inside.</p></div>
+      </div>
+      <div class="implication"><b>What this means for us.</b> We are not competing with the firm that reviews how the company is run, or the banks that close its deals. We sit in a gap they leave open. The work of joining up all those takeovers is real too, but that is a later, separate conversation, once the first one has gone well.</div>
+      <p class="srcline">Sources. Deloitte Private and The Wall Street Journal. PRNewswire, NCH completion, for the banks. Platinum Equity for the operating model. That no strategy firm owns the customer-demand question is our read from public sources, not a confirmed fact.</p>
+
+      <h2>What sets the timing</h2>
+      <p class="muted">From 12 August 2026, new EU packaging rules start, and on the same day a strict limit on PFAS chemicals in food packaging takes effect, with no grace period afterwards. PFAS are the long-lasting chemicals that many current coatings rely on, so this rule pushes brands towards paper and towards PFAS-free coatings. Solenis already knows the rule inside out. The useful question is not the rule itself, but which parts of it actually change what customers buy, and where.</p>
+
       <h2>Where to focus</h2>
       <div class="grid3">
-        <div class="card kv"><p class="label">Business unit</p><p class="big">Consumer Solutions</p><p>The pulp, paper and packaging chemistry business. This is the core, and where barrier coatings sit. Start here, not with procurement or sustainability teams.</p></div>
-        <div class="card kv"><p class="label">First geography</p><p class="big">Europe</p><p>European mills are closing and customers are switching suppliers now, so this is where movement and pressure are most concrete. APAC comes later.</p></div>
-        <div class="card kv"><p class="label">First project</p><p class="big">A short adoption study</p><p>A five to seven week look at which European converters and brand owners are actually buying coated fibre, ending in a clear go or no-go by segment.</p></div>
+        <div class="card kv"><p class="label">Which business</p><p class="big">The paper one</p><p>Consumer Solutions, where the coatings and our contacts sit. Start here, not with the buying or sustainability teams.</p></div>
+        <div class="card kv"><p class="label">Which region first</p><p class="big">Europe</p><p>European mills are closing and customers are changing suppliers right now, so this is where the pressure is real. Asia comes later.</p></div>
+        <div class="card kv"><p class="label">First piece of work</p><p class="big">A short study</p><p>A five to seven week look at which European printers and brands are actually buying coated paper, ending in a clear go or no-go for each group.</p></div>
       </div>
+
       <h2>What not to pitch</h2>
-      <p class="muted">Two things will not land. The first is sustainability intelligence. Solenis already reports against recognised standards and treats sustainability as a settled part of how it runs, so it does not need help with reporting. The second is market databases. Solenis already buys strong syndicated data for its core market. The value we can add is the part those databases cannot show: how converters are actually behaving, whether brand owners are ready to buy, what they will pay, what is holding adoption back, and the network of converters, inks and presses that Solenis does not naturally see.</p>
-      <h2>The regulation that sets the timing</h2>
-      <p class="muted">From 12 August 2026, new EU packaging rules apply, and on the same date PFAS limits for food contact packaging take effect, at 25 parts per billion for any single PFAS and 250 for the total. There is no grace period for packaging placed on the market after that date. This is the clearest near-term reason for demand in PFAS-free coatings and paper-based packaging. Solenis knows the legal timeline well, so there is no value in explaining it. The useful question is which of these rules actually change buying behaviour, and for which pack formats and regions.</p>
-      <h2>Recent signals worth knowing</h2>
-      <div class="card" style="padding:6px 24px">
-        <div class="signal"><div class="when">April 2026</div><p class="what">Solenis broke ground on a 35 million dollar, 60,000 tonne papermaking chemicals plant in Beihai, China, opening in mid 2027. This is firm evidence that growth in Asia is a funded priority, in a region it sees as contested by low-cost local players.</p></div>
-        <div class="signal"><div class="when">Through 2026</div><p class="what">European mill closures and cutbacks continued, with graphic paper falling sharply. Customers are removing capacity and changing suppliers, which is why Europe is the natural first market for paid work.</p></div>
-        <div class="signal"><div class="when">From 2024</div><p class="what">Solenis and Heidelberg are working together to apply barrier coatings on the printing press rather than at the mill. The partnership is real and public. How much business it has actually won is not public, and that is exactly the adoption question worth looking at.</p></div>
-        <div class="signal"><div class="when">June 2026</div><p class="what">Solenis joined Dow's Coolant Care network for data-center cooling. This is real momentum in industrial and data-center water, but it is a separate lane and does not change where the first conversation should start.</p></div>
-      </div>
-      <h2>Where not to take this message</h2>
-      <p class="muted">The barrier coatings and paper story only works inside Consumer Solutions. It does not belong with the Food and Beverage, Pool, or Diversey hygiene businesses, which buy in completely different ways. Using paper or barrier coating language with those audiences reads as not understanding the company, and it costs credibility. Procurement and plant operations are also not the right first door. The decisions we can help with sit with strategy, marketing and innovation, not with buying or running plants.</p>
+      <p class="muted">Two things will not work. Do not offer sustainability reporting, because the company already reports to the recognised standards and treats it as done. And do not offer market data, because it already buys good data for its core market. What we can add is what that data cannot show. How customers are really behaving, whether brands are ready to buy, what they will pay, and the printer and ink network Solenis does not naturally see.</p>
+
       <h2>Where to concentrate effort</h2>
-      <p class="muted">Five possible pieces of work survive a simple test: could Solenis realistically fund this in a tight year. They are listed in order of how close they sit to a real budget today.</p>
+      <p class="muted">Five possible pieces of work pass a simple test. Could Solenis realistically pay for this in a tight year. They are listed in order of how close each one sits to a real budget today. Open any one to see the decision behind it.</p>
       <div id="wedges"></div>
-      <h2>The first project to propose</h2>
-      <div class="soft-card"><p style="margin:0">A five to seven week study, Europe first, of a defined set of priority converters and brand owners. It would show who is actually moving from plastic to coated fibre, what they will pay, what is holding adoption back, and where the print-applied route makes economic sense. It would end with a clear go or no-go for each segment. It is deliberately kept to one decision and one buyer, because that is what a budget-disciplined company with no prior relationship to us can actually fund.</p></div>
+
+      <h2>The facts each email is built on</h2>
+      <p class="muted">Every email is built on a real fact about Solenis. The list shows the fact in plain terms, whether it is publicly confirmed or our own read, how central it is to the message, and whose email uses it.</p>
+      <div class="card" style="padding:8px 24px">
+        <div class="sig"><div class="s">A strict PFAS limit starts on 12 August 2026<small>The deadline that pushes brands towards paper and PFAS-free coatings</small></div><div class="m"><span class="status"><span class="sq"></span>Confirmed</span></div><div class="m">Used by Zebst, Luo<div class="bar2"><i style="width:100%"></i></div></div></div>
+        <div class="sig"><div class="s">Its rivals are printers and ink makers, not chemists<small>BASF, Michelman, Kuraray, ACTEGA and Siegwerk have better access to the press</small></div><div class="m"><span class="status"><span class="sq"></span>Confirmed</span></div><div class="m">Used by Zebst<div class="bar2"><i style="width:95%"></i></div></div></div>
+        <div class="sig"><div class="s">The new China plant opens in 2027<small>Customers must re-test the local product before they switch, which sets the pace</small></div><div class="m"><span class="status"><span class="sq"></span>Confirmed</span></div><div class="m">Used by Zhu<div class="bar2"><i style="width:92%"></i></div></div></div>
+        <div class="sig"><div class="s">It grew by buying companies, so costs overlap<small>Four takeovers in six years leaves duplicate routes and suppliers to remove</small></div><div class="m"><span class="status"><span class="sq"></span>Confirmed</span></div><div class="m">Used by Schieck<div class="bar2"><i style="width:88%"></i></div></div></div>
+        <div class="sig"><div class="s">New green-claims rules arrive in late September 2026<small>They apply to suppliers too, not only to the brands</small></div><div class="m"><span class="status"><span class="sq"></span>Confirmed</span></div><div class="m">Used by Verbiest<div class="bar2"><i style="width:80%"></i></div></div></div>
+        <div class="sig"><div class="s">Brands say they want paper faster than they are buying it<small>Stated ambition runs ahead of real orders</small></div><div class="m"><span class="status"><span class="sq grey"></span>Our read</span></div><div class="m">Used by Zebst, Luo<div class="bar2"><i style="width:85%"></i></div></div></div>
+      </div>
+
+      <h2>The first piece of work to propose</h2>
+      <div class="soft-card"><p style="margin:0">A five to seven week study, Europe first, of a chosen set of priority printers and brands. It would show who is actually moving from plastic to coated paper, what they will pay, what is holding them back, and where the print-applied route makes financial sense. It would end with a clear go or no-go for each group. It is kept deliberately to one decision and one buyer, because that is what a careful, debt-laden company with no history with us can actually pay for.</p></div>
+
+      <h2>Recent things worth knowing</h2>
+      <div class="card" style="padding:6px 24px">
+        <div class="signal"><div class="when">April 2026</div><p class="what">Started building a $35m, 60,000 tonne paper-chemicals plant in Beihai, China, opening in 2027. Clear proof that growth in Asia is a funded priority, in a region it sees as crowded with cheaper local rivals.</p></div>
+        <div class="signal"><div class="when">Through 2026</div><p class="what">European mills kept closing, with printing-paper demand falling sharply. Customers are cutting capacity and changing suppliers, which is why Europe is the natural first market for paid work.</p></div>
+        <div class="signal"><div class="when">From 2024</div><p class="what">Solenis and Heidelberg are working together to apply coatings on the printing press instead of at the mill. The partnership is real and public. How much it has actually sold is not, and that is exactly the question worth answering.</p></div>
+        <div class="signal"><div class="when">June 2026</div><p class="what">Joined Dow's network for cooling data centers. Real progress in factory and data-center water, but a separate line of business that does not change where our first conversation should start.</p></div>
+      </div>
     </section>
 
     <section class="panel" id="approach">
@@ -416,7 +568,7 @@ var WEDGES=[
 ];
 
 var CONTACTS=[
-  {id:"zebst",name:"Christophe Zebst",seat:"Senior innovation marketing, paper and water",status:"send",
+  {id:"zebst",name:"Christophe Zebst",seat:"Senior innovation marketing, paper and water",status:"send",verify:{status:"verified",label:"Designation verified",line:"Title and role confirmed against Solenis news releases. They match.",src:"Solenis news releases"},
    role:"Decides where the innovation marketing effort goes, and which barrier coating applications are worth pushing.",
    angle:"Three points come together for him. First, with PFAS most serious suppliers will have compliant coatings by August, so the coating will not decide who wins. Second, the rivals now entering are ink and paint companies with closer converter access, so the contest shifts to that ecosystem. Third, brand-owner commitments to paper packaging are running ahead of real orders, so the question is which segments have actually started buying.",
    help:"We talk to converters and brand owners directly, in packaging, and map adoption segment by segment.",
@@ -430,7 +582,7 @@ var CONTACTS=[
      {txt:"The gap between brand-owner ambition and real orders is our reading from downstream research, not a stated Solenis fact",src:"FutureBridge interpretation",st:"interp"},
      {txt:"PFAS limits for EU food contact packaging apply from 12 August 2026. The date is not stated in the email.",src:"EU packaging regulation",st:"ok"}
    ]},
-  {id:"zhu",name:"James Zhu",seat:"VP Supply Chain and Operations, Asia Pacific",status:"send",
+  {id:"zhu",name:"James Zhu",seat:"VP Supply Chain and Operations, Asia Pacific",status:"send",verify:{status:"verified",label:"Designation verified",line:"Title and career history confirmed against ZoomInfo and RocketReach. They match.",src:"ZoomInfo, RocketReach"},
    role:"Getting the new Asian capacity up to plan without losing existing customers during the switch from imported to local product.",
    angle:"Three points for the ramp. First, every customer has to requalify the local product per application before switching, and the order sets how fast the plant fills. Second, customers are most exposed to competitor trials during that window, so the sequence manages competitive risk too. Third, local supply can earn a better price from customers who value service and lead time, so the sequence is also where the margin is.",
    help:"We work with chemical companies localising in Asia, mapping the customer and competitor picture so the ramp follows a plan.",
@@ -443,7 +595,7 @@ var CONTACTS=[
      {txt:"Beihai plant: 35 million dollars, 60,000 tonnes a year, operations from mid 2027",src:"Solenis news release, April 2026",st:"ok"},
      {txt:"The pricing and sequencing points are our judgement on how localisation tends to play out, not a stated fact",src:"FutureBridge interpretation",st:"interp"}
    ]},
-  {id:"luo",name:"Mingxiang Luo",seat:"APAC Marketing Director, Consumer Solutions",status:"send",
+  {id:"luo",name:"Mingxiang Luo",seat:"APAC Marketing Director, Consumer Solutions",status:"send",verify:{status:"verified",label:"Designation verified",line:"Title and background confirmed against ZoomInfo. They match.",src:"ZoomInfo"},
    role:"Positioning premium chemistry in China, where cheaper local alternatives often win on price.",
    angle:"Three points. First, China paperization is mostly cost-driven, so good-enough local coatings win, except for converters whose customers export to Europe, who from August need compliant documented chemistry. Second, for that group compliance is a requirement their European buyers enforce, so price is not the only lever. Third, that segment is a beachhead, since China's own rules are likely to tighten and the references earned there carry into the wider market.",
    help:"We identify that group by name, the converters, the applications and the brand relationships behind them.",
@@ -456,7 +608,7 @@ var CONTACTS=[
      {txt:"PFAS limits for EU food contact packaging apply from August 2026, referenced as from August",src:"EU packaging regulation",st:"ok"},
      {txt:"The beachhead point, that today's compliance niche signals the wider market, is our reading, not a stated fact",src:"FutureBridge interpretation",st:"interp"}
    ]},
-  {id:"verbiest",name:"Paul Verbiest",seat:"VP Marketing, Food and Beverage",status:"check",
+  {id:"verbiest",name:"Paul Verbiest",seat:"VP Marketing, Food and Beverage",status:"check",verify:{status:"check",label:"Designation needs check",line:"The title is right, but sources disagree on his business unit. He may sit in Food and Beverage hygiene or in Consumer Solutions marketing. Confirm before sending.",src:"The Org, RocketReach, LinkedIn"},
    role:"Using sustainability as a commercial advantage in hygiene and cleaning for food and beverage producers.",
    angle:"Three points. First, the withdrawn Green Claims Directive did not end the pressure, binding rules still arrive in late September and reach suppliers. Second, when a customer drops an unsupported claim, the replacement evidence sits in the supply chain, so suppliers with verifiable numbers become more useful. Third, over time this shifts what hygiene suppliers compete on, towards the quality and auditability of their data, which is harder to copy than a product claim.",
    help:"We track how these claims rules turn into actual procurement behaviour across hygiene and processing chemistry.",
@@ -470,7 +622,7 @@ var CONTACTS=[
      {txt:"Binding environmental-claims rules apply from late September 2026, after the separate Green Claims Directive proposal was withdrawn in 2025",src:"EU consumer-protection legislation",st:"ok"},
      {txt:"The shift to competing on data and auditability is our interpretation, not a stated fact",src:"FutureBridge interpretation",st:"interp"}
    ]},
-  {id:"schieck",name:"Kim Schieck",seat:"Logistics and indirect sourcing, North America",status:"send",
+  {id:"schieck",name:"Kim Schieck",seat:"Logistics and indirect sourcing, North America",status:"send",verify:{status:"corrected",label:"Role corrected",line:"Role confirmed on LinkedIn. An earlier draft placed her in chemistry sourcing. That was wrong, and is now corrected to logistics and indirect sourcing.",src:"LinkedIn"},
    role:"Running logistics and indirect sourcing for North America, and coordinating globally where it applies. This is freight, warehousing and distribution, plus the goods and services Solenis buys that are not part of the product itself.",
    angle:"Three points. First, in a business built by acquisition the largest savings sit in the overlap, duplicate lanes, warehouses and indirect categories, not in harder negotiation. Second, that overlap is easiest to remove early, before contracts and routines settle. Third, consolidating across the combined footprint also shows where you are single sourced and which lanes are most exposed to tariffs, which is worth as much as the saving right now.",
    help:"We give logistics and indirect sourcing teams an outside read of where the overlap and the exposure sit across a North American footprint.",
@@ -536,6 +688,7 @@ function srcMark(st){
   if(st==="interp")return '<span class="status"><span class="sq grey"></span>Our reading</span>';
   return '<span class="status attn"><span class="sq"></span>Needs checking</span>';
 }
+function verifyPillClass(st){return st==="verified"?"ok":(st==="corrected"?"warn":(st==="check"?"red":""));}
 function statusMark(status){
   if(status==="send")return '<span class="status"><span class="sq"></span>Ready to send</span>';
   return '<span class="status"><span class="sq grey"></span>Send after one check</span>';
@@ -555,10 +708,10 @@ function renderContacts(){
     var flag=c.flag?'<div class="flag"><b>Check first.</b> '+esc(c.flag)+'</div>':'';
     var ap=isApproved(c.id);
     return '<article class="contact" data-status="'+c.status+'" data-id="'+c.id+'">'+
-      '<div class="head" role="button" tabindex="0" aria-expanded="false"><div class="who"><div class="nm">'+esc(c.name)+(ap?' <span class="pill ok">Approved</span>':'')+(em.edited?' <span class="pill">Edited</span>':'')+'</div><div class="seat">'+esc(c.seat)+'</div><div class="role"><b>What they do.</b> '+esc(c.role)+'</div></div>'+statusMark(c.status)+'<span class="caret"></span></div>'+
+      '<div class="head" role="button" tabindex="0" aria-expanded="false"><div class="who"><div class="nm">'+esc(c.name)+(c.verify?' <span class="pill '+verifyPillClass(c.verify.status)+'">'+esc(c.verify.label)+'</span>':'')+(ap?' <span class="pill ok">Approved</span>':'')+(em.edited?' <span class="pill">Edited</span>':'')+'</div><div class="seat">'+esc(c.seat)+'</div><div class="role"><b>What they do.</b> '+esc(c.role)+'</div></div>'+statusMark(c.status)+'<span class="caret"></span></div>'+
       '<div class="detail">'+
         '<div class="block"><p class="label">The points we make</p><p>'+esc(c.angle)+'</p></div>'+
-        '<div class="block"><p class="label">What we do in their area</p><p>'+esc(c.help)+'</p></div>'+flag+
+        '<div class="block"><p class="label">What we do in their area</p><p>'+esc(c.help)+'</p></div>'+(c.verify?'<div class="vcheck"><b>'+esc(c.verify.label)+'.</b> '+esc(c.verify.line)+'<span class="src">Checked against: '+esc(c.verify.src)+'</span></div>':'')+flag+
         '<div class="email'+(em.edited?' edited':'')+'" data-emailwrap="'+c.id+'">'+
           '<div class="ehead"><p class="label">The email'+(em.edited?' (edited)':'')+'</p><span class="acts">'+
             '<button class="btn sm" data-act="edit" data-id="'+c.id+'">Edit</button>'+
@@ -941,6 +1094,16 @@ function vlinks(name){
 }
 var UP_STATUS={pending:{c:"pend",t:"Not researched"},working:{c:"work",t:"Researching"},in_company:{c:"inco",t:"In company"},left_company:{c:"left",t:"Left the company"},uncertain:{c:"unc",t:"Could not confirm"},error:{c:"unc",t:"Research failed"}};
 
+function normTitle(t){return String(t||"").toLowerCase().replace(/[^a-z0-9 ]/g," ").replace(/\s+/g," ").trim();}
+function designationInfo(u){
+  if(!u.research||u.status!=="in_company")return null;
+  var conf=u.research.corrected_title||"";if(!conf)return null;
+  var given=u.title||"";
+  if(!given)return {cls:"ok",label:"Designation confirmed",line:"Confirmed by trusted sources as "+conf+"."};
+  var a=normTitle(given),b=normTitle(conf);
+  if(a===b||(a&&b&&(a.indexOf(b)>-1||b.indexOf(a)>-1)))return {cls:"ok",label:"Designation verified",line:"Matches your file. Confirmed as "+conf+"."};
+  return {cls:"warn",label:"Designation corrected",line:"Your file said "+given+". Trusted sources show "+conf+"."};
+}
 function renderUploaded(){
   var list=document.getElementById("uploadList");
   var has=uploaded.length>0;
@@ -988,7 +1151,7 @@ function renderUploaded(){
     var genBtn=canGen?'<button class="btn red sm" data-ugen="'+u.id+'">'+(u.gen?"Rewrite email and InMail":"Generate email and InMail")+'</button>':"";
     var researchBtn='<button class="btn sm" data-uresearch="'+u.id+'">'+(u.research?"Research again":"Verify and research")+'</button>';
     return '<div class="upcard" data-uid="'+u.id+'">'+
-      '<div class="uphead"><div><div class="un">'+esc(u.name)+'</div><div class="ut">'+esc([u.title,u.unit,u.company].filter(Boolean).join(", "))+'</div></div><span class="upstatus '+st.c+'">'+esc(st.t)+'</span></div>'+
+      '<div class="uphead"><div><div class="un">'+esc(u.name)+'</div><div class="ut">'+esc([u.title,u.unit,u.company].filter(Boolean).join(", "))+'</div></div><span class="upstatus '+st.c+'">'+esc(st.t)+'</span></div>'+(function(){var di=designationInfo(u);return di?'<div class="desigtag"><span class="pill '+di.cls+'">'+esc(di.label)+'</span> <span class="what">'+esc(di.line)+'</span></div>':"";})()+
       '<div class="vlinks">'+linkHtml+'</div>'+
       '<div class="liverify"><label style="display:flex;align-items:center;gap:8px;cursor:pointer"><input type="checkbox" data-uli="'+u.id+'" '+(u.liVerified?"checked":"")+' /> I have opened the LinkedIn profile and confirmed this is the right person</label>'+(u.liVerified?'<span class="status"><span class="sq"></span>LinkedIn confirmed</span>':'')+'</div>'+
       '<details class="ctxbox"'+(u.context?' open':'')+'><summary>Add context for this person (optional)</summary><textarea data-uctx="'+u.id+'" rows="3" placeholder="Anything you already know that should shape the email. Leave blank and the tool researches from trusted sources on its own.">'+esc(u.context||"")+'</textarea></details>'+
