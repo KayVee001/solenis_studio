@@ -42,6 +42,7 @@
   .muted{color:var(--grey)} .faint{color:var(--grey-2)}
   .label{font-size:11px;color:var(--faint);letter-spacing:.04em;text-transform:uppercase;margin:0 0 8px}
   hr.rule{height:1px;background:var(--line);border:0;margin:30px 0}
+  hr.sep{height:1px;background:var(--line);border:0;margin:36px 0;display:block;padding:0}
   .card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:22px 26px} .card + .card{margin-top:16px}
   .soft-card{background:var(--soft);border:1px solid var(--line);border-radius:14px;padding:24px 28px}
   .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px} .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
@@ -239,6 +240,22 @@
   .pdlgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px 18px} @media(max-width:620px){.pdlgrid{grid-template-columns:1fr}}
   .pdlgrid > div{display:flex;flex-direction:column;gap:1px} .pdlgrid .k{font-size:10.5px;font-weight:bold;color:var(--grey-2);text-transform:uppercase;letter-spacing:.04em} .pdlgrid .v{font-size:13.5px;color:var(--ink)}
   .pdlbox .vlink.li{margin-top:9px}
+  .ctabs{display:flex;gap:6px;margin:20px 0 0;border-bottom:1px solid var(--line)}
+  .ctab{display:flex;align-items:center;gap:10px;background:none;border:0;border-bottom:2.5px solid transparent;cursor:pointer;font-family:var(--sans);font-size:15.5px;font-weight:bold;color:var(--grey);padding:13px 10px 14px;margin-bottom:-1px;letter-spacing:-.005em}
+  .ctab:hover{color:var(--ink)}
+  .ctab.on{color:var(--ink);border-bottom-color:var(--red)}
+  .ctcount{font-size:12px;font-weight:bold;color:var(--grey);background:var(--soft);border:1px solid var(--line-2);border-radius:999px;min-width:23px;height:21px;display:inline-flex;align-items:center;justify-content:center;padding:0 7px}
+  .ctab.on .ctcount{color:#fff;background:var(--red);border-color:var(--red)}
+  .ctab-pane{display:none;padding-top:22px} .ctab-pane.show{display:block}
+  .actionbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:14px}
+  .procnote{display:inline-flex;align-items:center;gap:8px;font-size:12.5px;color:var(--grey);margin-left:2px}
+  .idbox{margin:12px 0 2px;border:1px solid var(--line-2);background:var(--soft);border-radius:12px;padding:13px 16px}
+  .idbox .idhdr{font-size:12px;color:var(--grey);margin-bottom:9px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .idbox .idname{font-size:16px;font-weight:bold;color:var(--ink)} .idbox .idtitle{font-size:13.5px;color:var(--body);margin-top:1px}
+  .idbox .idmeta{font-size:12.5px;color:var(--grey);margin-top:5px}
+  .idbox .sigs{margin-top:11px;border-top:1px solid var(--line);padding-top:10px}
+  .idbox .sigs .sl{font-size:10.5px;font-weight:bold;color:var(--grey-2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px}
+  .idbox .sigi{display:flex;gap:9px;padding:6px 0;font-size:13px;color:var(--body);line-height:1.5} .idbox .sigi .d3{flex:0 0 auto;width:6px;height:6px;border-radius:50%;background:var(--red);margin-top:6px}
   .why{margin-top:11px;padding-top:11px;border-top:1px solid var(--line);font-size:13px;color:var(--body);line-height:1.55} .coreblk .why{border-top-color:#f1c9cd}
   @media(max-width:1180px){.panel{margin:18px auto 32px;padding:44px 44px 64px;border-radius:16px}}
   @media(max-width:760px){
@@ -268,7 +285,6 @@
       <li><button data-p="account" class="active">Account summary</button></li>
       <li><button data-p="approach">How we write the emails</button></li>
       <li><button data-p="contacts">Contacts and emails</button></li>
-      <li><button data-p="builder">Add contacts</button></li>
       <li><button data-p="approved">Approved emails <span class="count" id="approvedCount">0</span></button></li>
       <li><button data-p="assistant">Assistant</button></li>
       <li><button data-p="sources">Sources and checks</button></li>
@@ -445,22 +461,26 @@
 
     <section class="panel" id="contacts">
       <h1>Contacts and emails</h1>
-      <p class="lead">These are the four roles closest to a live decision at Solenis, drawn from the account brief. Each has mapped pain points and a finished email and InMail written to that decision. The exact person and current title for each should be confirmed through People Data Labs in the Add contacts tab before sending, which checks the title against licensed LinkedIn data. You can edit any email and save it, approve the ones you are happy with, and set your name below so it appears in the sign-off.</p>
+      <p class="lead">This is where every contact lives. Recommended profiles are the four roles closest to a live decision at Solenis, drawn from the account brief, each with mapped pain points and a finished email. Your uploaded contacts are the people you add by file or by hand, verified and written up the same way. Open any contact to see the detail and the draft, and set your name below so it appears in the sign-off.</p>
       <div class="sender-bar"><label for="sender">Your name</label><input type="text" id="sender" placeholder="Type your name" autocomplete="off" /><span class="hint">This goes into the sign-off of every email.</span></div>
-      <div class="filter" id="filter"><button data-f="all" class="on">All four</button><button data-f="send">Ready to send</button><button data-f="check">Confirm the name first</button></div>
+      <div class="ctabs" id="ctabs">
+        <button class="ctab on" data-ct="rec"><span class="ctlabel">Recommended profiles</span><span class="ctcount" id="recCount">4</span></button>
+        <button class="ctab" data-ct="up"><span class="ctlabel">Your uploaded contacts</span><span class="ctcount" id="upCount">0</span></button>
+      </div>
+
+      <div class="ctab-pane show" id="pane-rec">
+        <p class="muted">Four roles, each tied to one decision in the brief. Open a profile to see its pain points and draft. Use Verify person to confirm the individual and current title, pull recent public signals, and tailor the email.</p>
+        <div class="filter" id="filter"><button data-f="all" class="on">All four</button><button data-f="send">Ready to send</button><button data-f="check">Confirm the name first</button></div>
       <div id="contactList"></div>
       <div id="parkedSection">
         <h2>People we decided not to email</h2>
         <p class="muted">Part of the method is choosing who not to contact. Any roles we looked at and left appear here, with the reason in each case.</p>
         <div id="parkedList"></div>
       </div>
-    </section>
+      </div>
 
-    <section class="panel" id="builder">
-      <h1>Add contacts</h1>
-      <p class="lead">Upload a CSV of Solenis contacts and the tool verifies each person before writing anything. It confirms the current title two ways: against licensed LinkedIn data through People Data Labs, and against trusted public sources by web search. It corrects the title where needed, and flags anyone who has left the company so no further work is done on them. For those still in place, it gathers contact intelligence, shows the sources, and gives you the link to confirm the LinkedIn profile yourself. It then writes a hyper-personal email and a LinkedIn InMail in the same way as the four roles on the Contacts tab.</p>
-
-      <h2>Upload a CSV</h2>
+      <div class="ctab-pane" id="pane-up">
+        <h2>Upload a CSV</h2>
       <div class="drop" id="drop">
         <p>Drop a CSV here, or choose a file. A name column is all that is required. Title, company, email, LinkedIn and business unit are used if present.</p>
         <input type="file" id="csvFile" accept=".csv,text/csv" style="display:none" />
@@ -479,7 +499,7 @@
       </div>
       <div id="uploadList"></div>
 
-      <hr class="rule" />
+      <hr class="sep" />
       <h2>Or add one person manually</h2>
       <div class="explain">
         <p>Use this when you want to write a single email from details you already have, without uploading a file. It does not look anyone up. It only uses what you enter.</p>
@@ -508,6 +528,7 @@
       </div>
       <div class="err" id="builderErr"></div>
       <div class="builder-out" id="builderOut"><h2>The draft</h2><div id="builderResult"></div></div>
+      </div>
     </section>
 
     <section class="panel" id="approved">
@@ -561,7 +582,7 @@
         <div class="step"><div class="dot">3</div><div class="c"><h3>Food and Beverage solutions, as a separate track</h3><p>Protein-processing food safety is a different buying decision from packaging. Send this on its own track, not in the same thread as the packaging contact.</p></div></div>
         <div class="step"><div class="dot">4</div><div class="c"><h3>Post-NCH integration, last</h3><p>Cross-sell prioritisation is broader and more integration-heavy, so it is best opened once at least one of the sharper conversations is under way. Keep it apart from the others.</p></div></div>
       </div>
-      <hr class="rule" />
+      <hr class="sep" />
       <h2>Before any of these go out</h2>
       <ul class="plain">
         <li>Confirm the exact person and current title for each role through People Data Labs in the Add contacts tab, then personalise the greeting. Every email is written to the decision, with the name to be filled once verified.</li>
@@ -584,7 +605,7 @@
       <div class="setting-row"><label for="set-style">Standing instruction applied to drafts and rewrites</label><div class="hint">Plain rules the assistant and the draft writer should follow for every email. The assistant can also update this for you.</div><textarea id="set-style" rows="4" placeholder="For example: keep emails under 180 words, always close with a 30-minute meeting request, never use dashes."></textarea></div>
       <button class="btn red" id="saveSettings">Save settings</button>
       <span class="note" id="settingsMsg"></span>
-      <hr class="rule" />
+      <hr class="sep" />
       <h2>Reset</h2>
       <p class="muted">Clearing storage removes your saved edits, approved emails, keys and house style from this browser. It cannot be undone.</p>
       <button class="btn" id="resetAll">Clear all saved data</button>
@@ -717,12 +738,17 @@ var SOURCES=[
   {txt:"The specific person who owns Europe barrier-coatings growth should be confirmed through People Data Labs before any name is used.",src:"Brief manual-check note; People Data Labs",st:"check"}
 ];
 var emailEdits=store.getJSON("email_edits",{});
+var recData=store.getJSON("rec_data",{});
+function saveRec(){store.setJSON("rec_data",recData);}
+function setProc(id,text,spin){var el=document.querySelector('[data-proc="'+id+'"]');if(!el)return;el.innerHTML=(spin?'<span class="spinner"></span>':'')+(text?esc(text):'');}
+function busy(btn,label){if(!btn)return"";var l=btn.getAttribute("data-lbl")||btn.textContent;btn.setAttribute("data-lbl",l);btn.disabled=true;btn.innerHTML='<span class="spinner"></span>'+esc(label||"Working");return l;}
+function unbusy(btn,label){if(!btn)return;btn.disabled=false;btn.textContent=label||btn.getAttribute("data-lbl")||"Done";}
 var approved=store.getJSON("approved",[]);
 var houseStyle=store.get("house_style","");
 var chatHistory=store.getJSON("chat",[]);
 
 function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
-function curEmail(c){var e=emailEdits[c.id]||{};return {subject:e.subject!=null?e.subject:c.subject,body:e.body!=null?e.body:c.body,inmail:e.inmail!=null?e.inmail:(c.inmail||""),edited:!!emailEdits[c.id]};}
+function curEmail(c){var e=emailEdits[c.id]||{};var rg=(recData[c.id]&&recData[c.id].email)||{};var bS=rg.subject!=null?rg.subject:c.subject,bB=rg.body!=null?rg.body:c.body,bI=rg.inmail!=null?rg.inmail:(c.inmail||"");return {subject:e.subject!=null?e.subject:bS,body:e.body!=null?e.body:bB,inmail:e.inmail!=null?e.inmail:bI,edited:!!emailEdits[c.id],tailored:!!(recData[c.id]&&recData[c.id].email)};}
 function senderName(){var v=(document.getElementById("sender").value||"").trim();return v||"[Your name]";}
 function withSender(body){return String(body).replace("[Your name]",senderName());}
 function isApproved(id){return approved.some(function(a){return a.contactId===id;});}
@@ -786,19 +812,77 @@ function renderWedges(){
   document.querySelectorAll("[data-wedge] > button").forEach(function(b){b.addEventListener("click",function(){var w=b.parentElement;var o=w.classList.toggle("open");b.setAttribute("aria-expanded",o?"true":"false");});});
 }
 
+function renderIdBox(f){
+  if(!f||!f.found)return"";
+  var sigs=(f.signals||[]).map(function(s){return '<div class="sigi"><span class="d3"></span><div>'+esc(s.text||"")+(s.source?' <a href="'+esc(s.source)+'" target="_blank" rel="noopener">source</a>':'')+'</div></div>';}).join("");
+  return '<div class="idbox"><div class="idhdr"><span class="pill ok">Verified</span> '+(f.confidence?esc("confidence "+f.confidence):'')+'</div>'+
+    '<div class="idname">'+esc(f.name||"")+'</div>'+
+    (f.title?'<div class="idtitle">'+esc(f.title)+(f.division?', '+esc(f.division):'')+'</div>':'')+
+    ((f.location||f.linkedin)?'<div class="idmeta">'+esc(f.location||"")+(f.linkedin?' <a href="'+esc(f.linkedin)+'" target="_blank" rel="noopener">LinkedIn profile</a>':'')+'</div>':'')+
+    (sigs?'<div class="sigs"><div class="sl">Recent public signals to use</div>'+sigs+'</div>':'')+
+    (f.note?'<div class="idmeta" style="margin-top:9px">'+esc(f.note)+'</div>':'')+
+  '</div>';
+}
+function findRecSystem(){return [
+"You identify the current named individual most likely to hold a given leadership role at Solenis, and gather recent public signals useful for an outreach conversation. Use web search across LinkedIn, the Solenis website and press releases, reputable news, conference programmes and industry media.",
+"",
+"Return the single most likely current holder of the role. If you cannot identify a person with reasonable confidence, set found false and explain briefly in note.",
+"For signals, return two to four recent, specific, public items: media coverage, conference talks, public statements, posts or company announcements, each relevant to this role's focus area, each with a source URL where possible. These help tailor the outreach, so prefer concrete and recent over generic.",
+"",
+"Be accurate and never invent names, titles or quotes. Return ONLY strict JSON, no markdown, with keys: found (true or false), name, title, division, location, linkedin, signals (array of objects with text and source), confidence (high, medium or low), note."
+].join("\n");}
+function findRecMsg(c){return ["Identify the person and recent signals for this role at Solenis.","","Role: "+c.name,"What they do: "+c.role,"Focus area: "+(c.angle||c.link||""),"Company: Solenis","","Return only the JSON object."].join("\n");}
+function genRecMsg(c,f){
+  var pains=(c.pains||[]).map(function(p){return "- "+p.p;}).join("\n");
+  var sigs=((f&&f.signals)||[]).map(function(s){return "- "+s.text;}).join("\n");
+  return ["Write the email and InMail for this person, following the rules.","",
+    "Name: "+((f&&f.name)||"the role holder"),
+    "Greet them by first name if a name is given.",
+    "Confirmed title: "+((f&&f.title)||c.name),
+    "Division: "+((f&&f.division)||c.division||""),
+    "What they do: "+c.role,
+    "Their pain points, as background only, do not read back to them:\n"+(pains||"none"),
+    "Recent public signals you may open with or reference lightly, do not quote at length:\n"+(sigs||"none"),
+    "The opportunity area to explore: "+c.angle,
+    "What we do in their area: "+c.help,
+    "","Return only the JSON object."].join("\n");
+}
+function verifyRecommended(id,btn){
+  var c=CONTACTS.find(function(x){return x.id===id;});if(!c)return;
+  var lbl=busy(btn,"Verifying");setProc(id,"Finding the person and recent public signals",true);
+  callClaude(findRecSystem(),[{role:"user",content:findRecMsg(c)}],1500,[{type:"web_search_20250305",name:"web_search",max_uses:5}]).then(function(text){
+    var fnd=parseJSON(text);
+    recData[id]={found:fnd};saveRec();
+    if(!fnd||!fnd.found){return;}
+    var pdlKey=(store.get("pdl_key","")||"").trim();
+    var step=Promise.resolve();
+    if(fnd.name&&pdlKey){setProc(id,"Confirming the title with People Data Labs",true);
+      step=callPDL(fnd.name,c.company||"Solenis").then(function(res){if(res&&res.status===200&&res.data){var p=pdlSummary(res.data);if(p.title)fnd.title=p.title;if(p.location)fnd.location=p.location;if(p.linkedin)fnd.linkedin=p.linkedin;recData[id].found=fnd;saveRec();}}).catch(function(){});}
+    return step.then(function(){setProc(id,"Tailoring the email to what we found",true);
+      return callClaude(genSystem(),[{role:"user",content:genRecMsg(c,fnd)}],1300).then(function(t2){var g=parseJSON(t2);if(g&&g.subject){recData[id].email={subject:g.subject||"",body:g.email||"",inmail:g.inmail||""};saveRec();}});});
+  }).then(function(){
+    setProc(id,"",false);renderContacts();
+    var card=document.querySelector('.contact[data-id="'+id+'"]');if(card){card.classList.add("open");var h=card.querySelector(".head");if(h)h.setAttribute("aria-expanded","true");}
+  }).catch(function(err){
+    setProc(id,"That did not complete. "+String(err.message||err).slice(0,120),false);unbusy(btn,lbl);
+  });
+}
 function renderContacts(){
   document.getElementById("contactList").innerHTML=CONTACTS.map(function(c){
     var em=curEmail(c);
     var srcs=c.sources.map(function(s){return '<div class="sr"><span class="txt">'+esc(s.txt)+' <span class="src">'+esc(s.src)+'</span></span>'+srcMark(s.st)+'</div>';}).join("");
     var flag=c.flag?'<div class="flag"><b>Check first.</b> '+esc(c.flag)+'</div>':'';
     var ap=isApproved(c.id);
-    return '<article class="contact" data-status="'+c.status+'" data-id="'+c.id+'">'+
-      '<div class="head" role="button" tabindex="0" aria-expanded="false"><div class="who"><div class="nm">'+esc(c.name)+(c.verify?' <span class="pill '+verifyPillClass(c.verify.status)+'">'+esc(c.verify.label)+'</span>':'')+(ap?' <span class="pill ok">Approved</span>':'')+(em.edited?' <span class="pill">Edited</span>':'')+'</div><div class="seat">'+esc(c.seat)+'</div><div class="role"><b>What they do.</b> '+esc(c.role)+'</div></div>'+statusMark(c.status)+'<span class="caret"></span></div>'+
+    var rd=recData[c.id]||{};var found=rd.found||null;var verified=!!(found&&found.found);var dispName=(verified&&found.name)?found.name:c.name;var effStatus=verified?"send":c.status;
+    return '<article class="contact" data-status="'+effStatus+'" data-id="'+c.id+'">'+
+      '<div class="head" role="button" tabindex="0" aria-expanded="false"><div class="who"><div class="nm">'+esc(dispName)+(verified?' <span class="pill ok">Verified</span>':' <span class="pill red">Name to verify</span>')+(ap?' <span class="pill ok">Approved</span>':'')+(em.edited?' <span class="pill">Edited</span>':'')+'</div><div class="seat">'+esc(c.seat)+'</div><div class="role"><b>What they do.</b> '+esc(c.role)+'</div></div>'+statusMark(effStatus)+'<span class="caret"></span></div>'+
       '<div class="detail">'+
+        '<div class="actionbar"><button class="btn red sm" data-act="verify" data-id="'+c.id+'">'+(verified?"Re-verify person":"Verify person and tailor email")+'</button><span class="procnote" data-proc="'+c.id+'"></span></div>'+
+        (verified?renderIdBox(found):(found?'<div class="vcheck"><b>Not confirmed yet.</b> '+esc(found.note||"Could not confirm a specific person. The role-based draft below still applies. You can also add the person on the uploaded tab.")+'</div>':''))+
         (c.pains&&c.pains.length?'<div class="block"><p class="label">Key pain points</p>'+c.pains.map(function(p){return '<details class="segc" style="margin-bottom:8px"><summary><div class="top"><div class="nm" style="font-size:13.5px;line-height:1.4">'+esc(p.p)+'</div></div><span class="more"><span class="lbl">Why this is live for them</span><span class="cv"></span></span></summary><div class="why">'+esc(p.why)+'</div></details>';}).join('')+'</div>':'')+'<div class="block"><p class="label">The points we make</p><p>'+esc(c.angle)+'</p></div>'+
-        '<div class="block"><p class="label">What we do in their area</p><p>'+esc(c.help)+'</p></div>'+(c.verify?'<div class="vcheck"><b>'+esc(c.verify.label)+'.</b> '+esc(c.verify.line)+'<span class="src">Checked against: '+esc(c.verify.src)+'</span></div>':'')+flag+
+        '<div class="block"><p class="label">What we do in their area</p><p>'+esc(c.help)+'</p></div>'+flag+
         '<div class="email'+(em.edited?' edited':'')+'" data-emailwrap="'+c.id+'">'+
-          '<div class="ehead"><p class="label">The email'+(em.edited?' (edited)':'')+'</p><span class="acts">'+
+          '<div class="ehead"><p class="label">The email'+(em.edited?' (edited)':(em.tailored?' (tailored to the person)':''))+'</p><span class="acts">'+
             '<button class="btn sm" data-act="edit" data-id="'+c.id+'">Edit</button>'+
             '<button class="btn sm" data-act="copy-subj" data-id="'+c.id+'">Copy subject</button>'+
             '<button class="btn sm" data-act="copy-email" data-id="'+c.id+'">Copy email</button>'+
@@ -827,6 +911,7 @@ function renderContacts(){
 }
 
 function handleEmailAct(act,id,btn){
+  if(act==="verify"){verifyRecommended(id,btn);return;}
   var c=CONTACTS.find(function(x){return x.id===id;});var em=curEmail(c);
   if(act==="copy-subj"){copyText(em.subject,btn);return;}
   if(act==="copy-email"){copyText("Subject: "+em.subject+"\n\n"+withSender(em.body),btn);return;}
@@ -933,6 +1018,9 @@ function switchPanel(id){
   window.scrollTo(0,0);
 }
 document.getElementById("nav").addEventListener("click",function(e){var b=e.target.closest("button[data-p]");if(!b)return;switchPanel(b.getAttribute("data-p"));});
+function setCtab(t){document.querySelectorAll("#ctabs .ctab").forEach(function(x){x.classList.toggle("on",x.getAttribute("data-ct")===t);});var pr=document.getElementById("pane-rec"),pu=document.getElementById("pane-up");if(pr)pr.classList.toggle("show",t==="rec");if(pu)pu.classList.toggle("show",t==="up");}
+document.querySelectorAll("#ctabs .ctab").forEach(function(b){b.addEventListener("click",function(){setCtab(b.getAttribute("data-ct"));});});
+function updateContactCounts(){var r=document.getElementById("recCount");if(r)r.textContent=CONTACTS.length;var u=document.getElementById("upCount");if(u)u.textContent=uploaded.length;}
 document.querySelector(".settings-link").addEventListener("click",function(){switchPanel("settings");});
 
 document.getElementById("filter").addEventListener("click",function(e){var b=e.target.closest("button");if(!b)return;document.querySelectorAll("#filter button").forEach(function(x){x.classList.remove("on");});b.classList.add("on");var f=b.getAttribute("data-f");document.querySelectorAll(".contact").forEach(function(c){c.style.display=(f==="all"||c.getAttribute("data-status")===f)?"":"none";});});
@@ -984,11 +1072,11 @@ function composeSystem(){return [
 '{"decision":"send or leave","reason":"one short sentence, only if leave","subject":"plain subject line","email":"full email including greeting and sign-off","inmail":"70 to 100 word LinkedIn InMail","check":"two or three short plain lines on what the email does and does not do"}',
 styleClause()
 ].join("\n");}
-function bMsg(){function g(id){return (document.getElementById(id).value||"").trim();}return ["Write one email to this person, following the rules.","","Name: "+(g("b-name")||"not given"),"Job title and business unit: "+(g("b-seat")||"not given"),"Their job in one sentence: "+(g("b-role")||"not given"),"A confirmed detail about them: "+(g("b-anchor")||"not given"),"Two or three points: "+(g("b-angle")||"not given"),"What we do in their area: "+(g("b-help")||"not given"),"","Return only the JSON object."].join("\n");}
+function bMsg(force){function g(id){return (document.getElementById(id).value||"").trim();}var arr=["Write one email to this person, following the rules.","","Name: "+(g("b-name")||"not given"),"Job title and business unit: "+(g("b-seat")||"not given"),"Their job in one sentence: "+(g("b-role")||"not given"),"A confirmed detail about them: "+(g("b-anchor")||"not given"),"Two or three points: "+(g("b-angle")||"not given"),"What we do in their area: "+(g("b-help")||"not given")];if(force)arr.push("The user has chosen to proceed with this person. Write the best email you can from the detail given and do not return leave.");arr.push("","Return only the JSON object.");return arr.join("\n");}
 function bReady(){return ["b-name","b-seat","b-role","b-anchor","b-angle","b-help"].every(function(id){return (document.getElementById(id).value||"").trim().length>0;});}
-function renderBuilderResult(obj){
+function renderBuilderResult(obj,forced){
   var out=document.getElementById("builderOut"),box=document.getElementById("builderResult");
-  if(obj.decision==="leave"){box.innerHTML='<div class="verdict fail show" style="margin-top:0"><b>Better to leave this one.</b> '+esc(obj.reason||"One of the inputs was too thin to write a good email.")+'</div>';out.classList.add("show");out.scrollIntoView({behavior:"smooth",block:"start"});return;}
+  if(obj.decision==="leave"&&!forced){box.innerHTML='<div class="verdict fail show" style="margin-top:0"><b>Better to leave this one.</b> '+esc(obj.reason||"One of the inputs was too thin to write a good email.")+'</div><div style="margin-top:12px"><button class="btn red sm" id="bForce">Write it anyway</button> <span class="faint" style="font-size:12.5px">You stay in control. This writes the draft from what you entered.</span></div>';out.classList.add("show");out.scrollIntoView({behavior:"smooth",block:"start"});document.getElementById("bForce").addEventListener("click",function(){runCompose(true,this);});return;}
   var email=withSender(obj.email||"");
   var nm=(document.getElementById("b-name").value||"").trim()||"New contact";
   var seat=(document.getElementById("b-seat").value||"").trim();
@@ -1001,17 +1089,18 @@ function renderBuilderResult(obj){
   document.getElementById("bApprove").addEventListener("click",function(){var roles=(document.getElementById("b-role").value||"").trim();addApprovedCustom(nm,seat,obj.subject||"",obj.email||"",obj.inmail||"",{designation:seat,division:seat,roles:roles});this.textContent="Stored in Approved";this.disabled=true;renderApproved();});
   out.scrollIntoView({behavior:"smooth",block:"start"});
 }
-document.getElementById("composeBtn").addEventListener("click",function(){
+function runCompose(force,btn){
   var errEl=document.getElementById("builderErr");errEl.classList.remove("show");document.getElementById("builderOut").classList.remove("show");
-  if(!bReady()){errEl.innerHTML="Some details are missing. Fill in the name, job title, job in one sentence, confirmed detail, points and what we do.";errEl.classList.add("show");return;}
-  var btn=this,label=btn.textContent;btn.disabled=true;btn.innerHTML='<span class="spinner"></span>Writing';
-  callClaude(composeSystem(),[{role:"user",content:bMsg()}],1100).then(function(text){
+  if(!force&&!bReady()){errEl.innerHTML="Some details are missing. Fill in the name, job title, job in one sentence, confirmed detail, points and what we do.";errEl.classList.add("show");return;}
+  var label=btn?busy(btn,"Writing"):"";
+  callClaude(composeSystem(),[{role:"user",content:bMsg(force)}],1100).then(function(text){
     var clean=text.replace(/```json/gi,"").replace(/```/g,"").trim();var a=clean.indexOf("{"),b=clean.lastIndexOf("}");if(a>-1&&b>-1)clean=clean.slice(a,b+1);
-    renderBuilderResult(JSON.parse(clean));
+    renderBuilderResult(JSON.parse(clean),force);
   }).catch(function(err){
     errEl.innerHTML="The draft writer did not return an email. It needs the Anthropic API. Inside the Claude preview it works without a key. If you are running this on your own host, add your Anthropic API key in Settings. You can also write the email by hand from the points above. ("+esc(String(err.message||err))+")";errEl.classList.add("show");
-  }).finally(function(){btn.disabled=false;btn.textContent=label;evalGate();});
-});
+  }).finally(function(){if(btn)unbusy(btn,label);evalGate();});
+}
+document.getElementById("composeBtn").addEventListener("click",function(){runCompose(false,this);});
 
 function targetSelectInit(){var sel=document.getElementById("asstTarget");CONTACTS.forEach(function(c){var o=document.createElement("option");o.value=c.id;o.textContent="Email to "+c.name;sel.appendChild(o);});}
 function assistantSystem(){
@@ -1162,7 +1251,7 @@ function importCSV(text){
     added++;
   });
   persistUploaded();renderUploaded();
-  if(added)showUploadOk();else showUploadErr("No contacts were read from that file.");
+  if(added){showUploadOk();setCtab("up");}else showUploadErr("No contacts were read from that file.");
 }
 function showUploadErr(m){var e=document.getElementById("uploadErr");e.textContent=m;e.classList.add("show");}
 function showUploadOk(){document.getElementById("uploadErr").classList.remove("show");}
@@ -1202,6 +1291,7 @@ function designationInfo(u){
   return {cls:"warn",label:"Designation corrected",line:"Your file said "+given+". Trusted sources show "+conf+"."};
 }
 function renderUploaded(){
+  updateContactCounts();
   var list=document.getElementById("uploadList");
   var has=uploaded.length>0;
   document.getElementById("upHeading").style.display=has?"":"none";
@@ -1236,7 +1326,8 @@ function renderUploaded(){
     }
     var gen="";
     if(u.gen){
-      gen='<div class="email" style="margin-top:14px"><div class="ehead"><p class="label">Draft email and InMail</p><span class="acts">'+
+      gen='<div class="email" data-uemailwrap="'+u.id+'" style="margin-top:14px"><div class="ehead"><p class="label">Draft email and InMail</p><span class="acts">'+
+        '<button class="btn sm" data-uedit="'+u.id+'">Edit</button>'+
         '<button class="btn sm" data-ucopy-subj="'+u.id+'">Copy subject</button>'+
         '<button class="btn sm" data-ucopy-email="'+u.id+'">Copy email</button>'+
         '<button class="btn sm" data-ucopy-inmail="'+u.id+'">Copy InMail</button>'+
@@ -1244,8 +1335,9 @@ function renderUploaded(){
         '<div class="subj"><b>Subject.</b> '+esc(u.gen.subject||"")+'</div><div class="bodytext">'+esc(withSender(u.gen.email||""))+'</div>'+
         '<div class="subj" style="border-top:1px solid var(--line);margin-top:4px;padding-top:10px"><b style="color:var(--ink)">LinkedIn InMail</b></div><div class="bodytext">'+esc(withSender(u.gen.inmail||""))+'</div></div>';
     }
-    var canGen=u.status==="in_company";
-    var genBtn=canGen?'<button class="btn red sm" data-ugen="'+u.id+'">'+(u.gen?"Rewrite email and InMail":"Generate email and InMail")+'</button>':"";
+    var leaveNote=(u.genNote&&!u.gen)?'<div class="vcheck"><b>The writer suggested leaving this one.</b> '+esc(u.genNote)+' You can still write it anyway using the button below.</div>':'';
+    var inco=u.status==="in_company";
+    var genBtn='<button class="btn red sm" data-ugen="'+u.id+'" data-force="'+(inco?"0":"1")+'">'+(u.gen?"Rewrite email and InMail":(inco?"Generate email and InMail":"Write email anyway"))+'</button>';
     var researchBtn='<button class="btn sm" data-uresearch="'+u.id+'">'+(u.research?"Research again":"Verify and research")+'</button>';
     var pdlBtn='<button class="btn sm" data-updl="'+u.id+'">'+(u.pdl?"Re-check title (PDL)":"Verify title (People Data Labs)")+'</button>';
     return '<div class="upcard" data-uid="'+u.id+'">'+
@@ -1262,7 +1354,8 @@ function renderUploaded(){
       '<div class="liverify"><label style="display:flex;align-items:center;gap:8px;cursor:pointer"><input type="checkbox" data-uli="'+u.id+'" '+(u.liVerified?"checked":"")+' /> I have opened the LinkedIn profile and confirmed this is the right person</label>'+(u.liVerified?'<span class="status"><span class="sq"></span>LinkedIn confirmed</span>':'')+'</div>'+
       '<details class="ctxbox"'+(u.context?' open':'')+'><summary>Add context for this person (optional)</summary><textarea data-uctx="'+u.id+'" rows="3" placeholder="Anything you already know that should shape the email. Leave blank and the tool researches from trusted sources on its own.">'+esc(u.context||"")+'</textarea></details>'+
       intel+
-      '<div class="upacts">'+researchBtn+pdlBtn+genBtn+'<button class="btn sm ghost" data-uremove="'+u.id+'">Remove</button></div>'+
+      leaveNote+
+      '<div class="upacts">'+researchBtn+pdlBtn+genBtn+'<button class="btn sm ghost" data-uremove="'+u.id+'">Remove</button><span class="procnote" data-proc="up-'+u.id+'"></span></div>'+
       gen+
     '</div>';
   }).join("");
@@ -1272,7 +1365,8 @@ function renderUploaded(){
   list.querySelectorAll("[data-uremove]").forEach(function(b){b.addEventListener("click",function(){uploaded=uploaded.filter(function(x){return x.id!==b.getAttribute("data-uremove");});persistUploaded();renderUploaded();});});
   list.querySelectorAll("[data-uresearch]").forEach(function(b){b.addEventListener("click",function(){researchOne(b.getAttribute("data-uresearch"),b);});});
   list.querySelectorAll("[data-updl]").forEach(function(b){b.addEventListener("click",function(){pdlOne(b.getAttribute("data-updl"),b);});});
-  list.querySelectorAll("[data-ugen]").forEach(function(b){b.addEventListener("click",function(){generateOne(b.getAttribute("data-ugen"),b);});});
+  list.querySelectorAll("[data-ugen]").forEach(function(b){b.addEventListener("click",function(){generateOne(b.getAttribute("data-ugen"),b,b.getAttribute("data-force")==="1");});});
+  list.querySelectorAll("[data-uedit]").forEach(function(b){b.addEventListener("click",function(){editUploadedEmail(b.getAttribute("data-uedit"));});});
   list.querySelectorAll("[data-ucopy-subj]").forEach(function(b){b.addEventListener("click",function(){var u=upFind(b.getAttribute("data-ucopy-subj"));copyText(u.gen.subject||"",b);});});
   list.querySelectorAll("[data-ucopy-email]").forEach(function(b){b.addEventListener("click",function(){var u=upFind(b.getAttribute("data-ucopy-email"));copyText("Subject: "+(u.gen.subject||"")+"\n\n"+withSender(u.gen.email||""),b);});});
   list.querySelectorAll("[data-ucopy-inmail]").forEach(function(b){b.addEventListener("click",function(){var u=upFind(b.getAttribute("data-ucopy-inmail"));copyText(withSender(u.gen.inmail||""),b);});});
@@ -1360,21 +1454,33 @@ function genSystem(){return [
 "",
 "Return ONLY strict JSON, no markdown, with keys: decision (send or leave), reason, subject, email, inmail, check."
 ].join("\n")+styleClause();}
-function genMsg(u){
+function genMsg(u,force){
   var R=u.research||{};
   var pts=(R.points||[]).map(function(p){return "- "+p.text;}).join("\n");
-  return ["Write the email and InMail for this person.","","Name: "+u.name,"Confirmed title: "+(R.corrected_title||u.title||"not confirmed"),"Business unit: "+(R.business_unit||u.unit||"not given"),"What they do: "+(R.summary||"not given"),"Intelligence:\n"+(pts||"none gathered"),"Fit: "+(R.relevance?(R.relevance.fit+", "+R.relevance.reason):"not assessed"),(u.context?("Extra context from our team: "+u.context):"No extra context was given."),"","Return only the JSON object."].join("\n");
+  var arr=["Write the email and InMail for this person.","","Name: "+u.name,"Confirmed title: "+(R.corrected_title||(u.pdl&&u.pdl.title)||u.title||"not confirmed"),"Business unit: "+(R.business_unit||u.unit||"not given"),"What they do: "+(R.summary||"not given"),"Intelligence:\n"+(pts||"none gathered"),"Fit: "+(R.relevance?(R.relevance.fit+", "+R.relevance.reason):"not assessed"),(u.context?("Extra context from our team: "+u.context):"No extra context was given.")];
+  if(force)arr.push("The user has chosen to proceed with this person. Write the best email you can from the available detail and do not return leave.");
+  arr.push("","Return only the JSON object.");
+  return arr.join("\n");
 }
-function generateOne(id,btn){
+function generateOne(id,btn,force){
   var u=upFind(id);if(!u)return;
-  var lbl=btn.textContent;btn.disabled=true;btn.innerHTML='<span class="spinner"></span>Writing';
-  callClaude(genSystem(),[{role:"user",content:genMsg(u)}],1300).then(function(text){
+  var lbl=busy(btn,"Writing");setProc("up-"+id,"Writing the email and InMail in our style",true);
+  callClaude(genSystem(),[{role:"user",content:genMsg(u,force)}],1300).then(function(text){
     var g=parseJSON(text);
-    if(g.decision==="leave"){u.gen=null;u.genNote=g.reason||"";renderUploaded();alert("Better to leave this one. "+(g.reason||""));return;}
-    u.gen={subject:g.subject||"",email:g.email||"",inmail:g.inmail||""};persistUploaded();renderUploaded();
+    if(g.decision==="leave"&&!force){u.gen=null;u.genNote=g.reason||"This person looks like a weaker fit for our work.";persistUploaded();setProc("up-"+id,"",false);renderUploaded();return;}
+    u.genNote="";u.gen={subject:g.subject||"",email:g.email||"",inmail:g.inmail||""};persistUploaded();setProc("up-"+id,"",false);renderUploaded();
   }).catch(function(err){
-    alert("The writer did not return a draft. This step needs the Anthropic API. Inside the Claude preview it works without a key. If you host this yourself, add your Anthropic API key in Settings. ("+String(err.message||err)+")");
-  }).finally(function(){btn.disabled=false;btn.textContent=lbl;});
+    setProc("up-"+id,"The writer did not return a draft. This step needs the Anthropic API, or your key in Settings. "+String(err.message||err).slice(0,90),false);
+    unbusy(btn,lbl);
+  });
+}
+function editUploadedEmail(id){
+  var u=upFind(id);if(!u||!u.gen)return;
+  var wrap=document.querySelector('[data-uemailwrap="'+id+'"]');if(!wrap)return;
+  wrap.innerHTML='<div class="edit-area" style="padding:0"><p class="label">Edit the draft</p><label>Subject</label><input type="text" data-ues /><label>Email</label><textarea data-ueb rows="12"></textarea><label>LinkedIn InMail</label><textarea data-uei rows="6"></textarea><div style="display:flex;gap:8px;margin-top:8px"><button class="btn red sm" data-uesave>Save</button><button class="btn sm" data-uecancel>Cancel</button></div></div>';
+  wrap.querySelector("[data-ues]").value=u.gen.subject||"";wrap.querySelector("[data-ueb]").value=u.gen.email||"";wrap.querySelector("[data-uei]").value=u.gen.inmail||"";
+  wrap.querySelector("[data-uesave]").addEventListener("click",function(){u.gen.subject=wrap.querySelector("[data-ues]").value;u.gen.email=wrap.querySelector("[data-ueb]").value;u.gen.inmail=wrap.querySelector("[data-uei]").value;persistUploaded();renderUploaded();});
+  wrap.querySelector("[data-uecancel]").addEventListener("click",renderUploaded);
 }
 
 function csvTemplate(){
@@ -1384,7 +1490,7 @@ function csvTemplate(){
 document.getElementById("csvPick").addEventListener("click",function(){document.getElementById("csvFile").click();});
 document.getElementById("csvFile").addEventListener("change",function(e){var file=e.target.files&&e.target.files[0];if(!file)return;var rd=new FileReader();rd.onload=function(){importCSV(rd.result);};rd.readAsText(file);e.target.value="";});
 document.getElementById("csvTemplate").addEventListener("click",csvTemplate);
-document.getElementById("addManual").addEventListener("click",function(){var name=window.prompt("Name of the person at Solenis");if(!name||!name.trim())return;uploaded.push({id:uid(),name:name.trim(),title:"",company:"Solenis",email:"",linkedin:"",unit:"",context:"",status:"pending",liVerified:false,research:null,gen:null});persistUploaded();renderUploaded();});
+document.getElementById("addManual").addEventListener("click",function(){var name=window.prompt("Name of the person at Solenis");if(!name||!name.trim())return;uploaded.push({id:uid(),name:name.trim(),title:"",company:"Solenis",email:"",linkedin:"",unit:"",context:"",status:"pending",liVerified:false,research:null,gen:null});persistUploaded();renderUploaded();setCtab("up");});
 document.getElementById("researchAll").addEventListener("click",researchAll);
 document.getElementById("clearUploaded").addEventListener("click",function(){if(!uploaded.length)return;if(!window.confirm("Remove all uploaded contacts from this list?"))return;uploaded=[];persistUploaded();renderUploaded();});
 var dropEl=document.getElementById("drop");
