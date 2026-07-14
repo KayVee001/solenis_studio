@@ -961,7 +961,7 @@ function findRecMsg(c){return ["Identify the person and recent signals for this 
 function genRecMsg(c,f){
   var pains=(c.pains||[]).map(function(p){return "- "+p.p;}).join("\n");
   var sigs=((f&&f.signals)||[]).map(function(s){return "- "+s.text;}).join("\n");
-  return ["Write the email and InMail for this person, following the rules.","",
+  return ["Write the email and InMail for this person, following the rules.","This profile is pre-vetted by the practice. Do not return leave. Always write the email.","",
     "Name: "+((f&&f.name)||"the role holder"),
     "Greet them by first name if a name is given.",
     "Confirmed title: "+((f&&f.title)||c.name),
@@ -1496,7 +1496,8 @@ function renderUploaded(){
     }
     var leaveNote=(u.genNote&&!u.gen)?'<div class="vcheck"><b>The writer suggested leaving this one.</b> '+esc(u.genNote)+' You can still write it anyway using the button below.</div>':'';
     var inco=u.status==="in_company";
-    var genBtn='<button class="btn red sm" data-ugen="'+u.id+'" data-force="'+(inco?"0":"1")+'">'+(u.gen?"Rewrite email and InMail":(inco?"Generate email and InMail":"Write email anyway"))+'</button>';
+    var forceNow=(!inco)||(!!u.genNote&&!u.gen);
+    var genBtn='<button class="btn red sm" data-ugen="'+u.id+'" data-force="'+(forceNow?"1":"0")+'">'+(u.gen?"Rewrite email and InMail":(u.genNote?"Write email anyway":(inco?"Generate email and InMail":"Write email anyway")))+'</button>';
     var researchBtn='<button class="btn sm" data-uresearch="'+u.id+'">'+(u.research?"Research again":"Verify and research")+'</button>';
     var pdlBtn='<button class="btn sm" data-updl="'+u.id+'">'+(u.pdl?"Re-check title (PDL)":"Verify title (People Data Labs)")+'</button>';
     return '<div class="upcard" data-uid="'+u.id+'">'+
@@ -1661,6 +1662,7 @@ function generateOne(id,btn,force){
   callClaude(genSystem(),[{role:"user",content:genMsg(u,force)}],1300).then(function(text){
     var g=parseJSON(text);
     if(g.decision==="leave"&&!force){u.gen=null;u.genNote=g.reason||"This person looks like a weaker fit for our work.";persistUploaded();setProc("up-"+id,"",false);renderUploaded();return;}
+    if(!(g.email&&String(g.email).trim())){u.gen=null;u.genNote="The writer returned an empty draft. Press Write email anyway once more.";persistUploaded();setProc("up-"+id,"",false);renderUploaded();return;}
     u.genNote="";u.gen={subject:g.subject||"",email:g.email||"",inmail:g.inmail||""};u.gen.centralId=recordDraft({contact:u.name,subject:g.subject||"",body:g.email||"",inmail:g.inmail||"",source:"uploaded"});persistUploaded();setProc("up-"+id,"",false);renderUploaded();
   }).catch(function(err){
     setProc("up-"+id,"The writer did not return a draft. This step needs the Anthropic API, or your key in Settings. "+String(err.message||err).slice(0,90),false);
