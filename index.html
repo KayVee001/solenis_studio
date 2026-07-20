@@ -283,6 +283,36 @@
   .logrow{display:grid;grid-template-columns:150px 210px 100px 1fr;gap:10px;padding:8px 4px;border-bottom:1px solid var(--line);font-size:12.5px;color:var(--body)}
   .logrow.h{font-weight:bold;color:var(--ink);border-bottom:1.5px solid var(--line-2)}
   @media(max-width:760px){.logrow{grid-template-columns:1fr 1fr}}
+  .uptable{width:100%;border-collapse:collapse;font-size:13.5px;background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+  .uptable th{background:var(--bg);text-align:left;font-size:11.5px;letter-spacing:.04em;text-transform:uppercase;color:var(--grey);padding:10px 12px;border-bottom:1px solid var(--line)}
+  .uptable td{padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top;color:var(--body)}
+  .uptable tr:last-child td{border-bottom:none}
+  .uptable .tn{font-weight:bold;color:var(--ink)}
+  .uptable .tacts{display:flex;gap:6px;flex-wrap:wrap}
+  .meter{border:1px solid var(--line);border-radius:12px;padding:13px 15px;margin:12px 0;background:var(--bg)}
+  .mtop{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:8px}
+  .mscore{font-weight:bold;font-size:13px}
+  .mscore.g{color:#1f7a3f}.mscore.a{color:#a86a00}.mscore.r{color:var(--red-2)}
+  .mbar{height:8px;border-radius:5px;background:var(--line);overflow:hidden;margin-bottom:10px}
+  .mbar span{display:block;height:100%;background:var(--red-2);transition:width .4s}
+  .mbar span.g{background:#2c9e57}.mbar span.a{background:#e0a52a}.mbar span.r{background:var(--red-2)}
+  .mcheck{display:flex;gap:8px;font-size:12.8px;margin:5px 0;line-height:1.5}
+  .mtag{flex:0 0 auto;font-size:10.5px;font-weight:bold;letter-spacing:.04em;border-radius:5px;padding:2px 6px;height:fit-content;margin-top:1px}
+  .mtag.g{background:#e2f3e8;color:#1f7a3f}.mtag.r{background:#fdeaea;color:var(--red-2)}.mtag.n{background:var(--line);color:var(--grey)}
+  .mhead{font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--grey);margin:10px 0 4px}
+  .missue,.mfix{font-size:12.8px;margin:3px 0;padding-left:12px;position:relative}
+  .missue:before,.mfix:before{content:"";position:absolute;left:0;top:8px;width:5px;height:5px;border-radius:50%;background:var(--grey)}
+  .missue:before{background:var(--red-2)}
+  .evrow{font-size:13.5px;margin:6px 0;line-height:1.55}
+  .evrow b{color:var(--ink)}
+  .evtag{display:inline-block;font-size:10.5px;font-weight:bold;letter-spacing:.03em;border-radius:5px;padding:1px 6px;margin-left:6px;background:var(--line);color:var(--grey);text-transform:uppercase}
+  .evtag.verified{background:#e2f3e8;color:#1f7a3f}.evtag.reported{background:#e8eefb;color:#2b58a8}.evtag.inferred{background:#fdf3dd;color:#a86a00}.evtag.unknown{background:#fdeaea;color:var(--red-2)}
+  .assist{border:1px dashed var(--line-2);border-radius:12px;padding:13px 15px;margin:12px 0}
+  .assist textarea{width:100%;box-sizing:border-box;border:1px solid var(--line-2);border-radius:9px;padding:9px 11px;font-family:var(--sans);font-size:13.5px;min-height:56px;margin:8px 0}
+  .assist .anote{font-size:12.5px;color:var(--grey);margin-top:6px}
+  .pill.amb{background:#fdf3dd;color:#a86a00}
+  .revitem{border:1px solid var(--line);border-radius:12px;padding:15px 17px;margin-bottom:12px;background:#fff}
+  .revitem textarea,.revitem input[type=text]{width:100%;box-sizing:border-box;border:1px solid var(--line-2);border-radius:9px;padding:9px 11px;font-family:var(--sans);font-size:13.5px;margin:5px 0}
 </style>
 </head>
 <body>
@@ -505,7 +535,9 @@
       <div class="sender-bar"><label for="sender">Your name</label><input type="text" id="sender" placeholder="Type your name" autocomplete="off" /><span class="hint">This goes into the sign-off of every email.</span></div>
       <div class="ctabs" id="ctabs">
         <button class="ctab on" data-ct="rec"><span class="ctlabel">Recommended profiles</span><span class="ctcount" id="recCount">4</span></button>
-        <button class="ctab" data-ct="up"><span class="ctlabel">Your uploaded contacts</span><span class="ctcount" id="upCount">0</span></button>
+        <button class="ctab" data-ct="up"><span class="ctlabel">Contact list</span><span class="ctcount" id="upCount">0</span></button>
+        <button class="ctab" data-ct="prof"><span class="ctlabel">Profiles and communication</span><span class="ctcount" id="profCount">0</span></button>
+        <button class="ctab" data-ct="rev"><span class="ctlabel">Practice review</span><span class="ctcount" id="revCount">0</span></button>
       </div>
 
       <div class="ctab-pane show" id="pane-rec">
@@ -545,6 +577,9 @@
         <p>Use this when you want to write a single email from details you already have, without uploading a file. It does not look anyone up. It only uses what you enter.</p>
         <p>It first checks whether the person is worth emailing, then writes a draft in the same way as the four roles on the Contacts tab.</p>
       </div>
+
+
+
       <h2>Step one. Is this person worth emailing?</h2>
       <div class="gate" id="gate">
         <div class="g"><div class="q">Can you describe this person's job in one sentence?<small>What is the one thing they are responsible for. If you cannot say it clearly, the email will miss.</small></div><div class="toggle" data-g="role"><button data-v="y">Yes</button><button data-v="n">No</button></div></div>
@@ -568,6 +603,20 @@
       </div>
       <div class="err" id="builderErr"></div>
       <div class="builder-out" id="builderOut"><h2>The draft</h2><div id="builderResult"></div></div>
+      </div>
+
+      <div class="ctab-pane" id="pane-prof">
+        <p class="muted">Only people with research initiated appear here. Each profile carries the evidence file, a confidence audit scored the way a practice reviewer would score it, the draft, and an assistant for specific edits. Save the strong ones for practice review.</p>
+        <div id="profList"></div>
+      </div>
+
+      <div class="ctab-pane" id="pane-rev">
+        <p class="muted">Everything saved for practice review sits here until it is approved or returned. Items stay in the permanent record and, with the shared store configured, are visible across the team. Approved items remain available in this tab and in Approved emails.</p>
+        <div class="toolbar">
+          <select id="revStatus" class="ovsel"><option value="both">In review and approved</option><option value="review">In review only</option><option value="approved">Approved only</option></select>
+          <button class="btn dark" id="revExport">Export CSV for HubSpot or mail merge</button>
+        </div>
+        <div id="revList"></div>
       </div>
     </section>
 
@@ -637,7 +686,7 @@
       <p class="lead">Every draft generated in the studio, with who made it, when, and whether it has been approved. A draft recorded here is never lost, even if the person who made it never approves it or closes their tab. Deleting a draft records who deleted it and when.</p>
       <div class="ovfilters">
         <select id="ovPerson"><option value="all">Everyone</option></select>
-        <select id="ovStatus"><option value="all">All statuses</option><option value="generated">Awaiting approval</option><option value="approved">Approved</option></select>
+        <select id="ovStatus"><option value="all">All statuses</option><option value="generated">Awaiting approval</option><option value="review">In practice review</option><option value="approved">Approved</option></select>
         <button class="btn sm" id="ovRefresh">Refresh from shared store</button>
         <span class="note" id="ovSync" style="margin:0"></span>
       </div>
@@ -674,6 +723,9 @@
       <div class="setting-row"><label for="set-pdl">People Data Labs API key</label><div class="hint">Used to verify a contact's current title, company and responsibilities against licensed LinkedIn data when you add contacts. The key is stored in your browser and sent directly to People Data Labs. If their service blocks direct browser requests, the tool falls back to a web-based check and tells you. Get a key at dashboard.peopledatalabs.com.</div><input type="password" id="set-pdl" placeholder="Your People Data Labs key" autocomplete="off" /></div>
       <h2>House style for the emails</h2>
       <div class="setting-row"><label for="set-style">Standing instruction applied to drafts and rewrites</label><div class="hint">Plain rules the assistant and the draft writer should follow for every email. The assistant can also update this for you.</div><textarea id="set-style" rows="4" placeholder="For example: keep emails under 180 words, always close with a 30-minute meeting request, never use dashes."></textarea></div>
+      <div class="setting-row"><label for="set-model">Writing model</label><div class="hint">The model used for research, audits, drafting and the assistant. The most capable tier is available to accounts with the top level of access; everyone can choose among the others.</div><select id="set-model" style="border:1px solid var(--line-2);border-radius:9px;padding:9px 11px;font-family:var(--sans);font-size:13.5px;background:#fff;min-width:280px"></select></div>
+      <div class="setting-row"><label for="set-signoff">Email sign-off</label><div class="hint">Applied to every draft and every export, followed by the sender name.</div><select id="set-signoff" style="border:1px solid var(--line-2);border-radius:9px;padding:9px 11px;font-family:var(--sans);font-size:13.5px;background:#fff;min-width:280px"><option value="Best regards,">Best regards,</option><option value="Thanks,">Thanks,</option><option value="Kind regards,">Kind regards,</option></select></div>
+      <div class="setting-row"><label for="set-pplx">Perplexity API key (optional)</label><div class="hint">When present, profile research first pulls grounded, citation-backed findings from Perplexity Sonar and then verifies them, which tightens accuracy on titles, regions and recent moves. Get a key at perplexity.ai in Settings, API. If Perplexity blocks direct browser calls, the studio detects it and continues with its built-in web research.</div><input type="password" id="set-pplx" placeholder="pplx-..." autocomplete="off" /></div>
       <div class="setting-row"><label>Signed in on this device</label><div class="hint">The studio remembers you in this browser. Signing out returns to the sign-in screen and keeps all saved work.</div><div style="display:flex;gap:12px;align-items:center"><span class="note" id="whoami" style="margin:0"></span><button class="btn sm" id="signOut">Sign out</button></div></div>
       <div class="setting-row"><label for="set-fbp">Shared store project ID (optional)</label><div class="hint">For a shared record of drafts and actions across users and machines. Create a free Firebase project, enable Firestore, and paste the project ID and the web API key here. Leave blank to keep records in this browser only.</div><input type="text" id="set-fbp" placeholder="your-project-id" autocomplete="off" /></div>
       <div class="setting-row"><label for="set-fbk">Shared store web API key (optional)</label><input type="password" id="set-fbk" placeholder="Web API key" autocomplete="off" /></div>
@@ -723,6 +775,106 @@ var USER_KEYS=["uploaded","approved","email_edits","rec_data","sender","chat"];
     st("migr__"+currentUser,"1");
   }
 })();
+/* Standards lint, repair and confidence audit */
+var BANNED_WORDS=["unlock","navigate","transform","leverage","future proof","game changer","delve","robust","holistic","strategic imperative","exciting","thrilled","at the intersection"];
+function lintIssues(u){
+  var out=[];var texts=[];
+  if(u.gen){texts.push(["email",u.gen.email||""]);texts.push(["inmail",u.gen.inmail||""]);texts.push(["subject",u.gen.subject||""]);}
+  var R=u.research||{};
+  texts.forEach(function(pair){
+    var where=pair[0],t=pair[1];if(!t)return;
+    if(/[\u2014\u2013]/.test(t))out.push("An em or en dash appears in the "+where+".");
+    if(/[\u2018\u2019\u201c\u201d]/.test(t))out.push("Curly quote marks appear in the "+where+".");
+    BANNED_WORDS.forEach(function(w){if(t.toLowerCase().indexOf(w)>-1)out.push("Banned word or phrase in the "+where+": "+w+".");});
+    if(where!=="subject"){
+      if(R.title_exact&&R.title_exact.length>=12&&t.indexOf(R.title_exact)>-1)out.push("The raw profile title is pasted into the "+where+".");
+      var ab=t.match(/\b(NA|Sr|Mgr|Assoc|Dir\.|LI)\b/);
+      if(ab)out.push("A crude abbreviation reached the "+where+": "+ab[1]+".");
+    }
+  });
+  if(u.gen&&u.gen.email&&u.gen.email.indexOf("we'd welcome a 30-minute meeting at a date and time of your choosing")===-1)out.push("The hard-coded close sentence is missing from the email.");
+  return out;
+}
+function repairSystem(){return ["You repair one prospecting email against fixed house standards. Change ONLY what the listed violations require. Keep every other word, the meaning, the structure and the length identical.","Return ONLY strict JSON with keys subject, email, inmail."].join("\n");}
+function repairDraft(u){
+  var issues=lintIssues(u);
+  if(!issues.length||!u.gen)return Promise.resolve(false);
+  var msg=["Violations to fix:","- "+issues.join("\n- "),"","Subject: "+(u.gen.subject||""),"","Email:",u.gen.email||"","","InMail:",u.gen.inmail||"","","House standards: no em or en dashes, straight quotes only, expand every abbreviation into natural words, never quote the raw profile title, keep the close sentence, keep the sign-off block.","Return only the JSON object."].join("\n");
+  return callClaude(repairSystem(),[{role:"user",content:msg}],1300).then(function(text){
+    var g=parseJSON(text);if(!g||!g.email)return false;
+    u.gen.subject=g.subject||u.gen.subject;u.gen.email=g.email;u.gen.inmail=g.inmail||u.gen.inmail;
+    return true;
+  }).catch(function(){return false;});
+}
+function auditSystem(){return [
+"You are a managing director in the chemicals, materials and natural resources practice of a leading strategy consultancy, reviewing an analyst's evidence file and outreach draft before anything reaches a client. You are objective, evidence-first and unsentimental. Reputations rest on not sending a wrong email.",
+"",
+"Audit the file against these checks. Use web search where a claim can be spot-checked quickly, especially the current title, employer and region.",
+"1. Identity. Is this clearly the right person at Solenis, on current evidence?",
+"2. Title and remit. Is the title current and exactly right, and is the remit interpretation supported by evidence rather than by the obvious reading of the title? Sourcing must be resolved direct or indirect. Marketing must name the actual offering. Operations must not be treated as commercial. Planning and PMO roles must be treated as support.",
+"3. Region and scope. Does every geographic claim match the profile exactly? A substituted or adjacent region is an automatic fail on this check.",
+"4. Signal quality. Are the signals recent, specific, sourced and relevant to this person's remit?",
+"5. Draft matches evidence. Does every sentence of the draft trace to a verified or reported claim, and does the email speak to this person's actual world? If no draft is provided, mark this check as not yet applicable and do not penalise the score for it.",
+"6. Confidence to send. Weigh it all as the reviewer who signs it off.",
+"",
+"Scoring: 0 to 100. 85 or above only when you would put your own name to it without edits. 60 to 84 when it is usable after the named checks. Below 60 when it must not be sent yet. Be conservative: unresolved title ambiguity, an unverified region, or a draft-evidence mismatch caps the score below 60.",
+"",
+"Return ONLY strict JSON, no markdown: {score, band (bank, check or stop), checks (array of {name, ok (true, false or null for not applicable), note}), issues (array of short strings), fixes (array of short strings, the fastest way to close each issue)}."
+].join("\n");}
+function auditMsg(u){
+  var R=u.research||{};var P=u.pdl||{};
+  var arr=["Audit this evidence file"+(u.gen?" and draft":"")+".","","Person: "+u.name,"Company expected: "+(u.company||"Solenis"),"","EVIDENCE FILE:",JSON.stringify(R,null,1)];
+  if(P&&P.title)arr.push("","PDL check: "+JSON.stringify({title:P.title,company:P.company,location:P.location,linkedin:P.linkedin}));
+  if(u.gen)arr.push("","DRAFT SUBJECT: "+(u.gen.subject||""),"","DRAFT EMAIL:",u.gen.email||"","","DRAFT INMAIL:",u.gen.inmail||"");
+  var lint=lintIssues(u);
+  if(lint.length)arr.push("","Mechanical standards scan found:","- "+lint.join("\n- "));
+  arr.push("","Return only the JSON object.");
+  return arr.join("\n");
+}
+function auditOne(id,btn){
+  var u=upFind(id);if(!u||!u.research)return Promise.resolve();
+  var lbl=btn?btn.textContent:"";if(btn){btn.disabled=true;btn.innerHTML='<span class="spinner"></span>Auditing';}
+  u.auditing=true;renderProfiles();
+  return callClaude(auditSystem(),[{role:"user",content:auditMsg(u)}],1400,[{type:"web_search_20250305",name:"web_search",max_uses:3}]).then(function(text){
+    var g=parseJSON(text);
+    if(g&&typeof g.score!=="undefined"){u.audit={score:Math.max(0,Math.min(100,parseInt(g.score,10)||0)),band:(g.band==="bank"||g.band==="check"||g.band==="stop")?g.band:(g.score>=85?"bank":(g.score>=60?"check":"stop")),checks:g.checks||[],issues:g.issues||[],fixes:g.fixes||[],ts:Date.now()};}
+    u.auditing=false;persistUploaded();renderProfiles();
+  }).catch(function(){u.auditing=false;u.audit={score:0,band:"stop",checks:[],issues:["The audit did not complete. Run it again."],fixes:[],ts:Date.now()};persistUploaded();renderProfiles();if(btn){btn.disabled=false;btn.textContent=lbl;}});
+}
+function bandLabel(b){return b==="bank"?"Bank on it":(b==="check"?"Use with checks":"Do not send yet");}
+function meterHTML(u){
+  if(u.auditing)return '<div class="meter"><div class="mtop"><b>Confidence audit</b><span class="faint">Running</span></div><div class="mbar"><span style="width:8%"></span></div></div>';
+  if(!u.audit)return '<div class="meter"><div class="mtop"><b>Confidence audit</b><span class="faint">Runs automatically after research</span></div></div>';
+  var a=u.audit;var cls=a.band==="bank"?"g":(a.band==="check"?"a":"r");
+  var checks=(a.checks||[]).map(function(c){var mark=c.ok===true?"PASS":(c.ok===false?"FAIL":"NA");var mc=c.ok===true?"g":(c.ok===false?"r":"n");return '<div class="mcheck"><span class="mtag '+mc+'">'+mark+'</span><span><b>'+esc(c.name||"")+'.</b> '+esc(c.note||"")+'</span></div>';}).join("");
+  var iss=(a.issues||[]).length?('<div class="mhead">Open issues</div>'+a.issues.map(function(x){return '<div class="missue">'+esc(x)+'</div>';}).join("")):"";
+  var fx=(a.fixes||[]).length?('<div class="mhead">Fastest fixes</div>'+a.fixes.map(function(x){return '<div class="mfix">'+esc(x)+'</div>';}).join("")):"";
+  return '<div class="meter"><div class="mtop"><b>Confidence audit</b><span class="mscore '+cls+'">'+a.score+' / 100, '+bandLabel(a.band)+'</span></div><div class="mbar"><span class="'+cls+'" style="width:'+a.score+'%"></span></div>'+checks+iss+fx+'</div>';
+}
+function signoffWord(){return store.get("signoff","Best regards,");}
+var MODELS=[
+  {id:"claude-fable-5",label:"Claude Fable 5, most capable",sa:true},
+  {id:"claude-opus-4-8",label:"Claude Opus 4.8"},
+  {id:"claude-sonnet-4-6",label:"Claude Sonnet 4.6, fast"},
+  {id:"claude-haiku-4-5-20251001",label:"Claude Haiku 4.5, fastest"}
+];
+function modelId(){
+  var m=store.get("model","");
+  var def=isSA()?"claude-fable-5":"claude-opus-4-8";
+  if(!m)return def;
+  var found=null;for(var i=0;i<MODELS.length;i++){if(MODELS[i].id===m)found=MODELS[i];}
+  if(!found)return def;
+  if(found.sa&&!isSA())return "claude-opus-4-8";
+  return m;
+}
+function pplxKey(){return (store.get("pplx_key","")||"").trim();}
+function callPerplexity(prompt){
+  var k=pplxKey();if(!k)return Promise.resolve(null);
+  return fetch("https://api.perplexity.ai/chat/completions",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+k},body:JSON.stringify({model:"sonar-pro",messages:[{role:"system",content:"You are a precise research assistant. Answer only from current web evidence, cite sources inline, quote titles and regions exactly as written, and say unknown where the evidence is unclear. Never guess."},{role:"user",content:prompt}]})})
+  .then(function(r){if(!r.ok)throw new Error("HTTP "+r.status);return r.json();})
+  .then(function(j){var t=(j.choices&&j.choices[0]&&j.choices[0].message&&j.choices[0].message.content)||"";var cites=(j.citations||[]).map(function(c,i){return "["+(i+1)+"] "+c;}).join("\n");return t+(cites?("\n\nCitations:\n"+cites):"");})
+  .catch(function(){return null;});
+}
 function normAns(v){return String(v||"").toLowerCase().replace(/\s+/g,"");}
 function sha256hex(t){return crypto.subtle.digest("SHA-256",new TextEncoder().encode(t)).then(function(b){return Array.prototype.map.call(new Uint8Array(b),function(x){return ("0"+x.toString(16)).slice(-2);}).join("");});}
 function isSA(){return !!currentUser&&SA_EMAILS.indexOf(currentUser)>-1&&store.get("sa_ok__"+currentUser,"")==="1";}
@@ -866,7 +1018,7 @@ var SOURCES=[
 var emailEdits=store.getJSON("email_edits",{});
 var recData=store.getJSON("rec_data",{});
 function saveRec(){store.setJSON("rec_data",recData);}
-function setProc(id,text,spin){var el=document.querySelector('[data-proc="'+id+'"]');if(!el)return;el.innerHTML=(spin?'<span class="spinner"></span>':'')+(text?esc(text):'');}
+function setProc(id,text,spin){document.querySelectorAll('[data-proc="'+id+'"]').forEach(function(el){el.innerHTML=(spin?'<span class="spinner"></span>':'')+(text?esc(text):'');});}
 function busy(btn,label){if(!btn)return"";var l=btn.getAttribute("data-lbl")||btn.textContent;btn.setAttribute("data-lbl",l);btn.disabled=true;btn.innerHTML='<span class="spinner"></span>'+esc(label||"Working");return l;}
 function unbusy(btn,label){if(!btn)return;btn.disabled=false;btn.textContent=label||btn.getAttribute("data-lbl")||"Done";}
 var approved=store.getJSON("approved",[]);
@@ -876,7 +1028,7 @@ var chatHistory=store.getJSON("chat",[]);
 function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
 function curEmail(c){var e=emailEdits[c.id]||{};var rg=(recData[c.id]&&recData[c.id].email)||{};var bS=rg.subject!=null?rg.subject:c.subject,bB=rg.body!=null?rg.body:c.body,bI=rg.inmail!=null?rg.inmail:(c.inmail||"");return {subject:e.subject!=null?e.subject:bS,body:e.body!=null?e.body:bB,inmail:e.inmail!=null?e.inmail:bI,edited:!!emailEdits[c.id],tailored:!!(recData[c.id]&&recData[c.id].email)};}
 function senderName(){var v=(document.getElementById("sender").value||"").trim();return v||"[Your name]";}
-function withSender(body){return String(body).replace("[Your name]",senderName());}
+function withSender(t){t=String(t||"");t=t.replace(/(^|\n)(Thanks,|Best regards,|Kind regards,|Regards,|Warm regards,)\s*\n(\[Your name\])\s*$/,function(m,p1){return p1+signoffWord()+"\n[Your name]";});return t.split("[Your name]").join(senderName());}
 function isApproved(id){return approved.some(function(a){return a.contactId===id;});}
 function uid(){return "a"+Date.now().toString(36)+Math.random().toString(36).slice(2,6);}
 
@@ -911,7 +1063,7 @@ function callClaude(system,messages,maxTokens,tools){
   var key=(store.get("anthropic_key","")||"").trim();
   var headers={"Content-Type":"application/json"};
   if(key){headers["x-api-key"]=key;headers["anthropic-version"]="2023-06-01";headers["anthropic-dangerous-direct-browser-access"]="true";}
-  var bodyObj={model:"claude-sonnet-4-6",max_tokens:maxTokens||1024,messages:messages};
+  var bodyObj={model:modelId(),max_tokens:maxTokens||1024,messages:messages};
   if(system)bodyObj.system=system;
   if(tools&&tools.length)bodyObj.tools=tools;
   return fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:headers,body:JSON.stringify(bodyObj)})
@@ -1144,15 +1296,15 @@ function switchPanel(id){if(id==="oversight"){if(!isAdmin()){id="account";}else{
   window.scrollTo(0,0);
 }
 document.getElementById("nav").addEventListener("click",function(e){var b=e.target.closest("button[data-p]");if(!b)return;switchPanel(b.getAttribute("data-p"));});
-function setCtab(t){document.querySelectorAll("#ctabs .ctab").forEach(function(x){x.classList.toggle("on",x.getAttribute("data-ct")===t);});var pr=document.getElementById("pane-rec"),pu=document.getElementById("pane-up");if(pr)pr.classList.toggle("show",t==="rec");if(pu)pu.classList.toggle("show",t==="up");}
+function setCtab(t){document.querySelectorAll("#ctabs .ctab").forEach(function(x){x.classList.toggle("on",x.getAttribute("data-ct")===t);});[["pane-rec","rec"],["pane-up","up"],["pane-prof","prof"],["pane-rev","rev"]].forEach(function(p){var el=document.getElementById(p[0]);if(el)el.classList.toggle("show",t===p[1]);});if(t==="prof")renderProfiles();if(t==="rev")renderReview();}
 document.querySelectorAll("#ctabs .ctab").forEach(function(b){b.addEventListener("click",function(){setCtab(b.getAttribute("data-ct"));});});
-function updateContactCounts(){var r=document.getElementById("recCount");if(r)r.textContent=CONTACTS.length;var u=document.getElementById("upCount");if(u)u.textContent=uploaded.length;}
+function updateContactCounts(){var r=document.getElementById("recCount");if(r)r.textContent=CONTACTS.length;var u=document.getElementById("upCount");if(u)u.textContent=uploaded.length;var p=document.getElementById("profCount");if(p)p.textContent=uploaded.filter(function(x){return x.research||x.status==="working";}).length;var v=document.getElementById("revCount");if(v)v.textContent=centralAll().filter(function(x){return !x.deleted&&(x.status==="review"||x.status==="approved");}).length;}
 document.querySelector(".settings-link").addEventListener("click",function(){switchPanel("settings");});
 
 document.getElementById("filter").addEventListener("click",function(e){var b=e.target.closest("button");if(!b)return;document.querySelectorAll("#filter button").forEach(function(x){x.classList.remove("on");});b.classList.add("on");var f=b.getAttribute("data-f");document.querySelectorAll(".contact").forEach(function(c){c.style.display=(f==="all"||c.getAttribute("data-status")===f)?"":"none";});});
 
 var senderEl=document.getElementById("sender");
-senderEl.value=store.get("sender","");
+senderEl.value=store.get("sender","Sarah");
 function refreshBodies(){
   document.querySelectorAll("[data-body]").forEach(function(el){var c=CONTACTS.find(function(x){return x.id===el.getAttribute("data-body");});if(c)el.textContent=withSender(curEmail(c).body);});
   document.querySelectorAll("[data-abody]").forEach(function(el){var a=approved.find(function(x){return x.id===el.getAttribute("data-abody");});if(a)el.textContent=withSender(a.body);});
@@ -1205,13 +1357,16 @@ function composeSystem(){return [
 "3. What we do. One line, adapted to their area: reaching those people is what we do at FutureBridge, primary, bottom-up intelligence on the technical and commercial reality before capital or commitments are made. No client names, no proof points, no promises.",
 "4. What it could mean for them. Optional, include only when it sharpens the email: For a [their portfolio or remit], that could mean: followed by exactly two short bullet questions, each under 18 words, naming precisely what we would find out.",
 "5. The close. A hard rule, always this sentence, adjusted only for grammar: If this is useful to discuss near-term, we'd welcome a 30-minute meeting at a date and time of your choosing.",
-"6. The sign-off. A hard rule: Thanks, then [Your name] on its own line. Nothing else. No titles, no email address, no phone number, no links, no firm line, no images.",
+"6. The sign-off. A hard rule: "+signoffWord()+" then [Your name] on its own line. Nothing else. No titles, no email address, no phone number, no links, no firm line, no images.",
 "Build the opening tension and the ecosystem from the points the user gives. If the points cannot support a specific tension in this person's world, do not write. Return leave with a one line reason.",
 "",
 "LOGIC GUARDRAILS, checked before returning:",
 "- Every sentence must connect to this person's actual remit and the decision in front of them. If a fact does not change that decision, leave it out.",
 "- Never mention an acquisition, ownership change or other corporate event unless it directly changes the specific decision being discussed, and never as the hook or opening. Never connect corporate activity to a technical or commercial question unless the connection is real and explicit in the intelligence. If the connection needs explaining, it does not exist.",
 "- Never assert technical specifics beyond the verified intelligence. If a claim is uncertain, leave it out and flag it in check so it can be validated.",
+"- Never reproduce the job title as it appears on LinkedIn inside the email, and never let abbreviations reach the prose. NA Light Industrial pricing becomes North America light industrial pricing, or better, a plain description of the remit. If an abbreviation cannot be expanded with certainty, leave it out.",
+"- Use any region or geographic scope exactly as evidenced. Never substitute a neighbouring or similar region. Eurasia is not Africa and the Middle East.",
+"- Write for the remit as evidenced, not the obvious reading of the title. Indirect sourcing is logistics, MRO, services and IT, not chemical raw materials. Innovation marketing for process water is not packaging. Operations owns plants and quality, not product or sales.",
 "- Read the draft once as the recipient. If any line would make a domain expert pause and think that does not follow, rewrite or remove it.",
 "",
 "SHAPE: 90 to 130 words. Short paragraphs of one or two sentences, with a blank line between every paragraph. Generous whitespace, especially towards the end. Greeting: Hi [first name].",
@@ -1354,7 +1509,7 @@ document.getElementById("set-hub").value=store.get("hubspot_token","");
 var _pdlEl=document.getElementById("set-pdl");if(_pdlEl)_pdlEl.value=store.get("pdl_key","");
 document.getElementById("set-style").value=houseStyle;
 document.getElementById("saveSettings").addEventListener("click",function(){
-  store.set("anthropic_key",(document.getElementById("set-key").value||"").trim());store.set("fb_project",(document.getElementById("set-fbp").value||"").trim());store.set("fb_key",(document.getElementById("set-fbk").value||"").trim());
+  store.set("anthropic_key",(document.getElementById("set-key").value||"").trim());store.set("fb_project",(document.getElementById("set-fbp").value||"").trim());store.set("fb_key",(document.getElementById("set-fbk").value||"").trim());store.set("pplx_key",(document.getElementById("set-pplx").value||"").trim());store.set("model",(document.getElementById("set-model").value||""));store.set("signoff",(document.getElementById("set-signoff").value||"Best regards,"));refreshBodies();renderApproved();
   store.set("hubspot_token",(document.getElementById("set-hub").value||"").trim());
   var _pe=document.getElementById("set-pdl");if(_pe)store.set("pdl_key",(_pe.value||"").trim());
   houseStyle=(document.getElementById("set-style").value||"").trim();store.set("house_style",houseStyle);
@@ -1449,104 +1604,195 @@ function designationInfo(u){
   if(a===b||(a&&b&&(a.indexOf(b)>-1||b.indexOf(a)>-1)))return {cls:"ok",label:"Designation verified",line:"Matches your file. Confirmed as "+conf+"."};
   return {cls:"warn",label:"Designation corrected",line:"Your file said "+given+". Trusted sources show "+conf+"."};
 }
+function upCity(u){var R=u.research||{};var loc=(R.location&&(R.location.city||R.location.country))?R.location:splitLoc((u.pdl&&u.pdl.location)||"");return {city:loc.city||"",country:loc.country||""};}
 function renderUploaded(){
   updateContactCounts();
   var list=document.getElementById("uploadList");
   var has=uploaded.length>0;
   document.getElementById("upHeading").style.display=has?"":"none";
   document.getElementById("upToolbar").style.display=has?"":"none";
-  if(!has){list.innerHTML="";return;}
-  list.innerHTML=uploaded.map(function(u){
+  if(!has){list.innerHTML="";renderProfiles();renderReview();return;}
+  var rows=uploaded.map(function(u){
     var st=UP_STATUS[u.status]||UP_STATUS.pending;
-    var links=vlinks(u.name);
-    if(u.research&&u.research.linkedin_url){links=[{label:"LinkedIn profile (found)",url:u.research.linkedin_url,li:true}].concat(links.slice(1));}
-    var linkHtml=links.map(function(l){return '<a class="vlink'+(l.li?' li':'')+'" href="'+esc(l.url)+'" target="_blank" rel="noopener">'+esc(l.label)+'</a>';}).join("");
-    var srcHtml="";
-    if(u.research&&u.research.sources&&u.research.sources.length){srcHtml=u.research.sources.map(function(x){return '<a class="vlink" href="'+esc(x.url)+'" target="_blank" rel="noopener">'+esc(x.label||"source")+'</a>';}).join("");}
-    var intel="";
-    if(u.research){
-      var R=u.research;
-      if(u.status==="in_company"){
-        var pts=(R.points||[]).map(function(p){return '<li>'+esc(p.text)+(p.source?' <a href="'+esc(p.source)+'" target="_blank" rel="noopener">source</a>':'')+'</li>';}).join("");
-        intel='<div class="intel">'+
-          (R.corrected_title?'<div class="row"><b>Confirmed title.</b> '+esc(R.corrected_title)+(R.business_unit?', '+esc(R.business_unit):'')+'</div>':'')+
-          (R.summary?'<div class="row"><b>What they do.</b> '+esc(R.summary)+'</div>':'')+
-          (pts?'<div class="row"><b>Contact intelligence.</b><ul>'+pts+'</ul></div>':'')+
-          (R.relevance?'<div class="row"><b>Fit for our work.</b> '+esc(R.relevance.fit||"")+'. '+esc(R.relevance.reason||"")+'</div>':'')+
-          (R.confidence?'<div class="row faint" style="font-size:12.5px">Confidence: '+esc(R.confidence)+'. Confirm the LinkedIn profile before sending.</div>':'')+
-          (srcHtml?'<div class="row"><b>Sources used.</b><div class="vlinks">'+srcHtml+'</div></div>':'')+
-        '</div>';
-      } else {
-        intel='<div class="intel"><div class="row"><b>'+esc(st.t)+'.</b> '+esc(R.note||(R.current_employer?("Current employer appears to be "+R.current_employer+"."):"No further research was done."))+'</div>'+
-          (R.summary&&u.status==="uncertain"?'<div class="row">'+esc(R.summary)+'</div>':'')+
-          (srcHtml?'<div class="row"><b>Sources checked.</b><div class="vlinks">'+srcHtml+'</div></div>':'')+
-          '<div class="row faint" style="font-size:12.5px">No email is generated for someone who has left or cannot be confirmed. Use the links above to check, then research again if needed.</div></div>';
-      }
+    var loc=upCity(u);
+    var di=designationInfo(u);
+    var researched=!!u.research||u.status==="working";
+    return '<tr data-urow="'+u.id+'">'+
+      '<td><span class="tn">'+esc(u.name)+'</span>'+(di?'<div style="margin-top:3px"><span class="pill '+di.cls+'" style="font-size:10.5px">'+esc(di.label)+'</span></div>':'')+'</td>'+
+      '<td>'+esc((u.research&&(u.research.title_plain||u.research.corrected_title))||(u.pdl&&u.pdl.title)||u.title||"")+'</td>'+
+      '<td>'+esc((u.research&&u.research.business_unit)||u.unit||"")+'</td>'+
+      '<td>'+esc(u.company||"Solenis")+'</td>'+
+      '<td>'+esc(loc.city)+'</td>'+
+      '<td>'+esc(loc.country)+'</td>'+
+      '<td><span class="upstatus '+st.c+'">'+esc(st.t)+'</span></td>'+
+      '<td><div class="tacts">'+
+        '<button class="btn sm" data-updl="'+u.id+'">'+(u.pdl?"Re-check title":"Verify title")+'</button>'+
+        '<button class="btn sm '+(researched?'':'red')+'" data-uresearch="'+u.id+'">'+(u.research?"Research again":"Verify and research")+'</button>'+
+        (researched?'<button class="btn sm red" data-uopen="'+u.id+'">Open profile</button>':'')+
+        '<button class="btn sm ghost" data-uremove="'+u.id+'">Remove</button>'+
+        '<span class="procnote" data-proc="up-'+u.id+'"></span></div></td></tr>';
+  }).join("");
+  list.innerHTML='<table class="uptable"><thead><tr><th>Name</th><th>Designation</th><th>Division</th><th>Company</th><th>City</th><th>Country</th><th>Status</th><th>Actions</th></tr></thead><tbody>'+rows+'</tbody></table>';
+  list.querySelectorAll("[data-updl]").forEach(function(b){b.addEventListener("click",function(){pdlOne(b.getAttribute("data-updl"),b);});});
+  list.querySelectorAll("[data-uresearch]").forEach(function(b){b.addEventListener("click",function(){researchOne(b.getAttribute("data-uresearch"),b);});});
+  list.querySelectorAll("[data-uopen]").forEach(function(b){b.addEventListener("click",function(){setCtab("prof");var el=document.querySelector('[data-uid="'+b.getAttribute("data-uopen")+'"]');if(el)el.scrollIntoView({behavior:"smooth",block:"start"});});});
+  list.querySelectorAll("[data-uremove]").forEach(function(b){b.addEventListener("click",function(){var u0=upFind(b.getAttribute("data-uremove"));if(u0)logAction("delete","uploaded contact removed, "+u0.name);uploaded=uploaded.filter(function(x){return x.id!==b.getAttribute("data-uremove");});persistUploaded();renderUploaded();});});
+  renderProfiles();renderReview();
+}
+function evTag(v){v=String(v||"").toLowerCase();var cls=(v.indexOf("verif")>-1?"verified":(v.indexOf("report")>-1?"reported":(v.indexOf("infer")>-1?"inferred":"unknown")));return v?'<span class="evtag '+cls+'">'+esc(v)+'</span>':"";}
+function renderProfiles(){
+  updateContactCounts();
+  var box=document.getElementById("profList");if(!box)return;
+  var subset=uploaded.filter(function(u){return u.research||u.status==="working";});
+  if(!subset.length){box.innerHTML='<p class="muted">No research started yet. Go to the Contact list tab, add people, and press Verify and research. Each researched person appears here with their evidence file, audit and draft.</p>';return;}
+  box.innerHTML=subset.map(function(u){
+    var st=UP_STATUS[u.status]||UP_STATUS.pending;
+    var R=u.research||{};var rem=R.remit||{};var reg=R.region||{};
+    var loc=upCity(u);
+    var head='<div class="uphead"><div><div class="un">'+esc(u.name)+'</div><div class="ut">'+esc([R.title_plain||R.corrected_title||u.title,R.business_unit||u.unit,[loc.city,loc.country].filter(Boolean).join(", ")].filter(Boolean).join(" | "))+'</div></div><span class="upstatus '+st.c+'">'+esc(st.t)+'</span></div>';
+    var prof="";
+    if(u.status==="working"){prof='<div class="evrow faint">Researching now. The evidence file, audit and draft controls appear here when it completes.</div>';}
+    else if(u.status!=="in_company"){prof='<div class="evrow"><b>'+esc(st.t)+'.</b> '+esc(R.note||(R.current_employer?("Current employer appears to be "+R.current_employer+"."):"Could not be confirmed."))+'</div>';}
+    else{
+      var sigs=((R.signals&&R.signals.length)?R.signals:(R.points||[])).map(function(p){return '<div class="evrow">- '+esc(p.text)+(p.recency?' <span class="faint">('+esc(p.recency)+')</span>':'')+evTag(p.confidence)+(p.source&&String(p.source).indexOf("http")===0?' <a href="'+esc(p.source)+'" target="_blank" rel="noopener">source</a>':'')+'</div>';}).join("");
+      prof=
+      '<div class="evrow"><b>Title, exactly as stated.</b> '+esc(R.title_exact||"not captured")+' <span class="faint">(never quoted in the email)</span></div>'+
+      '<div class="evrow"><b>Title in plain words.</b> '+esc(R.title_plain||R.corrected_title||"")+'</div>'+
+      (rem.summary?'<div class="evrow"><b>Remit.</b> '+esc(rem.summary)+evTag(rem.confidence)+(rem.direct_or_indirect?' <span class="pill amb" style="font-size:10.5px">'+esc(rem.direct_or_indirect)+'</span>':'')+'</div>':'')+
+      (rem.basis?'<div class="evrow faint" style="font-size:12.5px"><b>Basis.</b> '+esc(rem.basis)+(rem.alternatives_considered?' Considered and rejected: '+esc(rem.alternatives_considered):'')+'</div>':'')+
+      (reg.value?'<div class="evrow"><b>Region, exactly as evidenced.</b> '+esc(reg.value)+evTag(reg.confidence)+'</div>':'')+
+      (R.summary?'<div class="evrow"><b>What they own.</b> '+esc(R.summary)+'</div>':'')+
+      (sigs?'<div class="evrow" style="margin-top:9px"><b>Signals used in drafting.</b></div>'+sigs:'')+
+      (R.red_flags&&R.red_flags.length?'<div class="evrow" style="margin-top:9px"><b>Red flags.</b></div>'+R.red_flags.map(function(x){return '<div class="missue">'+esc(x)+'</div>';}).join(""):'')+
+      (R.relevance?'<div class="evrow" style="margin-top:9px"><b>Fit.</b> '+esc(R.relevance.fit||"")+'. '+esc(R.relevance.reason||"")+'</div>':'');
     }
-    var gen="";
-    if(u.gen){
-      gen='<div class="email" data-uemailwrap="'+u.id+'" style="margin-top:14px"><div class="ehead"><p class="label">Draft email and InMail</p><span class="acts">'+
-        '<button class="btn sm" data-uedit="'+u.id+'">Edit</button>'+
-        '<button class="btn sm" data-ucopy-subj="'+u.id+'">Copy subject</button>'+
-        '<button class="btn sm" data-ucopy-email="'+u.id+'">Copy email</button>'+
-        '<button class="btn sm" data-ucopy-inmail="'+u.id+'">Copy InMail</button>'+
-        '<button class="btn sm red" data-uapprove="'+u.id+'">Approve and store</button></span></div>'+
-        '<div class="subj"><b>Subject.</b> '+esc(u.gen.subject||"")+'</div><div class="bodytext">'+esc(withSender(u.gen.email||""))+'</div>'+
-        '<div class="subj" style="border-top:1px solid var(--line);margin-top:4px;padding-top:10px"><b style="color:var(--ink)">LinkedIn InMail</b></div><div class="bodytext">'+esc(withSender(u.gen.inmail||""))+'</div></div>';
-    }
+    var meter=(u.status==="in_company")?meterHTML(u)+'<div style="margin:-4px 0 10px"><button class="btn sm" data-uaudit="'+u.id+'">Re-run audit</button></div>':"";
     var leaveNote=(u.genNote&&!u.gen)?'<div class="vcheck"><b>The writer suggested leaving this one.</b> '+esc(u.genNote)+' You can still write it anyway using the button below.</div>':'';
     var inco=u.status==="in_company";
     var forceNow=(!inco)||(!!u.genNote&&!u.gen);
-    var genBtn='<button class="btn red sm" data-ugen="'+u.id+'" data-force="'+(forceNow?"1":"0")+'">'+(u.gen?"Rewrite email and InMail":(u.genNote?"Write email anyway":(inco?"Generate email and InMail":"Write email anyway")))+'</button>';
-    var researchBtn='<button class="btn sm" data-uresearch="'+u.id+'">'+(u.research?"Research again":"Verify and research")+'</button>';
-    var pdlBtn='<button class="btn sm" data-updl="'+u.id+'">'+(u.pdl?"Re-check title (PDL)":"Verify title (People Data Labs)")+'</button>';
-    return '<div class="upcard" data-uid="'+u.id+'">'+
-      '<div class="uphead"><div><div class="un">'+esc(u.name)+'</div><div class="ut">'+esc([u.title,u.unit,u.company].filter(Boolean).join(", "))+'</div></div><span class="upstatus '+st.c+'">'+esc(st.t)+'</span></div>'+(function(){var di=designationInfo(u);return di?'<div class="desigtag"><span class="pill '+di.cls+'">'+esc(di.label)+'</span> <span class="what">'+esc(di.line)+'</span></div>':"";})()+
-      (u.pdl?'<div class="pdlbox"><div class="pdlhdr"><span class="pill ok">People Data Labs</span> current role, from licensed LinkedIn data</div><div class="pdlgrid">'+
-        (u.pdl.title?'<div><span class="k">Current title</span><span class="v">'+esc(u.pdl.title)+'</span></div>':'')+
-        (u.pdl.company?'<div><span class="k">Company</span><span class="v">'+esc(u.pdl.company)+'</span></div>':'')+
-        ((u.pdl.role||u.pdl.sub)?'<div><span class="k">Function</span><span class="v">'+esc([u.pdl.role,u.pdl.sub].filter(Boolean).join(" / "))+'</span></div>':'')+
-        (u.pdl.level?'<div><span class="k">Seniority</span><span class="v">'+esc(u.pdl.level)+'</span></div>':'')+
-        (u.pdl.location?'<div><span class="k">Location</span><span class="v">'+esc(u.pdl.location)+'</span></div>':'')+
-        '</div>'+(u.pdl.linkedin?'<a class="vlink li" href="'+esc(u.pdl.linkedin)+'" target="_blank" rel="noopener">LinkedIn profile (People Data Labs)</a>':'')+'</div>':'')+
-      (u.pdlNote?'<div class="row faint" style="font-size:12.5px;margin:6px 0 0">'+esc(u.pdlNote)+'</div>':'')+
-      '<div class="vlinks">'+linkHtml+'</div>'+
-      '<div class="liverify"><label style="display:flex;align-items:center;gap:8px;cursor:pointer"><input type="checkbox" data-uli="'+u.id+'" '+(u.liVerified?"checked":"")+' /> I have opened the LinkedIn profile and confirmed this is the right person</label>'+(u.liVerified?'<span class="status"><span class="sq"></span>LinkedIn confirmed</span>':'')+'</div>'+
-      '<details class="ctxbox"'+(u.context?' open':'')+'><summary>Add context for this person (optional)</summary><textarea data-uctx="'+u.id+'" rows="3" placeholder="Anything you already know that should shape the email. Leave blank and the tool researches from trusted sources on its own.">'+esc(u.context||"")+'</textarea></details>'+
-      intel+
-      leaveNote+
-      '<div class="upacts">'+researchBtn+pdlBtn+genBtn+'<button class="btn sm ghost" data-uremove="'+u.id+'">Remove</button><span class="procnote" data-proc="up-'+u.id+'"></span></div>'+
-      gen+
-    '</div>';
+    var canGen=inco||u.status==="uncertain"||u.status==="left_company";
+    var genBtn=canGen?'<button class="btn red sm" data-ugen="'+u.id+'" data-force="'+(forceNow?"1":"0")+'">'+(u.gen?"Rewrite email and InMail":(u.genNote?"Write email anyway":(inco?"Generate email and InMail":"Write email anyway")))+'</button>':"";
+    var revState=u.review==="practice"?'<span class="pill amb">In practice review</span>':(u.review==="approved"?'<span class="pill ok">Approved</span>':"");
+    var draft="";
+    if(u.gen){
+      draft='<div class="email" style="margin-top:12px"><div class="ehead"><p class="label">The draft '+revState+'</p><span class="acts" style="display:flex;gap:7px;flex-wrap:wrap">'+
+      '<button class="btn sm" data-uedit="'+u.id+'">Edit</button>'+
+      '<button class="btn sm" data-ucopy-subj="'+u.id+'">Copy subject</button>'+
+      '<button class="btn sm" data-ucopy-email="'+u.id+'">Copy email</button>'+
+      '<button class="btn sm" data-ucopy-inmail="'+u.id+'">Copy InMail</button>'+
+      '<button class="btn sm dark" data-ureview="'+u.id+'">'+(u.review==="practice"?"Saved for practice review":"Save for practice review")+'</button>'+
+      '<button class="btn sm red" data-uapprove="'+u.id+'">Approve and store</button></span></div>'+
+      '<div class="subj"><b>Subject.</b> '+esc(u.gen.subject||"")+'</div><div class="bodytext">'+esc(withSender(u.gen.email||""))+'</div>'+
+      '<div class="subj" style="border-top:1px solid var(--line);margin-top:4px;padding-top:10px"><b style="color:var(--ink)">LinkedIn InMail</b></div><div class="bodytext">'+esc(withSender(u.gen.inmail||""))+'</div></div>'+
+      '<div class="assist"><b style="font-size:13px">Assistant, alongside this email</b><div class="anote">Tell it what to change: shorten it, lead with the water angle, make the bullets sharper, sound less formal. It rewrites within the house rules and you can undo.</div>'+
+      '<textarea data-uask="'+u.id+'" placeholder="What should change in this draft?"></textarea>'+
+      '<div style="display:flex;gap:8px;align-items:center"><button class="btn sm red" data-uassist="'+u.id+'">Improve with assistant</button><button class="btn sm ghost" data-uundo="'+u.id+'" '+(u.prevGen?'':'disabled')+'>Undo last change</button><span class="procnote" data-proc="as-'+u.id+'"></span></div>'+
+      '<div class="anote" data-uanote="'+u.id+'"></div></div>';
+    }
+    var ctx='<div class="evrow" style="margin-top:10px"><b>Context for the writer</b> <span class="faint">(optional, saved as you type)</span></div><textarea data-uctx="'+u.id+'" style="width:100%;box-sizing:border-box;border:1px solid var(--line-2);border-radius:9px;padding:9px 11px;font-family:var(--sans);font-size:13px;min-height:44px">'+esc(u.context||"")+'</textarea>';
+    return '<div class="upcard" data-uid="'+u.id+'">'+head+prof+meter+leaveNote+ctx+'<div class="upacts" style="margin-top:10px">'+genBtn+'<span class="procnote" data-proc="up-'+u.id+'"></span></div>'+draft+'</div>';
   }).join("");
-
-  list.querySelectorAll("[data-uctx]").forEach(function(t){t.addEventListener("change",function(){var u=upFind(t.getAttribute("data-uctx"));if(u){u.context=t.value;persistUploaded();}});});
-  list.querySelectorAll("[data-uli]").forEach(function(b){b.addEventListener("change",function(){var u=upFind(b.getAttribute("data-uli"));if(u){u.liVerified=b.checked;persistUploaded();renderUploaded();}});});
-  list.querySelectorAll("[data-uremove]").forEach(function(b){b.addEventListener("click",function(){var u0=upFind(b.getAttribute("data-uremove"));if(u0)logAction("delete","uploaded contact removed, "+u0.name);uploaded=uploaded.filter(function(x){return x.id!==b.getAttribute("data-uremove");});persistUploaded();renderUploaded();});});
-  list.querySelectorAll("[data-uresearch]").forEach(function(b){b.addEventListener("click",function(){researchOne(b.getAttribute("data-uresearch"),b);});});
-  list.querySelectorAll("[data-updl]").forEach(function(b){b.addEventListener("click",function(){pdlOne(b.getAttribute("data-updl"),b);});});
-  list.querySelectorAll("[data-ugen]").forEach(function(b){b.addEventListener("click",function(){generateOne(b.getAttribute("data-ugen"),b,b.getAttribute("data-force")==="1");});});
-  list.querySelectorAll("[data-uedit]").forEach(function(b){b.addEventListener("click",function(){editUploadedEmail(b.getAttribute("data-uedit"));});});
-  list.querySelectorAll("[data-ucopy-subj]").forEach(function(b){b.addEventListener("click",function(){var u=upFind(b.getAttribute("data-ucopy-subj"));copyText(u.gen.subject||"",b);});});
-  list.querySelectorAll("[data-ucopy-email]").forEach(function(b){b.addEventListener("click",function(){var u=upFind(b.getAttribute("data-ucopy-email"));copyText("Subject: "+(u.gen.subject||"")+"\n\n"+withSender(u.gen.email||""),b);});});
-  list.querySelectorAll("[data-ucopy-inmail]").forEach(function(b){b.addEventListener("click",function(){var u=upFind(b.getAttribute("data-ucopy-inmail"));copyText(withSender(u.gen.inmail||""),b);});});
-  list.querySelectorAll("[data-uapprove]").forEach(function(b){b.addEventListener("click",function(){var u=upFind(b.getAttribute("data-uapprove"));var R=u.research||{},P=u.pdl||{};var title=P.title||R.corrected_title||u.title||"";var div=R.business_unit||u.unit||"";var li=P.linkedin||R.linkedin_url||u.linkedin||"";var roles=R.summary||"";var loc=splitLoc(P.location||R.location||"");addApprovedCustom(u.name,[title,div].filter(Boolean).join(", "),u.gen.subject||"",u.gen.email||"",u.gen.inmail||"",{designation:title,division:div,city:loc.city,country:loc.country,roles:roles,linkedin:li,email:u.email||""});var ci2=u.gen&&u.gen.centralId;if(ci2)centralUpdate(ci2,{status:"approved"},"approve",u.name);else recordDraft({contact:u.name,subject:u.gen.subject||"",body:u.gen.email||"",inmail:u.gen.inmail||"",source:"uploaded"},"approved","approve");b.textContent="Stored in Approved";b.disabled=true;renderApproved();});});
+  wireProfiles(box);
+}
+function wireProfiles(box){
+  box.querySelectorAll("[data-uaudit]").forEach(function(b){b.addEventListener("click",function(){auditOne(b.getAttribute("data-uaudit"),b);});});
+  box.querySelectorAll("[data-ugen]").forEach(function(b){b.addEventListener("click",function(){generateOne(b.getAttribute("data-ugen"),b,b.getAttribute("data-force")==="1");});});
+  box.querySelectorAll("[data-uctx]").forEach(function(t){t.addEventListener("change",function(){var u=upFind(t.getAttribute("data-uctx"));if(u){u.context=t.value;persistUploaded();}});});
+  box.querySelectorAll("[data-uedit]").forEach(function(b){b.addEventListener("click",function(){editUploadedEmail(b.getAttribute("data-uedit"));});});
+  box.querySelectorAll("[data-ucopy-subj]").forEach(function(b){b.addEventListener("click",function(){var u=upFind(b.getAttribute("data-ucopy-subj"));copyText(u.gen.subject||"",b);});});
+  box.querySelectorAll("[data-ucopy-email]").forEach(function(b){b.addEventListener("click",function(){var u=upFind(b.getAttribute("data-ucopy-email"));copyText(withSender(u.gen.email||""),b);});});
+  box.querySelectorAll("[data-ucopy-inmail]").forEach(function(b){b.addEventListener("click",function(){var u=upFind(b.getAttribute("data-ucopy-inmail"));copyText(withSender(u.gen.inmail||""),b);});});
+  box.querySelectorAll("[data-ureview]").forEach(function(b){b.addEventListener("click",function(){saveForReview(b.getAttribute("data-ureview"));});});
+  box.querySelectorAll("[data-uapprove]").forEach(function(b){b.addEventListener("click",function(){var u=upFind(b.getAttribute("data-uapprove"));var R=u.research||{},P=u.pdl||{};var title=R.title_plain||P.title||R.corrected_title||u.title||"";var div=R.business_unit||u.unit||"";var li=P.linkedin||R.linkedin_url||u.linkedin||"";var roles=(R.remit&&R.remit.summary)||R.summary||"";var loc=upCity(u);addApprovedCustom(u.name,[title,div].filter(Boolean).join(", "),u.gen.subject||"",u.gen.email||"",u.gen.inmail||"",{designation:title,division:div,city:loc.city,country:loc.country,roles:roles,linkedin:li,email:u.email||""});var ci2=u.gen&&u.gen.centralId;if(ci2)centralUpdate(ci2,{status:"approved"},"approve",u.name);else recordDraft({contact:u.name,subject:u.gen.subject||"",body:u.gen.email||"",inmail:u.gen.inmail||"",source:"uploaded"},"approved","approve");u.review="approved";persistUploaded();b.textContent="Stored in Approved";b.disabled=true;renderApproved();renderProfiles();});});
+  box.querySelectorAll("[data-uassist]").forEach(function(b){b.addEventListener("click",function(){assistOne(b.getAttribute("data-uassist"),b);});});
+  box.querySelectorAll("[data-uundo]").forEach(function(b){b.addEventListener("click",function(){var u=upFind(b.getAttribute("data-uundo"));if(u&&u.prevGen){var keep=u.prevGen;u.prevGen=null;var cid=u.gen&&u.gen.centralId;u.gen={subject:keep.subject,email:keep.email,inmail:keep.inmail,centralId:cid};if(cid)centralUpdate(cid,{subject:u.gen.subject,body:u.gen.email,inmail:u.gen.inmail});persistUploaded();renderProfiles();}});});
+}
+function saveForReview(id){
+  var u=upFind(id);if(!u||!u.gen)return;
+  u.review="practice";
+  var loc=upCity(u);var R=u.research||{};
+  var patch={status:"review",subject:u.gen.subject||"",body:u.gen.email||"",inmail:u.gen.inmail||"",designation:R.title_plain||R.corrected_title||u.title||"",division:R.business_unit||u.unit||"",city:loc.city,country:loc.country,region:(R.region&&R.region.value)||"",remit:(R.remit&&R.remit.summary)||"",signals:((R.signals||R.points)||[]).map(function(x){return x.text;}).join(" | "),linkedin:R.linkedin_url||u.linkedin||"",score:(u.audit&&u.audit.score)||"",band:(u.audit&&u.audit.band)||""};
+  if(u.gen.centralId)centralUpdate(u.gen.centralId,patch,"review",u.name);
+  else u.gen.centralId=recordDraft({contact:u.name,source:"uploaded",subject:patch.subject,body:patch.body,inmail:patch.inmail,designation:patch.designation,division:patch.division,city:patch.city,country:patch.country,region:patch.region,remit:patch.remit,signals:patch.signals,linkedin:patch.linkedin,score:patch.score,band:patch.band},"review","review");
+  persistUploaded();renderProfiles();renderReview();
+}
+function assistSystem(){return ["You are an editorial assistant working alongside one prospecting email for FutureBridge. Apply the user's instruction to the draft while keeping every house rule: 90 to 130 words, short paragraphs with blank lines, no em or en dashes, straight quotes, no banned marketing words, plain confident peer-to-peer voice, British spelling, the close sentence If this is useful to discuss near-term, we'd welcome a 30-minute meeting at a date and time of your choosing, and the sign-off "+signoffWord()+" then [Your name]. Never quote the raw profile title, never use unexpanded abbreviations, never invent facts beyond the evidence given.","Return ONLY strict JSON with keys subject, email, inmail, note. The note is one sentence on what you changed."].join("\n");}
+function assistOne(id,btn){
+  var u=upFind(id);if(!u||!u.gen)return;
+  var ask=(document.querySelector('[data-uask="'+id+'"]').value||"").trim();
+  var noteEl=document.querySelector('[data-uanote="'+id+'"]');
+  if(!ask){noteEl.textContent="Tell the assistant what to change first.";return;}
+  var lbl=btn.textContent;btn.disabled=true;btn.innerHTML='<span class="spinner"></span>Working';setProc("as-"+id,"Rewriting",true);
+  var R=u.research||{};
+  var msg=["Instruction from the user: "+ask,"","Evidence file, do not go beyond it:",JSON.stringify({title_plain:R.title_plain||R.corrected_title,remit:R.remit,region:R.region,summary:R.summary,signals:R.signals||R.points},null,1),"","Current subject: "+(u.gen.subject||""),"","Current email:",u.gen.email||"","","Current InMail:",u.gen.inmail||"","","Return only the JSON object."].join("\n");
+  callClaude(assistSystem(),[{role:"user",content:msg}],1300).then(function(text){
+    var g=parseJSON(text);
+    if(!g||!g.email){noteEl.textContent="The assistant returned nothing usable. Try rephrasing the instruction.";return;}
+    u.prevGen={subject:u.gen.subject,email:u.gen.email,inmail:u.gen.inmail};
+    var cid=u.gen.centralId;
+    u.gen={subject:g.subject||u.gen.subject,email:g.email,inmail:g.inmail||u.gen.inmail,centralId:cid};
+    logAction("edit",u.name+" via assistant");
+    if(cid)centralUpdate(cid,{subject:u.gen.subject,body:u.gen.email,inmail:u.gen.inmail});
+    persistUploaded();renderProfiles();
+    var n2=document.querySelector('[data-uanote="'+id+'"]');if(n2)n2.textContent=g.note||"Applied.";
+  }).catch(function(err){noteEl.textContent="The assistant could not run. "+String(err&&err.message||err).slice(0,90);}).finally(function(){setProc("as-"+id,"",false);var b2=document.querySelector('[data-uassist="'+id+'"]');if(b2){b2.disabled=false;b2.textContent=lbl;}});
+}
+function exportReviewCSV(){
+  var mode=(document.getElementById("revStatus")||{}).value||"both";
+  var items=centralAll().filter(function(r){return !r.deleted&&(mode==="both"?(r.status==="review"||r.status==="approved"):r.status===mode);});
+  if(!items.length){window.alert("Nothing to export in this view yet.");return;}
+  var rows=[["Contact name","Designation","Division","Company","City","Country","Region","LinkedIn","Remit in plain words","Key signals used","Confidence score","Confidence band","Email subject","Email","LinkedIn InMail","Author","Status","Recorded"]];
+  items.forEach(function(r){rows.push([r.contact||"",r.designation||"",r.division||"","Solenis",r.city||"",r.country||"",r.region||"",r.linkedin||"",r.remit||"",r.signals||"",String(r.score||""),r.band?bandLabel(r.band):"",r.subject||"",withSender(r.body||""),withSender(r.inmail||""),r.author||"",r.status||"",new Date(r.ts||0).toISOString()]);});
+  download("solenis_practice_review.csv",toCSV(rows),"text/csv;charset=utf-8");
+  logAction("edit","practice review CSV exported, "+items.length+" rows");
+}
+function renderReview(){
+  updateContactCounts();
+  var box=document.getElementById("revList");if(!box)return;
+  var mode=(document.getElementById("revStatus")||{}).value||"both";
+  var items=centralAll().filter(function(r){return !r.deleted&&(mode==="both"?(r.status==="review"||r.status==="approved"):r.status===mode);}).sort(function(a,b){return (b.ts||0)-(a.ts||0);});
+  if(!items.length){box.innerHTML='<p class="muted">Nothing here yet. On a profile, press Save for practice review and it appears in this tab for review, editing and approval.</p>';return;}
+  box.innerHTML=items.map(function(r){
+    return '<div class="revitem" data-rid="'+esc(r.id)+'"><div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:flex-start"><div><b>'+esc(r.contact||"Contact")+'</b> <span class="pill '+(r.status==="approved"?"ok":"amb")+'">'+(r.status==="approved"?"Approved":"In practice review")+'</span>'+(r.band?' <span class="pill '+(r.band==="bank"?"ok":(r.band==="check"?"amb":"red"))+'">'+esc(String(r.score))+' / 100</span>':'')+'<div class="ovmeta">'+esc(r.author||"")+' &middot; '+new Date(r.ts||0).toLocaleString()+(r.designation?' &middot; '+esc(r.designation):'')+'</div></div></div>'+
+    '<label style="font-size:12px;font-weight:bold;display:block;margin-top:9px">Subject</label><input type="text" data-rs="'+esc(r.id)+'" value="'+esc(r.subject||"").replace(/"/g,"&quot;")+'" />'+
+    '<label style="font-size:12px;font-weight:bold;display:block;margin-top:4px">Email</label><textarea data-rb="'+esc(r.id)+'" rows="11">'+esc(r.body||"")+'</textarea>'+
+    '<label style="font-size:12px;font-weight:bold;display:block;margin-top:4px">LinkedIn InMail</label><textarea data-ri="'+esc(r.id)+'" rows="5">'+esc(r.inmail||"")+'</textarea>'+
+    '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px"><button class="btn sm" data-rsave="'+esc(r.id)+'">Save changes</button>'+(r.status!=="approved"?'<button class="btn sm red" data-rapprove="'+esc(r.id)+'">Approve</button>':'')+'<button class="btn sm ghost" data-rreturn="'+esc(r.id)+'">Return to drafts</button></div></div>';
+  }).join("");
+  box.querySelectorAll("[data-rsave]").forEach(function(b){b.addEventListener("click",function(){var id=b.getAttribute("data-rsave");centralUpdate(id,{subject:box.querySelector('[data-rs="'+id+'"]').value,body:box.querySelector('[data-rb="'+id+'"]').value,inmail:box.querySelector('[data-ri="'+id+'"]').value},"edit","practice review");b.textContent="Saved";setTimeout(function(){b.textContent="Save changes";},1200);syncReviewToContact(id);}); });
+  box.querySelectorAll("[data-rapprove]").forEach(function(b){b.addEventListener("click",function(){var id=b.getAttribute("data-rapprove");centralUpdate(id,{status:"approved",subject:box.querySelector('[data-rs="'+id+'"]').value,body:box.querySelector('[data-rb="'+id+'"]').value,inmail:box.querySelector('[data-ri="'+id+'"]').value},"approve","practice review");var rec=centralAll().find(function(x){return x.id===id;});if(rec){addApprovedCustom(rec.contact||"Contact",rec.designation||"",rec.subject||"",rec.body||"",rec.inmail||"",{designation:rec.designation||"",division:rec.division||"",city:rec.city||"",country:rec.country||"",roles:rec.remit||"",linkedin:rec.linkedin||"",email:""});}syncReviewToContact(id,"approved");renderReview();renderApproved();}); });
+  box.querySelectorAll("[data-rreturn]").forEach(function(b){b.addEventListener("click",function(){var id=b.getAttribute("data-rreturn");centralUpdate(id,{status:"generated"},"edit","returned to drafts");syncReviewToContact(id,"none");renderReview();}); });
+}
+function syncReviewToContact(cid,review){
+  var rec=centralAll().find(function(x){return x.id===cid;});if(!rec)return;
+  uploaded.forEach(function(u){if(u.gen&&u.gen.centralId===cid){u.gen.subject=rec.subject;u.gen.email=rec.body;u.gen.inmail=rec.inmail;if(review)u.review=(review==="none"?"none":review);persistUploaded();}});
+  renderProfiles();
 }
 function upFind(id){return uploaded.find(function(x){return x.id===id;});}
 
 function researchSystem(){return [
-"You verify a person's current role and gather professional intelligence for a B2B outreach tool used by FutureBridge to reach people at Solenis, a specialty chemicals company. Use web search to find current, accurate information from trustworthy public sources such as LinkedIn, the company website and press releases, reputable news, ZoomInfo, RocketReach, The Org and conference biographies.",
+"You verify a person's current role and build an evidence file for a B2B outreach tool used by FutureBridge to reach people at Solenis, a specialty chemicals company. Use web search on trustworthy public sources: LinkedIn, the company website, press releases, reputable news, ZoomInfo, RocketReach, The Org, conference biographies.",
+"",
+"EVIDENCE DISCIPLINE, the heart of this job:",
+"- Every claim carries a basis and a confidence: verified means you saw it stated on the person's profile or an official source; reported means a credible third party states it; inferred means you reasoned it from evidence and you say from what; unknown means unknown. Never guess and never fill gaps with the most likely story.",
+"- Copy the title exactly as written, into title_exact. Then expand it into natural business English in title_plain, spelling out every abbreviation. NA becomes North America, LI becomes light industrial, Sr becomes senior, and so on.",
+"- Copy any region or scope exactly as the profile states it, into region. Eurasia is Eurasia. Never substitute a neighbouring or similar-sounding geography. If the region is not stated, region is unknown.",
+"- Interpret the remit with care, in remit. State what this person actually owns day to day, the basis for that reading, and the alternatives you considered and rejected. Title words are ambiguous, so apply these rules:",
+"  Sourcing or procurement titles: establish whether the remit is direct materials or indirect, meaning logistics, MRO, professional services, IT and similar. Look for the phrase indirect, or category clues on the profile. If indirect, say so plainly; an email about chemical raw materials to an indirect sourcing leader is a known failure.",
+"  Marketing or innovation titles: establish which offering they market. In paper, process water treatment is not packaging and barrier coatings. Name the offering from evidence.",
+"  Operations titles: plants, quality and supply are operations. Never frame an operations leader as a product, sales or business development owner.",
+"  Planning, PMO, chief of staff or transformation-office titles: these usually support the corporate team through project management rather than owning a commercial decision. Say so.",
+"- Gather three to five signals: recent, specific, sourced observations about what this person appears to be driving or responding to. Each signal has text, source, a date or recency note, and a confidence.",
+"- List red_flags: anything that could make an email to this person misfire, including title ambiguity you could not resolve, stale profile data, or a support rather than decision remit.",
 "",
 "Steps:",
-"1. Find the person's current employer and job title.",
-"2. Decide status. Use in_company if they currently work at Solenis. Use left_company if they have clearly moved to a different employer. Use uncertain if you cannot confirm with reasonable confidence.",
-"3. If status is left_company or uncertain, do not gather deep intelligence. Note the current employer if known and the source, and stop.",
-"4. If status is in_company, gather: the corrected job title, the business unit, a one sentence plain summary of what they are responsible for, and three to five intelligence points about their responsibilities, what they appear to be driving, relevant background, and any recent public activity. Tie points to a source URL where you can.",
-"5. Assess fit for FutureBridge work. The strongest fit is leadership close to a growth decision: Consumer Solutions and barrier coatings for paper packaging, Chem-Aqua and data-centre liquid cooling, food and beverage and protein food safety, or post-NCH cross-sell and integration. People who are procurement only, plant operations only, or in an unrelated area are usually a lower fit. Return fit as high, medium or low with a one line reason.",
-"6. Provide a linkedin_url only if you find a confident match.",
-"7. List the key sources you used as objects with label and url.",
+"1. Find the current employer and title. Decide status: in_company, left_company, or uncertain.",
+"2. If left_company or uncertain, note the evidence and stop. Do not gather deep intelligence.",
+"3. If in_company, build the full evidence file as above.",
+"4. Assess fit for FutureBridge work. Strongest fit is leadership close to a growth decision: Consumer Solutions and barrier coatings, Chem-Aqua and data-centre cooling, food and beverage and protein food safety, post-NCH cross-sell. Indirect procurement, plant operations, IT and planning support roles are usually low fit. Return fit high, medium or low with a one line reason.",
+"5. Provide linkedin_url only on a confident match. List sources as objects with label and url.",
 "",
-"Be accurate and do not invent. Plain language. Return ONLY strict JSON, no markdown, with keys: status, current_employer, corrected_title, business_unit, summary, points (array of objects with text and source), relevance (object with fit and reason), linkedin_url, sources (array of objects with label and url), confidence, note."
+"Plain language throughout. Return ONLY strict JSON, no markdown, with keys: status, current_employer, title_exact, title_plain, corrected_title (same as title_plain, kept for compatibility), business_unit, location (object with city and country), region (object with value, basis, confidence), remit (object with summary, basis, alternatives_considered, direct_or_indirect where relevant, confidence), summary (two plain sentences on what they own), signals (array of objects with text, source, recency, confidence), points (array of objects with text and source, mirror of signals for compatibility), relevance (object with fit and reason), red_flags (array of strings), linkedin_url, sources (array of objects with label and url), confidence, note."
 ].join("\n");}
 function researchMsg(u){return ["Verify and research this person.","","Name: "+u.name,"Company we expect: "+(u.company||"Solenis"),"Title given to us: "+(u.title||"not given"),"LinkedIn given to us: "+(u.linkedin||"not given"),"Business unit given: "+(u.unit||"not given"),(u.context?("Context from our team: "+u.context):"No extra context was given. Research from trusted public sources."),"","Return only the JSON object."].join("\n");}
 function parseJSON(text){var clean=String(text).replace(/```json/gi,"").replace(/```/g,"").trim();var a=clean.indexOf("{"),b=clean.lastIndexOf("}");if(a>-1&&b>-1)clean=clean.slice(a,b+1);return JSON.parse(clean);}
@@ -1572,11 +1818,15 @@ function researchOne(id,btn){
   var u=upFind(id);if(!u)return;
   var lbl=btn?btn.textContent:"";if(btn){btn.disabled=true;btn.innerHTML='<span class="spinner"></span>Researching';}
   u.status="working";renderUploaded();
-  return callClaude(researchSystem(),[{role:"user",content:researchMsg(u)}],1600,[{type:"web_search_20250305",name:"web_search",max_uses:5}]).then(function(text){
+  var pre=pplxKey()?callPerplexity("Find the current role of "+u.name+" at "+(u.company||"Solenis")+". Report: current employer, the exact job title as written on their LinkedIn profile, business unit, region or scope exactly as stated, city and country, what the role owns day to day, whether any sourcing remit is direct or indirect, and 3 recent professional signals. Quote titles and regions verbatim. Say unknown where unclear."):Promise.resolve(null);
+  return pre.then(function(grounded){
+  var msg=researchMsg(u)+(grounded?("\n\nGrounded web findings from Perplexity Sonar, verify before relying on them:\n"+grounded):"");
+  return callClaude(researchSystem(),[{role:"user",content:msg}],2000,[{type:"web_search_20250305",name:"web_search",max_uses:5}]);}).then(function(text){
     var r=parseJSON(text);
     u.research=r;
     u.status=(r.status==="in_company"||r.status==="left_company"||r.status==="uncertain")?r.status:"uncertain";
     persistUploaded();renderUploaded();
+    if(u.status==="in_company"){setCtab("prof");auditOne(u.id,null);}
   }).catch(function(err){
     u.status="error";u.research={note:"Research did not complete. This step needs the Anthropic API with web search. Inside the Claude preview it works without a key. If you host this yourself, add your Anthropic API key in Settings. ("+String(err.message||err)+")"};
     persistUploaded();renderUploaded();
@@ -1624,12 +1874,15 @@ function genSystem(){return [
 "3. What we do. One line, adapted to their area: reaching those people is what we do at FutureBridge, primary, bottom-up intelligence on the technical and commercial reality before capital or commitments are made. No client names, no proof points, no promises.",
 "4. What it could mean for them. Optional, include only when it sharpens the email: For a [their portfolio or remit], that could mean: followed by exactly two short bullet questions, each under 18 words, naming precisely what we would find out.",
 "5. The close. A hard rule, always this sentence, adjusted only for grammar: If this is useful to discuss near-term, we'd welcome a 30-minute meeting at a date and time of your choosing.",
-"6. The sign-off. A hard rule: Thanks, then [Your name] on its own line. Nothing else. No titles, no email address, no phone number, no links, no firm line, no images.",
+"6. The sign-off. A hard rule: "+signoffWord()+" then [Your name] on its own line. Nothing else. No titles, no email address, no phone number, no links, no firm line, no images.",
 "",
 "LOGIC GUARDRAILS, checked before returning:",
 "- Every sentence must connect to this person's actual remit and the decision in front of them. If a fact does not change that decision, leave it out.",
 "- Never mention an acquisition, ownership change or other corporate event unless it directly changes the specific decision being discussed, and never as the hook or opening. Never connect corporate activity to a technical or commercial question unless the connection is real and explicit in the intelligence. If the connection needs explaining, it does not exist.",
 "- Never assert technical specifics beyond the verified intelligence. If a claim is uncertain, leave it out and flag it in check so it can be validated.",
+"- Never reproduce the job title as it appears on LinkedIn inside the email, and never let abbreviations reach the prose. NA Light Industrial pricing becomes North America light industrial pricing, or better, a plain description of the remit. If an abbreviation cannot be expanded with certainty, leave it out.",
+"- Use any region or geographic scope exactly as evidenced. Never substitute a neighbouring or similar region. Eurasia is not Africa and the Middle East.",
+"- Write for the remit as evidenced, not the obvious reading of the title. Indirect sourcing is logistics, MRO, services and IT, not chemical raw materials. Innovation marketing for process water is not packaging. Operations owns plants and quality, not product or sales.",
 "- Read the draft once as the recipient. If any line would make a domain expert pause and think that does not follow, rewrite or remove it.",
 "",
 "SHAPE: 90 to 130 words. Short paragraphs of one or two sentences, with a blank line between every paragraph. Generous whitespace, especially towards the end. Greeting: Hi [first name].",
@@ -1649,12 +1902,32 @@ function genSystem(){return [
 "Return ONLY strict JSON, no markdown, with keys: decision (send or leave), reason, subject, email, inmail, check."
 ].join("\n")+styleClause();}
 function genMsg(u,force){
-  var R=u.research||{};
-  var pts=(R.points||[]).map(function(p){return "- "+p.text;}).join("\n");
-  var arr=["Write the email and InMail for this person.","","Name: "+u.name,"Confirmed title: "+(R.corrected_title||(u.pdl&&u.pdl.title)||u.title||"not confirmed"),"Business unit: "+(R.business_unit||u.unit||"not given"),"What they do: "+(R.summary||"not given"),"Intelligence:\n"+(pts||"none gathered"),"Fit: "+(R.relevance?(R.relevance.fit+", "+R.relevance.reason):"not assessed"),(u.context?("Extra context from our team: "+u.context):"No extra context was given.")];
+  var R=u.research||{};var P=u.pdl||{};
+  function sig(x){return "- "+x.text+" [source: "+(x.source||"unstated")+", "+(x.recency||"recency unknown")+", "+(x.confidence||"confidence unstated")+"]";}
+  var sigs=((R.signals&&R.signals.length)?R.signals:(R.points||[])).map(sig).join("\n");
+  var rem=R.remit||{};var reg=R.region||{};
+  var arr=["Write the email and InMail for this person.","",
+  "Name: "+u.name,
+  "Title exactly as their profile states it, never to be quoted in the email: "+(R.title_exact||u.title||"not confirmed"),
+  "Title in natural business English: "+(R.title_plain||R.corrected_title||P.title||u.title||"not confirmed"),
+  "Business unit: "+(R.business_unit||u.unit||"not given"),
+  "Region or scope, exactly as evidenced: "+(reg.value||"unknown")+(reg.basis?(" [basis: "+reg.basis+", "+(reg.confidence||"")+"]"):""),
+  "Remit, what they actually own: "+(rem.summary||R.summary||"not established"),
+  (rem.basis?("Remit basis: "+rem.basis):""),
+  (rem.direct_or_indirect?("Direct or indirect: "+rem.direct_or_indirect):""),
+  "What they do in plain words: "+(R.summary||"not given"),
+  "Signals:\n"+(sigs||"none gathered"),
+  (R.red_flags&&R.red_flags.length?("Red flags to respect:\n- "+R.red_flags.join("\n- ")):""),
+  (u.context?("Context from our team: "+u.context):""),
+  "",
+  "EVIDENCE RULES FOR THIS DRAFT:",
+  "- Build the email for the remit as evidenced, not for the industry the company name suggests and not for the most common meaning of the title.",
+  "- Use the region exactly as given above. If region is unknown, write without naming a region.",
+  "- Use only claims marked verified or reported. An inferred claim may be used only as our reading, and never as fact. Unknown stays out of the email.",
+  "- If the remit is indirect sourcing, operations, IT or planning support, the email must speak to that world specifically or the decision should be leave."];
   if(force)arr.push("The user has chosen to proceed with this person. Write the best email you can from the available detail and do not return leave.");
   arr.push("","Return only the JSON object.");
-  return arr.join("\n");
+  return arr.filter(Boolean).join("\n");
 }
 function generateOne(id,btn,force){
   var u=upFind(id);if(!u)return;
@@ -1663,7 +1936,11 @@ function generateOne(id,btn,force){
     var g=parseJSON(text);
     if(g.decision==="leave"&&!force){u.gen=null;u.genNote=g.reason||"This person looks like a weaker fit for our work.";persistUploaded();setProc("up-"+id,"",false);renderUploaded();return;}
     if(!(g.email&&String(g.email).trim())){u.gen=null;u.genNote="The writer returned an empty draft. Press Write email anyway once more.";persistUploaded();setProc("up-"+id,"",false);renderUploaded();return;}
-    u.genNote="";u.gen={subject:g.subject||"",email:g.email||"",inmail:g.inmail||""};u.gen.centralId=recordDraft({contact:u.name,subject:g.subject||"",body:g.email||"",inmail:g.inmail||"",source:"uploaded"});persistUploaded();setProc("up-"+id,"",false);renderUploaded();
+    u.genNote="";u.gen={subject:g.subject||"",email:g.email||"",inmail:g.inmail||""};
+    return repairDraft(u).then(function(){
+      u.gen.centralId=recordDraft({contact:u.name,subject:u.gen.subject||"",body:u.gen.email||"",inmail:u.gen.inmail||"",source:"uploaded",designation:(u.research&&(u.research.title_plain||u.research.corrected_title))||u.title||"",division:(u.research&&u.research.business_unit)||u.unit||"",city:(u.research&&u.research.location&&u.research.location.city)||"",country:(u.research&&u.research.location&&u.research.location.country)||"",region:(u.research&&u.research.region&&u.research.region.value)||"",remit:(u.research&&u.research.remit&&u.research.remit.summary)||"",signals:((u.research&&(u.research.signals||u.research.points))||[]).map(function(x){return x.text;}).join(" | "),linkedin:(u.research&&u.research.linkedin_url)||u.linkedin||""});
+      persistUploaded();setProc("up-"+id,"",false);renderUploaded();auditOne(id,null);
+    });
   }).catch(function(err){
     setProc("up-"+id,"The writer did not return a draft. This step needs the Anthropic API, or your key in Settings. "+String(err.message||err).slice(0,90),false);
     unbusy(btn,lbl);
@@ -1671,11 +1948,14 @@ function generateOne(id,btn,force){
 }
 function editUploadedEmail(id){
   var u=upFind(id);if(!u||!u.gen)return;
-  var wrap=document.querySelector('[data-uemailwrap="'+id+'"]');if(!wrap)return;
-  wrap.innerHTML='<div class="edit-area" style="padding:0"><p class="label">Edit the draft</p><label>Subject</label><input type="text" data-ues /><label>Email</label><textarea data-ueb rows="12"></textarea><label>LinkedIn InMail</label><textarea data-uei rows="6"></textarea><div style="display:flex;gap:8px;margin-top:8px"><button class="btn red sm" data-uesave>Save</button><button class="btn sm" data-uecancel>Cancel</button></div></div>';
-  wrap.querySelector("[data-ues]").value=u.gen.subject||"";wrap.querySelector("[data-ueb]").value=u.gen.email||"";wrap.querySelector("[data-uei]").value=u.gen.inmail||"";
-  wrap.querySelector("[data-uesave]").addEventListener("click",function(){u.gen.subject=wrap.querySelector("[data-ues]").value;u.gen.email=wrap.querySelector("[data-ueb]").value;u.gen.inmail=wrap.querySelector("[data-uei]").value;logAction("edit",u.name);if(u.gen.centralId)centralUpdate(u.gen.centralId,{subject:u.gen.subject,body:u.gen.email,inmail:u.gen.inmail});persistUploaded();renderUploaded();});
-  wrap.querySelector("[data-uecancel]").addEventListener("click",renderUploaded);
+  var card=document.querySelector('#profList [data-uid="'+id+'"]');if(!card)return;
+  var em=card.querySelector('.email');if(!em)return;
+  var ed=document.createElement('div');ed.className='edit-area';
+  ed.innerHTML='<p class="label">Edit the draft</p><label>Subject</label><input type="text" data-ues /><label>Email</label><textarea data-ueb rows="12"></textarea><label>LinkedIn InMail</label><textarea data-uei rows="6"></textarea><div style="display:flex;gap:8px"><button class="btn red sm" data-uesave>Save</button><button class="btn sm" data-uecancel>Cancel</button></div>';
+  em.style.display='none';em.parentNode.insertBefore(ed,em);
+  ed.querySelector('[data-ues]').value=u.gen.subject||'';ed.querySelector('[data-ueb]').value=u.gen.email||'';ed.querySelector('[data-uei]').value=u.gen.inmail||'';
+  ed.querySelector('[data-uesave]').addEventListener('click',function(){u.gen.subject=ed.querySelector('[data-ues]').value;u.gen.email=ed.querySelector('[data-ueb]').value;u.gen.inmail=ed.querySelector('[data-uei]').value;logAction("edit",u.name);if(u.gen.centralId)centralUpdate(u.gen.centralId,{subject:u.gen.subject,body:u.gen.email,inmail:u.gen.inmail});persistUploaded();renderProfiles();});
+  ed.querySelector('[data-uecancel]').addEventListener('click',function(){renderProfiles();});
 }
 
 function csvTemplate(){
@@ -1748,7 +2028,7 @@ function renderOversight(){
   var who=document.getElementById("ovPerson").value,st=document.getElementById("ovStatus").value;
   var rows=list.filter(function(r){return (who==="all"||r.author===who)&&(st==="all"||r.status===st);}).sort(function(a,b){return (b.ts||0)-(a.ts||0);});
   document.getElementById("ovList").innerHTML=rows.length?rows.map(function(r){
-    return '<div class="ovitem"><div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:flex-start"><div><b>'+esc(r.contact||"Contact")+'</b> <span class="pill '+(r.status==="approved"?"ok":"red")+'">'+(r.status==="approved"?"Approved":"Awaiting approval")+'</span><div class="ovmeta">'+esc(r.author||"")+" &middot; "+new Date(r.ts||0).toLocaleString()+(r.source?" &middot; "+esc(r.source):"")+'</div></div><div style="display:flex;gap:6px"><button class="btn sm" data-ovview="'+esc(r.id)+'">View</button><button class="btn sm ghost" data-ovdel="'+esc(r.id)+'">Delete</button></div></div><div class="ovbody" style="display:none" data-ovbody="'+esc(r.id)+'"></div></div>';
+    return '<div class="ovitem"><div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:flex-start"><div><b>'+esc(r.contact||"Contact")+'</b> <span class="pill '+(r.status==="approved"?"ok":(r.status==="review"?"amb":"red"))+'">'+(r.status==="approved"?"Approved":(r.status==="review"?"In practice review":"Awaiting approval"))+'</span><div class="ovmeta">'+esc(r.author||"")+" &middot; "+new Date(r.ts||0).toLocaleString()+(r.source?" &middot; "+esc(r.source):"")+'</div></div><div style="display:flex;gap:6px"><button class="btn sm" data-ovview="'+esc(r.id)+'">View</button><button class="btn sm ghost" data-ovdel="'+esc(r.id)+'">Delete</button></div></div><div class="ovbody" style="display:none" data-ovbody="'+esc(r.id)+'"></div></div>';
   }).join(""):'<p class="muted">No drafts recorded yet. A draft appears here the moment anyone generates it.</p>';
   var byId={};list.forEach(function(r){byId[r.id]=r;});
   document.querySelectorAll("[data-ovview]").forEach(function(b){b.addEventListener("click",function(){
@@ -1811,6 +2091,12 @@ function initIdentityUI(){
   var fp=document.getElementById("set-fbp"),fk=document.getElementById("set-fbk");
   if(fp)fp.value=store.get("fb_project","");
   if(fk)fk.value=store.get("fb_key","");
+  var px=document.getElementById("set-pplx");if(px)px.value=store.get("pplx_key","");
+  var ms=document.getElementById("set-model");
+  if(ms){ms.innerHTML=MODELS.filter(function(m){return !m.sa||isSA();}).map(function(m){return '<option value="'+m.id+'">'+esc(m.label)+'</option>';}).join("");ms.value=modelId();}
+  var so2=document.getElementById("set-signoff");if(so2)so2.value=signoffWord();
+  var rs=document.getElementById("revStatus");if(rs)rs.addEventListener("change",renderReview);
+  var re=document.getElementById("revExport");if(re)re.addEventListener("click",exportReviewCSV);
   ["ovPerson","ovStatus"].forEach(function(id){var el=document.getElementById(id);if(el)el.addEventListener("change",renderOversight);});
   ["logPerson","logAction"].forEach(function(id){var el=document.getElementById(id);if(el)el.addEventListener("change",renderLog);});
   var le=document.getElementById("logExport");if(le)le.addEventListener("click",exportLogCSV);
