@@ -724,6 +724,7 @@
       <h2>House style for the emails</h2>
       <div class="setting-row"><label for="set-style">Standing instruction applied to drafts and rewrites</label><div class="hint">Plain rules the assistant and the draft writer should follow for every email. The assistant can also update this for you.</div><textarea id="set-style" rows="4" placeholder="For example: keep emails under 180 words, always close with a 30-minute meeting request, never use dashes."></textarea></div>
       <div class="setting-row"><label for="set-model">Writing model</label><div class="hint">The model used for research, audits, drafting and the assistant. The most capable tier is available to accounts with the top level of access; everyone can choose among the others.</div><select id="set-model" style="border:1px solid var(--line-2);border-radius:9px;padding:9px 11px;font-family:var(--sans);font-size:13.5px;background:#fff;min-width:280px"></select><div class="hint" id="modelNotice" style="display:none;color:var(--red-2);margin-top:6px"></div><div class="hint">If a chosen model is not enabled on your API key, the studio automatically uses the next available one so work never stops.</div></div>
+      <div class="setting-row"><label>Connection check</label><div class="hint">Runs a quick end-to-end test of the API so you can see exactly what works: the key, the model, web search, and Perplexity. Use this whenever research fails.</div><div style="display:flex;gap:10px;align-items:center"><button class="btn dark" id="runDiag">Test connection</button><span class="procnote" data-proc="diag"></span></div><div id="diagOut" style="margin-top:10px"></div></div>
       <div class="setting-row"><label for="set-signoff">Email sign-off</label><div class="hint">Applied to every draft and every export, followed by the sender name.</div><select id="set-signoff" style="border:1px solid var(--line-2);border-radius:9px;padding:9px 11px;font-family:var(--sans);font-size:13.5px;background:#fff;min-width:280px"><option value="Best regards,">Best regards,</option><option value="Thanks,">Thanks,</option><option value="Kind regards,">Kind regards,</option></select></div>
       <div class="setting-row"><label for="set-pplx">Perplexity API key (optional)</label><div class="hint">When present, profile research first pulls grounded, citation-backed findings from Perplexity Sonar and then verifies them, which tightens accuracy on titles, regions and recent moves. Get a key at perplexity.ai in Settings, API. If Perplexity blocks direct browser calls, the studio detects it and continues with its built-in web research.</div><input type="password" id="set-pplx" placeholder="pplx-..." autocomplete="off" /></div>
       <div class="setting-row"><label>Signed in on this device</label><div class="hint">The studio remembers you in this browser. Signing out returns to the sign-in screen and keeps all saved work.</div><div style="display:flex;gap:12px;align-items:center"><span class="note" id="whoami" style="margin:0"></span><button class="btn sm" id="signOut">Sign out</button></div></div>
@@ -835,7 +836,7 @@ function auditOne(id,btn){
   var u=upFind(id);if(!u||!u.research)return Promise.resolve();
   var lbl=btn?btn.textContent:"";if(btn){btn.disabled=true;btn.innerHTML='<span class="spinner"></span>Auditing';}
   u.auditing=true;renderProfiles();
-  return callClaude(auditSystem(),[{role:"user",content:auditMsg(u)}],1400,[{type:"web_search_20250305",name:"web_search",max_uses:3}]).then(function(text){
+  return callClaude(auditSystem(),[{role:"user",content:auditMsg(u)}],3000,[{type:"web_search_20250305",name:"web_search",max_uses:3}]).then(function(text){
     var g=parseJSON(text);
     if(g&&typeof g.score!=="undefined"){u.audit={score:Math.max(0,Math.min(100,parseInt(g.score,10)||0)),band:(g.band==="bank"||g.band==="check"||g.band==="stop")?g.band:(g.score>=85?"bank":(g.score>=60?"check":"stop")),checks:g.checks||[],issues:g.issues||[],fixes:g.fixes||[],ts:Date.now()};}
     u.auditing=false;persistUploaded();renderProfiles();
@@ -1072,25 +1073,33 @@ function callClaude(system,messages,maxTokens,tools){
   if(key){headers["x-api-key"]=key;headers["anthropic-version"]="2023-06-01";headers["anthropic-dangerous-direct-browser-access"]="true";}
   var chosen=modelId();
   var order=[chosen];MODEL_FALLBACK.forEach(function(m){if(order.indexOf(m)<0)order.push(m);});
-  function attempt(i){
+  function attempt(i,dropTools){
     var model=order[i];
+    var useTools=tools&&tools.length&&!dropTools;
     var bodyObj={model:model,max_tokens:maxTokens||1024,messages:messages};
     if(system)bodyObj.system=system;
-    if(tools&&tools.length)bodyObj.tools=tools;
+    if(useTools)bodyObj.tools=tools;
     return fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:headers,body:JSON.stringify(bodyObj)})
       .then(function(r){
-        if(r.ok)return r.json().then(function(data){return (data.content||[]).filter(function(b){return b.type==="text";}).map(function(b){return b.text;}).join("\n").trim();});
+        if(r.ok)return r.json().then(function(data){
+          var txt=(data.content||[]).filter(function(b){return b.type==="text";}).map(function(b){return b.text;}).join("\n").trim();
+          if(data.stop_reason==="max_tokens")window.__truncated=true;
+          return txt;
+        });
         return r.text().then(function(t){
           var body=(t||"");
-          var modelIssue=r.status===404||r.status===403|| /model/i.test(body);
-          if(modelIssue&&i<order.length-1){if(model===chosen)window.__modelFellBack=order[i+1];return attempt(i+1);}
+          var modelIssue=r.status===404||r.status===403||/model:/i.test(body)||/not_found_error/i.test(body);
+          if(modelIssue&&i<order.length-1){if(model===chosen)window.__modelFellBack=order[i+1];return attempt(i+1,dropTools);}
+          var toolIssue=useTools&&(/web_search|tool|not enabled|not available|not_enabled|permission/i.test(body)||r.status===400);
+          if(toolIssue){window.__toolDropped=true;return attempt(i,true);}
           if(r.status===401)throw new Error("The Anthropic API key was rejected (401). Open Settings, re-paste a valid key with no stray spaces, and press Save. If it still fails, the key may be exhausted or revoked; create a fresh one at console.anthropic.com.");
+          if(/credit balance is too low|insufficient|billing/i.test(body))throw new Error("Your Anthropic credit balance is too low. Add credits at console.anthropic.com under Plans and Billing, in the same workspace as this API key, then try again.");
           if(modelIssue)throw new Error("No available model was accepted by this API key. In Settings, choose Claude Sonnet or Haiku, then Save. (Last error: "+body.slice(0,140)+")");
           throw new Error("API "+r.status+" "+body.slice(0,180));
         });
       });
   }
-  return attempt(0);
+  return attempt(0,false);
 }
 
 function srcMark(st){
@@ -1159,7 +1168,7 @@ function verifyRecommended(id,btn){
     if(fnd.name&&pdlKey){setProc(id,"Confirming the title with People Data Labs",true);
       step=callPDL(fnd.name,c.company||"Solenis").then(function(res){if(res&&res.status===200&&res.data){var p=pdlSummary(res.data);if(p.title)fnd.title=p.title;if(p.location)fnd.location=p.location;if(p.linkedin)fnd.linkedin=p.linkedin;recData[id].found=fnd;saveRec();}}).catch(function(){});}
     return step.then(function(){setProc(id,"Tailoring the email to what we found",true);
-      return callClaude(genSystem(),[{role:"user",content:genRecMsg(c,fnd)}],1300).then(function(t2){var g=parseJSON(t2);if(g&&g.subject){recData[id].email={subject:g.subject||"",body:g.email||"",inmail:g.inmail||""};recData[id].centralId=recordDraft({contact:((fnd&&fnd.name)?fnd.name+", ":"")+c.name,subject:g.subject||"",body:g.email||"",inmail:g.inmail||"",source:"recommended"});saveRec();}});});
+      return callClaude(genSystem(),[{role:"user",content:genRecMsg(c,fnd)}],1800).then(function(t2){var g=parseJSON(t2);if(g&&g.subject){recData[id].email={subject:g.subject||"",body:g.email||"",inmail:g.inmail||""};recData[id].centralId=recordDraft({contact:((fnd&&fnd.name)?fnd.name+", ":"")+c.name,subject:g.subject||"",body:g.email||"",inmail:g.inmail||"",source:"recommended"});saveRec();}});});
   }).then(function(){
     setProc(id,"",false);renderContacts();
     var card=document.querySelector('.contact[data-id="'+id+'"]');if(card){card.classList.add("open");var h=card.querySelector(".head");if(h)h.setAttribute("aria-expanded","true");}
@@ -1817,7 +1826,7 @@ function researchSystem(){return [
 "Plain language throughout. Return ONLY strict JSON, no markdown, with keys: status, current_employer, title_exact, title_plain, corrected_title (same as title_plain, kept for compatibility), business_unit, location (object with city and country), region (object with value, basis, confidence), remit (object with summary, basis, alternatives_considered, direct_or_indirect where relevant, confidence), summary (two plain sentences on what they own), signals (array of objects with text, source, recency, confidence), points (array of objects with text and source, mirror of signals for compatibility), relevance (object with fit and reason), red_flags (array of strings), linkedin_url, sources (array of objects with label and url), confidence, note."
 ].join("\n");}
 function researchMsg(u){return ["Verify and research this person.","","Name: "+u.name,"Company we expect: "+(u.company||"Solenis"),"Title given to us: "+(u.title||"not given"),"LinkedIn given to us: "+(u.linkedin||"not given"),"Business unit given: "+(u.unit||"not given"),(u.context?("Context from our team: "+u.context):"No extra context was given. Research from trusted public sources."),"","Return only the JSON object."].join("\n");}
-function parseJSON(text){var clean=String(text).replace(/```json/gi,"").replace(/```/g,"").trim();var a=clean.indexOf("{"),b=clean.lastIndexOf("}");if(a>-1&&b>-1)clean=clean.slice(a,b+1);return JSON.parse(clean);}
+function parseJSON(text){try{var clean=String(text||"").replace(/```json/gi,"").replace(/```/g,"").trim();var a=clean.indexOf("{"),b=clean.lastIndexOf("}");if(a>-1&&b>-1)clean=clean.slice(a,b+1);return JSON.parse(clean);}catch(e){return null;}}
 
 function pdlOne(id,btn){
   var u=upFind(id);if(!u)return;
@@ -1843,8 +1852,13 @@ function researchOne(id,btn){
   var pre=pplxKey()?callPerplexity("Find the current role of "+u.name+" at "+(u.company||"Solenis")+". Report: current employer, the exact job title as written on their LinkedIn profile, business unit, region or scope exactly as stated, city and country, what the role owns day to day, whether any sourcing remit is direct or indirect, and 3 recent professional signals. Quote titles and regions verbatim. Say unknown where unclear."):Promise.resolve(null);
   return pre.then(function(grounded){
   var msg=researchMsg(u)+(grounded?("\n\nGrounded web findings from Perplexity Sonar, verify before relying on them:\n"+grounded):"");
-  return callClaude(researchSystem(),[{role:"user",content:msg}],2000,[{type:"web_search_20250305",name:"web_search",max_uses:5}]);}).then(function(text){
+  return callClaude(researchSystem(),[{role:"user",content:msg}],4500,[{type:"web_search_20250305",name:"web_search",max_uses:5}]);}).then(function(text){
     var r=parseJSON(text);
+    if(!r||!r.status){
+      if(!u._retriedResearch){u._retriedResearch=true;setProc("up-"+id,"Reply was not readable, retrying once",true);return researchOne(id,btn);}
+      u.status="error";u.research={note:"Research reached the model but the reply was not in the expected format"+(window.__truncated?", and the reply was cut off (a longer response is needed)":"")+". Press Verify and research again. If it keeps happening, switch to Claude Sonnet in Settings and retry."};persistUploaded();renderUploaded();return;
+    }
+    u._retriedResearch=false;
     u.research=r;
     u.status=(r.status==="in_company"||r.status==="left_company"||r.status==="uncertain")?r.status:"uncertain";
     persistUploaded();renderUploaded();noteModelFallback();
@@ -1957,8 +1971,9 @@ function genMsg(u,force){
 function generateOne(id,btn,force){
   var u=upFind(id);if(!u)return;
   var lbl=busy(btn,"Writing");setProc("up-"+id,"Writing the email and InMail in our style",true);
-  callClaude(genSystem(),[{role:"user",content:genMsg(u,force)}],1300).then(function(text){
+  callClaude(genSystem(),[{role:"user",content:genMsg(u,force)}],1800).then(function(text){
     var g=parseJSON(text);
+    if(!g){u.gen=null;u.genNote="The writer replied but not in a readable format"+(window.__truncated?", and the reply was cut off":"")+". Press the button again, or switch to Claude Sonnet in Settings.";persistUploaded();setProc("up-"+id,"",false);renderUploaded();return;}
     if(g.decision==="leave"&&!force){u.gen=null;u.genNote=g.reason||"This person looks like a weaker fit for our work.";persistUploaded();setProc("up-"+id,"",false);renderUploaded();return;}
     if(!(g.email&&String(g.email).trim())){u.gen=null;u.genNote="The writer returned an empty draft. Press Write email anyway once more.";persistUploaded();setProc("up-"+id,"",false);renderUploaded();return;}
     u.genNote="";u.gen={subject:g.subject||"",email:g.email||"",inmail:g.inmail||""};
@@ -2122,6 +2137,7 @@ function initIdentityUI(){
   var so2=document.getElementById("set-signoff");if(so2)so2.value=signoffWord();
   var rs=document.getElementById("revStatus");if(rs)rs.addEventListener("change",renderReview);
   var re=document.getElementById("revExport");if(re)re.addEventListener("click",exportReviewCSV);
+  var dg=document.getElementById("runDiag");if(dg)dg.addEventListener("click",function(){runDiagnostics(dg);});
   ["ovPerson","ovStatus"].forEach(function(id){var el=document.getElementById(id);if(el)el.addEventListener("change",renderOversight);});
   ["logPerson","logAction"].forEach(function(id){var el=document.getElementById(id);if(el)el.addEventListener("change",renderLog);});
   var le=document.getElementById("logExport");if(le)le.addEventListener("click",exportLogCSV);
@@ -2136,6 +2152,57 @@ function initIdentityUI(){
     document.getElementById("admEmail").value="";renderAdmins();
   });
   renderMyActs();
+}
+function diagLine(ok,label,detail){var mark=ok===true?'<span class="mtag g">PASS</span>':(ok===false?'<span class="mtag r">FAIL</span>':'<span class="mtag n">INFO</span>');return '<div class="mcheck">'+mark+'<span><b>'+esc(label)+'.</b> '+esc(detail||"")+'</span></div>';}
+function runDiagnostics(btn){
+  var out=document.getElementById("diagOut");var rows=[];
+  var lbl=btn?btn.textContent:"";if(btn){btn.disabled=true;}setProc("diag","Testing",true);
+  function render(extra){out.innerHTML='<div class="meter">'+rows.join("")+(extra||"")+'</div>';}
+  var key=(store.get("anthropic_key","")||"").trim();
+  rows.push(diagLine(!!key,"Anthropic API key present",key?("A key is saved, ending "+key.slice(-4)+"."):"No key is saved. Paste your Anthropic key above and press Save settings."));
+  render();
+  if(!key){setProc("diag","",false);if(btn){btn.disabled=false;btn.textContent=lbl;}render('<div class="mhead">Verdict</div><div class="missue">Research cannot run without an Anthropic API key on the hosted studio.</div>');return;}
+  window.__modelFellBack=null;window.__toolDropped=false;window.__truncated=false;
+  var headers={"Content-Type":"application/json","x-api-key":key,"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"};
+  var chosen=modelId();
+  // Test 1: minimal call, chosen model, no tools
+  fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:headers,body:JSON.stringify({model:chosen,max_tokens:16,messages:[{role:"user",content:"Reply with the single word ok."}]})})
+  .then(function(r){return r.text().then(function(t){return {status:r.status,body:t};});})
+  .then(function(res){
+    if(res.status===200){rows.push(diagLine(true,"Model call on "+chosen,"The selected model answered."));render();return runToolTest();}
+    var body=res.body||"";
+    if(res.status===401){rows.push(diagLine(false,"Model call","The key was rejected (401). Re-paste a valid key and Save, or create a fresh one at console.anthropic.com."));}
+    else if(/credit balance is too low|insufficient|billing/i.test(body)){rows.push(diagLine(false,"Model call","Your credit balance is too low. Add credits in the Console under Plans and Billing, in the same workspace as this key."));}
+    else if(res.status===404||res.status===403||/model:/i.test(body)){rows.push(diagLine(false,"Model call on "+chosen,"This key cannot use "+chosen+". Trying a fallback model."));return runFallbackTest();}
+    else{rows.push(diagLine(false,"Model call","API "+res.status+". "+body.slice(0,160)));}
+    render();finish();
+  })
+  .catch(function(e){rows.push(diagLine(false,"Model call","The browser could not reach api.anthropic.com. This is a network block, VPN or ad blocker, or the page is offline. ("+String(e&&e.message||e).slice(0,80)+")"));render();finish();});
+
+  function runFallbackTest(){
+    fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:headers,body:JSON.stringify({model:"claude-sonnet-4-6",max_tokens:16,messages:[{role:"user",content:"Reply with the single word ok."}]})})
+    .then(function(r){return r.text().then(function(t){return {status:r.status,body:t};});})
+    .then(function(res){if(res.status===200){rows.push(diagLine(true,"Fallback model","Claude Sonnet works on this key. Select it in the Writing model list above and Save."));render();return runToolTest();}rows.push(diagLine(false,"Fallback model","Even Claude Sonnet was refused. "+(res.body||"").slice(0,140)));render();finish();})
+    .catch(function(e){rows.push(diagLine(false,"Fallback model",String(e&&e.message||e).slice(0,100)));render();finish();});
+  }
+  function runToolTest(){
+    fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:headers,body:JSON.stringify({model:"claude-sonnet-4-6",max_tokens:64,messages:[{role:"user",content:"Search the web for the current CEO of Solenis and reply in one short sentence."}],tools:[{type:"web_search_20250305",name:"web_search",max_uses:1}]})})
+    .then(function(r){return r.text().then(function(t){return {status:r.status,body:t};});})
+    .then(function(res){
+      if(res.status===200){rows.push(diagLine(true,"Web search tool","Web search is enabled, so research can use live web evidence."));}
+      else{rows.push(diagLine(null,"Web search tool","Web search is not enabled on this key ("+res.status+"). Research will still run using the model's knowledge and Perplexity if set, but for best accuracy enable web search or add a Perplexity key."));}
+      render();finish();
+    })
+    .catch(function(e){rows.push(diagLine(null,"Web search tool","Could not confirm web search. Research will fall back automatically. ("+String(e&&e.message||e).slice(0,60)+")"));render();finish();});
+  }
+  function finish(){
+    var px=pplxKey();
+    rows.push(diagLine(px?true:null,"Perplexity key",px?"A Perplexity key is set, so research pulls grounded findings first.":"No Perplexity key set. Optional, but it improves accuracy on titles and regions."));
+    var anyFail=rows.some(function(x){return x.indexOf(">FAIL<")>-1;});
+    var verdict=anyFail?'<div class="missue">Research will not run until the failing item above is fixed.</div>':'<div class="mfix">All essentials pass. Research should work. Go to the Contact list tab and press Verify and research.</div>';
+    render('<div class="mhead">Verdict</div>'+verdict);
+    setProc("diag","",false);if(btn){btn.disabled=false;btn.textContent=lbl;}
+  }
 }
 initGate();
 initIdentityUI();
