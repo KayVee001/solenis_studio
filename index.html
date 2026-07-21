@@ -313,6 +313,21 @@
   .pill.amb{background:#fdf3dd;color:#a86a00}
   .revitem{border:1px solid var(--line);border-radius:12px;padding:15px 17px;margin-bottom:12px;background:#fff}
   .revitem textarea,.revitem input[type=text]{width:100%;box-sizing:border-box;border:1px solid var(--line-2);border-radius:9px;padding:9px 11px;font-family:var(--sans);font-size:13.5px;margin:5px 0}
+  .urow{border:1px solid var(--line);border-radius:12px;background:#fff;margin-bottom:9px;overflow:hidden}
+  .urhead{display:grid;grid-template-columns:30px 30px 1.35fr 1.7fr 1fr .8fr .8fr .8fr .95fr;gap:8px;align-items:center;padding:10px 12px;cursor:pointer}
+  .urhead:hover{background:var(--bg)}
+  .urhead .cell{font-size:13px;color:var(--body);overflow:hidden;text-overflow:ellipsis}
+  .urhead .tn{font-weight:bold;color:var(--ink)}
+  .uhdr{display:grid;grid-template-columns:30px 30px 1.35fr 1.7fr 1fr .8fr .8fr .8fr .95fr;gap:8px;padding:6px 12px;font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--grey)}
+  .caret{background:none;border:none;cursor:pointer;font-size:13px;color:var(--grey);padding:2px}
+  .udetail{border-top:1px solid var(--line);padding:15px 17px;background:#fff}
+  .batchbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:12px 0}
+  .approved-item.sentrow{opacity:.55}
+  .approved-item.sentrow .em,.approved-item.sentrow .addr{pointer-events:none}
+  .revitem.greyed{opacity:.55}
+  .revitem.greyed textarea,.revitem.greyed input{pointer-events:none;background:var(--bg)}
+  .duechip{display:inline-block;font-size:11px;font-weight:bold;border-radius:6px;padding:2px 8px;margin-left:6px;background:#fdf3dd;color:#a86a00}
+  .duechip.over{background:#fdeaea;color:var(--red-2)}
 </style>
 </head>
 <body>
@@ -536,8 +551,8 @@
       <div class="ctabs" id="ctabs">
         <button class="ctab on" data-ct="rec"><span class="ctlabel">Recommended profiles</span><span class="ctcount" id="recCount">4</span></button>
         <button class="ctab" data-ct="up"><span class="ctlabel">Contact list</span><span class="ctcount" id="upCount">0</span></button>
-        <button class="ctab" data-ct="prof"><span class="ctlabel">Profiles and communication</span><span class="ctcount" id="profCount">0</span></button>
         <button class="ctab" data-ct="rev"><span class="ctlabel">Practice review</span><span class="ctcount" id="revCount">0</span></button>
+        <button class="ctab" data-ct="fu"><span class="ctlabel">Follow-ups</span><span class="ctcount" id="fuCount">0</span></button>
       </div>
 
       <div class="ctab-pane show" id="pane-rec">
@@ -568,6 +583,15 @@
         <button class="btn dark" id="researchAll">Verify and research all</button>
         <button class="btn ghost" id="clearUploaded">Clear list</button>
         <span class="faint" style="font-size:12.5px">Research checks the current title, skips anyone who has left, and gathers intelligence on the rest.</span>
+      </div>
+      <div class="batchbar" id="batchBar" style="display:none">
+        <label style="display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--grey)"><input type="checkbox" id="selAll" /> Select all</label>
+        <button class="btn sm" id="expAll">Expand all</button>
+        <button class="btn sm" id="colAll">Collapse all</button>
+        <button class="btn sm red" id="bResearch">Research selected</button>
+        <button class="btn sm dark" id="bReview">Save selected for review</button>
+        <button class="btn sm" id="bApproveSel">Approve selected</button>
+        <button class="btn sm ghost" id="bDelete">Delete selected</button>
       </div>
       <div id="uploadList"></div>
 
@@ -605,18 +629,24 @@
       <div class="builder-out" id="builderOut"><h2>The draft</h2><div id="builderResult"></div></div>
       </div>
 
-      <div class="ctab-pane" id="pane-prof">
-        <p class="muted">Only people with research initiated appear here. Each profile carries the evidence file, a confidence audit scored the way a practice reviewer would score it, the draft, and an assistant for specific edits. Save the strong ones for practice review.</p>
-        <div id="profList"></div>
-      </div>
+
 
       <div class="ctab-pane" id="pane-rev">
         <p class="muted">Everything saved for practice review sits here until it is approved or returned. Items stay in the permanent record and, with the shared store configured, are visible across the team. Approved items remain available in this tab and in Approved emails.</p>
         <div class="toolbar">
-          <select id="revStatus" class="ovsel"><option value="both">In review and approved</option><option value="review">In review only</option><option value="approved">Approved only</option></select>
+          <select id="revStatus" class="ovsel"><option value="review">In review only</option><option value="both">In review and approved</option><option value="approved">Approved only</option></select>
           <button class="btn dark" id="revExport">Export CSV for HubSpot or mail merge</button>
         </div>
         <div id="revList"></div>
+      </div>
+
+      <div class="ctab-pane" id="pane-fu">
+        <p class="muted">A custom follow-up for each contact who has a first email, written to the same standard: 90 to 100 words, one fresh insight that advances the first note, the same close and sign-off, and never a line like just following up. Send it about a week after the first email. When a contact is marked Sent in Approved emails, the due date appears here.</p>
+        <div class="batchbar">
+          <button class="btn sm" id="fuExpAll">Expand all</button>
+          <button class="btn sm" id="fuColAll">Collapse all</button>
+        </div>
+        <div id="fuList"></div>
       </div>
     </section>
 
@@ -697,7 +727,7 @@
         <p class="muted">Every meaningful action, recorded against the person who took it. Filter by person or action, and export the full log.</p>
         <div class="ovfilters">
           <select id="logPerson"><option value="all">Everyone</option></select>
-          <select id="logAction"><option value="all">All actions</option><option value="sign_in">Sign in</option><option value="sign_out">Sign out</option><option value="generate">Generate</option><option value="edit">Edit</option><option value="approve">Approve</option><option value="delete">Delete</option></select>
+          <select id="logAction"><option value="all">All actions</option><option value="sign_in">Sign in</option><option value="sign_out">Sign out</option><option value="generate">Generate</option><option value="edit">Edit</option><option value="approve">Approve</option><option value="delete">Delete</option><option value="sent">Marked sent</option><option value="export">Export or push</option></select>
           <button class="btn sm" id="logExport">Export CSV</button>
         </div>
         <div id="logList"></div>
@@ -1071,6 +1101,7 @@ function callClaude(system,messages,maxTokens,tools){
   var key=(store.get("anthropic_key","")||"").trim();
   var headers={"Content-Type":"application/json"};
   if(key){headers["x-api-key"]=key;headers["anthropic-version"]="2023-06-01";headers["anthropic-dangerous-direct-browser-access"]="true";}
+  window.__truncated=false;
   var chosen=modelId();
   var order=[chosen];MODEL_FALLBACK.forEach(function(m){if(order.indexOf(m)<0)order.push(m);});
   function attempt(i,dropTools){
@@ -1263,13 +1294,15 @@ function renderApproved(){
   var list=document.getElementById("approvedList");
   if(!approved.length){list.innerHTML='<div class="empty">No approved emails yet. Approve an email on the Contacts tab and it will appear here, and stay here when you refresh.</div>';updateCounts();return;}
   list.innerHTML=approved.map(function(a){
-    return '<div class="approved-item" data-aid="'+a.id+'"><div class="top"><div><div class="nm">'+esc(a.name)+'</div><div class="seat">'+esc(a.seat||"")+'</div></div><span class="acts" style="display:flex;gap:7px"><button class="btn sm" data-aedit="'+a.id+'">Edit</button><button class="btn sm" data-acopy="'+a.id+'">Copy</button><button class="btn sm ghost" data-aremove="'+a.id+'">Remove</button></span></div><div class="addr"><label>Email address</label><input type="text" data-aemail="'+a.id+'" value="'+esc(a.email||"").replace(/"/g,"&quot;")+'" placeholder="name@solenis.com" /><span class="note" style="margin:0">Verify before sending.</span></div><div class="em"><div class="s"><b>Subject.</b> <span>'+esc(a.subject)+'</span></div><div class="bd" data-abody="'+a.id+'">'+esc(withSender(a.body))+'</div>'+(a.inmail?'<div class="s" style="border-top:1px solid var(--line-2);margin-top:10px;padding-top:10px;display:flex;justify-content:space-between;align-items:center"><b>LinkedIn InMail.</b> <button class="btn sm" data-aicopy="'+a.id+'">Copy InMail</button></div><div class="bd" data-ainmail="'+a.id+'">'+esc(withSender(a.inmail))+'</div>':'')+'</div></div>';
+    var stamps=[];if(a.sent)stamps.push("Sent on "+new Date(a.sentAt||Date.now()).toLocaleDateString());if(a.extractedAt)stamps.push("Exported "+new Date(a.extractedAt).toLocaleDateString());if(a.pushedAt)stamps.push("Pushed to HubSpot "+new Date(a.pushedAt).toLocaleDateString());
+    return '<div class="approved-item'+(a.sent?' sentrow':'')+'" data-aid="'+a.id+'"><div class="top"><div><div class="nm">'+esc(a.name)+'</div><div class="seat">'+esc(a.seat||"")+(stamps.length?' <span class="faint" style="font-size:11.5px">'+esc(stamps.join(" | "))+'</span>':'')+'</div></div><span class="acts" style="display:flex;gap:7px;align-items:center"><label style="display:flex;align-items:center;gap:5px;font-size:12px;color:var(--grey)"><input type="checkbox" data-asent="'+a.id+'" '+(a.sent?'checked':'')+' /> Sent</label><button class="btn sm" data-aedit="'+a.id+'">Edit</button><button class="btn sm" data-acopy="'+a.id+'">Copy</button><button class="btn sm ghost" data-aremove="'+a.id+'">Remove</button></span></div><div class="addr"><label>Email address</label><input type="text" data-aemail="'+a.id+'" value="'+esc(a.email||"").replace(/"/g,"&quot;")+'" placeholder="name@solenis.com" /><span class="note" style="margin:0">Verify before sending.</span></div><div class="em"><div class="s"><b>Subject.</b> <span>'+esc(a.subject)+'</span></div><div class="bd" data-abody="'+a.id+'">'+esc(withSender(a.body))+'</div>'+(a.inmail?'<div class="s" style="border-top:1px solid var(--line-2);margin-top:10px;padding-top:10px;display:flex;justify-content:space-between;align-items:center"><b>LinkedIn InMail.</b> <button class="btn sm" data-aicopy="'+a.id+'">Copy InMail</button></div><div class="bd" data-ainmail="'+a.id+'">'+esc(withSender(a.inmail))+'</div>':'')+'</div></div>';
   }).join("");
   list.querySelectorAll("[data-aemail]").forEach(function(inp){inp.addEventListener("change",function(){var it=approved.find(function(x){return x.id===inp.getAttribute("data-aemail");});if(it){it.email=inp.value.trim();store.setJSON("approved",approved);}});});
   list.querySelectorAll("[data-aremove]").forEach(function(b){b.addEventListener("click",function(){var aid=b.getAttribute("data-aremove");var rec0=approved.find(function(x){return x.id===aid;});logAction("delete","approved email removed"+(rec0?", "+rec0.name:""));removeApprovedById(aid);renderApproved();renderContacts();updateCounts();});});
   list.querySelectorAll("[data-acopy]").forEach(function(b){b.addEventListener("click",function(){var a=approved.find(function(x){return x.id===b.getAttribute("data-acopy");});copyText("Subject: "+a.subject+"\n\n"+withSender(a.body),b);});});
   list.querySelectorAll("[data-aicopy]").forEach(function(b){b.addEventListener("click",function(){var a=approved.find(function(x){return x.id===b.getAttribute("data-aicopy");});copyText(withSender(a.inmail||""),b);});});
   list.querySelectorAll("[data-aedit]").forEach(function(b){b.addEventListener("click",function(){openApprovedEditor(b.getAttribute("data-aedit"));});});
+  list.querySelectorAll("[data-asent]").forEach(function(c){c.addEventListener("change",function(){var a=approved.find(function(x){return x.id===c.getAttribute("data-asent");});if(!a)return;a.sent=c.checked;a.sentAt=c.checked?Date.now():null;store.setJSON("approved",approved);logAction("sent",a.name+(c.checked?" marked sent":" unmarked sent"));renderApproved();renderFollowups();});});
   updateCounts();
 }
 function openApprovedEditor(aid){
@@ -1288,9 +1321,14 @@ function showApprovedErr(m){var e=document.getElementById("approvedErr");e.inner
 
 document.getElementById("exportCsv").addEventListener("click",function(){
   if(!approved.length){showApprovedErr("There are no approved emails to export yet.");return;}
-  var rows=[["Contact name","Designation","Division","City","Country","Key roles and responsibilities","LinkedIn profile","Email subject","Email","LinkedIn InMail"]];
-  approved.forEach(function(a){rows.push([a.name||"",a.designation||a.seat||"",a.division||"",a.city||"",a.country||"",a.roles||"",a.linkedin||"",a.subject||"",withSender(a.body),withSender(a.inmail||"")]);});
+  var batch=approved.filter(function(a){return !a.sent;});
+  if(!batch.length){showApprovedErr("Everything here is marked as sent, so there is nothing new to export. Untick Sent on an item if you need it in a CSV again.");return;}
+  var rows=[["Contact name","Designation","Division","City","Country","Key roles and responsibilities","LinkedIn profile","Email subject","Email","LinkedIn InMail","Follow-up email"]];
+  batch.forEach(function(a){var fu=followupFor(a.name);rows.push([a.name||"",a.designation||a.seat||"",a.division||"",a.city||"",a.country||"",a.roles||"",a.linkedin||"",a.subject||"",withSender(a.body),withSender(a.inmail||""),fu?withSender(fu.email||""):""]);});
   download("solenis_approved_emails.csv",toCSV(rows),"text/csv;charset=utf-8");
+  var now=Date.now();batch.forEach(function(a){a.extractedAt=now;});store.setJSON("approved",approved);
+  logAction("export","approved CSV exported, "+batch.length+" contacts, items marked sent were excluded");
+  renderApproved();
   showApprovedMsg("CSV exported. Each row carries the contact name, designation, division, city, country, key roles and responsibilities, LinkedIn profile, and the full email and InMail text, ready for HubSpot or a mail-merge.");
 });
 
@@ -1299,13 +1337,15 @@ document.getElementById("pushHubspot").addEventListener("click",function(){
   if(!approved.length){showApprovedErr("There are no approved emails to send yet.");return;}
   var token=(store.get("hubspot_token","")||"").trim();
   if(!token){showApprovedErr("Add a HubSpot private app token in Settings first. If your HubSpot blocks direct browser requests, use Export CSV instead, which always works.");switchPanel("settings");return;}
-  var missing=approved.filter(function(a){return !a.email;});
+  var batchH=approved.filter(function(a){return !a.sent;});
+  if(!batchH.length){showApprovedErr("Everything here is marked as sent, so there is nothing new to push.");return;}
+  var missing=batchH.filter(function(a){return !a.email;});
   if(missing.length){showApprovedErr("Add an email address for every approved person before sending to HubSpot. "+missing.length+" still need one.");return;}
-  var inputs=approved.map(function(a){var p=String(a.name).trim().split(/\s+/);return {idProperty:"email",id:a.email,properties:{email:a.email,firstname:p[0]||"",lastname:p.slice(1).join(" "),company:"Solenis",jobtitle:a.seat||""}};});
+  var inputs=batchH.map(function(a){var p=String(a.name).trim().split(/\s+/);return {idProperty:"email",id:a.email,properties:{email:a.email,firstname:p[0]||"",lastname:p.slice(1).join(" "),company:"Solenis",jobtitle:a.seat||""}};});
   btn.disabled=true;var lbl=btn.textContent;btn.innerHTML='<span class="spinner"></span>Sending';
   fetch("https://api.hubapi.com/crm/v3/objects/contacts/batch/upsert",{method:"POST",headers:{"Authorization":"Bearer "+token,"Content-Type":"application/json"},body:JSON.stringify({inputs:inputs})})
     .then(function(r){return r.text().then(function(t){if(!r.ok)throw new Error("HubSpot "+r.status+" "+t.slice(0,200));return t;});})
-    .then(function(){showApprovedMsg("Created or updated "+approved.length+" contacts in HubSpot, ready to enrol in a sequence. The email text travels with the CSV; the actual send is run from a HubSpot sequence or workflow.");})
+    .then(function(){var now=Date.now();batchH.forEach(function(a){a.pushedAt=now;});store.setJSON("approved",approved);logAction("export","pushed to HubSpot, "+batchH.length+" contacts");renderApproved();showApprovedMsg("Created or updated "+batchH.length+" contacts in HubSpot, ready to enrol in a sequence. The email text travels with the CSV; the actual send is run from a HubSpot sequence or workflow.");})
     .catch(function(err){showApprovedErr("HubSpot did not accept the request. This usually means the browser blocked the call for security reasons, or the token lacks contact-write permission. Use Export CSV instead, which always works, then import it into HubSpot. ("+esc(String(err.message||err))+")");})
     .finally(function(){btn.disabled=false;btn.textContent=lbl;});
 });
@@ -1327,9 +1367,9 @@ function switchPanel(id){if(id==="oversight"){if(!isAdmin()){id="account";}else{
   window.scrollTo(0,0);
 }
 document.getElementById("nav").addEventListener("click",function(e){var b=e.target.closest("button[data-p]");if(!b)return;switchPanel(b.getAttribute("data-p"));});
-function setCtab(t){document.querySelectorAll("#ctabs .ctab").forEach(function(x){x.classList.toggle("on",x.getAttribute("data-ct")===t);});[["pane-rec","rec"],["pane-up","up"],["pane-prof","prof"],["pane-rev","rev"]].forEach(function(p){var el=document.getElementById(p[0]);if(el)el.classList.toggle("show",t===p[1]);});if(t==="prof")renderProfiles();if(t==="rev")renderReview();}
+function setCtab(t){document.querySelectorAll("#ctabs .ctab").forEach(function(x){x.classList.toggle("on",x.getAttribute("data-ct")===t);});[["pane-rec","rec"],["pane-up","up"],["pane-rev","rev"],["pane-fu","fu"]].forEach(function(p){var el=document.getElementById(p[0]);if(el)el.classList.toggle("show",t===p[1]);});if(t==="rev")renderReview();if(t==="fu")renderFollowups();}
 document.querySelectorAll("#ctabs .ctab").forEach(function(b){b.addEventListener("click",function(){setCtab(b.getAttribute("data-ct"));});});
-function updateContactCounts(){var r=document.getElementById("recCount");if(r)r.textContent=CONTACTS.length;var u=document.getElementById("upCount");if(u)u.textContent=uploaded.length;var p=document.getElementById("profCount");if(p)p.textContent=uploaded.filter(function(x){return x.research||x.status==="working";}).length;var v=document.getElementById("revCount");if(v)v.textContent=centralAll().filter(function(x){return !x.deleted&&(x.status==="review"||x.status==="approved");}).length;}
+function updateContactCounts(){var r=document.getElementById("recCount");if(r)r.textContent=CONTACTS.length;var u=document.getElementById("upCount");if(u)u.textContent=uploaded.length;var fc=document.getElementById("fuCount");if(fc)fc.textContent=uploaded.filter(function(x){return x.gen;}).length;var v=document.getElementById("revCount");if(v)v.textContent=centralAll().filter(function(x){return !x.deleted&&(x.status==="review"||x.status==="approved");}).length;}
 document.querySelector(".settings-link").addEventListener("click",function(){switchPanel("settings");});
 
 document.getElementById("filter").addEventListener("click",function(e){var b=e.target.closest("button");if(!b)return;document.querySelectorAll("#filter button").forEach(function(x){x.classList.remove("on");});b.classList.add("on");var f=b.getAttribute("data-f");document.querySelectorAll(".contact").forEach(function(c){c.style.display=(f==="all"||c.getAttribute("data-status")===f)?"":"none";});});
@@ -1642,102 +1682,126 @@ function renderUploaded(){
   var has=uploaded.length>0;
   document.getElementById("upHeading").style.display=has?"":"none";
   document.getElementById("upToolbar").style.display=has?"":"none";
-  if(!has){list.innerHTML="";renderProfiles();renderReview();return;}
-  var rows=uploaded.map(function(u){
+  var bb=document.getElementById("batchBar");if(bb)bb.style.display=has?"":"none";
+  if(!has){list.innerHTML="";renderReview();renderFollowups();return;}
+  var hdr='<div class="uhdr"><div></div><div></div><div>Name</div><div>Designation</div><div>Division</div><div>Company</div><div>City</div><div>Country</div><div>Status</div></div>';
+  list.innerHTML=hdr+uploaded.map(function(u){
     var st=UP_STATUS[u.status]||UP_STATUS.pending;
     var loc=upCity(u);
-    var di=designationInfo(u);
-    var researched=!!u.research||u.status==="working";
-    return '<tr data-urow="'+u.id+'">'+
-      '<td><span class="tn">'+esc(u.name)+'</span>'+(di?'<div style="margin-top:3px"><span class="pill '+di.cls+'" style="font-size:10.5px">'+esc(di.label)+'</span></div>':'')+'</td>'+
-      '<td>'+esc((u.research&&(u.research.title_plain||u.research.corrected_title))||(u.pdl&&u.pdl.title)||u.title||"")+'</td>'+
-      '<td>'+esc((u.research&&u.research.business_unit)||u.unit||"")+'</td>'+
-      '<td>'+esc(u.company||"Solenis")+'</td>'+
-      '<td>'+esc(loc.city)+'</td>'+
-      '<td>'+esc(loc.country)+'</td>'+
-      '<td><span class="upstatus '+st.c+'">'+esc(st.t)+'</span></td>'+
-      '<td><div class="tacts">'+
-        '<button class="btn sm" data-updl="'+u.id+'">'+(u.pdl?"Re-check title":"Verify title")+'</button>'+
-        '<button class="btn sm '+(researched?'':'red')+'" data-uresearch="'+u.id+'">'+(u.research?"Research again":"Verify and research")+'</button>'+
-        (researched?'<button class="btn sm red" data-uopen="'+u.id+'">Open profile</button>':'')+
-        '<button class="btn sm ghost" data-uremove="'+u.id+'">Remove</button>'+
-        '<span class="procnote" data-proc="up-'+u.id+'"></span></div></td></tr>';
+    var open=!!u._open;
+    return '<div class="urow" data-uid="'+u.id+'">'+
+      '<div class="urhead" data-uhead="'+u.id+'">'+
+      '<input type="checkbox" data-usel="'+u.id+'" '+(u._sel?'checked':'')+' />'+
+      '<button class="caret" data-utoggle="'+u.id+'" aria-label="Expand">'+(open?'&#9662;':'&#9656;')+'</button>'+
+      '<div class="cell tn">'+esc(u.name)+'</div>'+
+      '<div class="cell">'+esc((u.research&&(u.research.title_plain||u.research.corrected_title))||(u.pdl&&u.pdl.title)||u.title||"")+'</div>'+
+      '<div class="cell">'+esc((u.research&&u.research.business_unit)||u.unit||"")+'</div>'+
+      '<div class="cell">'+esc(u.company||"Solenis")+'</div>'+
+      '<div class="cell">'+esc(loc.city)+'</div>'+
+      '<div class="cell">'+esc(loc.country)+'</div>'+
+      '<div class="cell"><span class="upstatus '+st.c+'">'+esc(st.t)+'</span></div>'+
+      '</div>'+
+      '<div class="udetail" style="display:'+(open?'block':'none')+'">'+(open?profileDetailHTML(u):'')+'</div>'+
+      '</div>';
   }).join("");
-  list.innerHTML='<table class="uptable"><thead><tr><th>Name</th><th>Designation</th><th>Division</th><th>Company</th><th>City</th><th>Country</th><th>Status</th><th>Actions</th></tr></thead><tbody>'+rows+'</tbody></table>';
+  list.querySelectorAll("[data-uhead]").forEach(function(h){h.addEventListener("click",function(ev){
+    if(ev.target.matches("input,button,a"))return;
+    toggleRow(h.getAttribute("data-uhead"));
+  });});
+  list.querySelectorAll("[data-utoggle]").forEach(function(b){b.addEventListener("click",function(){toggleRow(b.getAttribute("data-utoggle"));});});
+  list.querySelectorAll("[data-usel]").forEach(function(c){c.addEventListener("change",function(){var u=upFind(c.getAttribute("data-usel"));if(u){u._sel=c.checked;persistUploaded();syncSelAll();}});});
+  wireDetails(list);
+  syncSelAll();
+  renderReview();renderFollowups();
+}
+function toggleRow(id){var u=upFind(id);if(!u)return;u._open=!u._open;persistUploaded();renderUploaded();if(u._open){var el=document.querySelector('.urow[data-uid="'+id+'"]');if(el)el.scrollIntoView({behavior:"smooth",block:"nearest"});}}
+function setAllOpen(v){uploaded.forEach(function(u){u._open=v;});persistUploaded();renderUploaded();}
+function syncSelAll(){var all=document.getElementById("selAll");if(!all)return;var n=uploaded.length,k=uploaded.filter(function(u){return u._sel;}).length;all.checked=n>0&&k===n;all.indeterminate=k>0&&k<n;}
+function selectedContacts(){return uploaded.filter(function(u){return u._sel;});}
+function evTag(v){v=String(v||"").toLowerCase();var cls=(v.indexOf("verif")>-1?"verified":(v.indexOf("report")>-1?"reported":(v.indexOf("infer")>-1?"inferred":"unknown")));return v?'<span class="evtag '+cls+'">'+esc(v)+'</span>':"";}
+function profileDetailHTML(u){
+  var R=u.research||{};var rem=R.remit||{};var reg=R.region||{};
+  var topActs='<div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:11px"><button class="btn sm" data-updl="'+u.id+'">'+(u.pdl?"Re-check title":"Verify title")+'</button><button class="btn sm" data-uresearch="'+u.id+'">'+(u.research?"Research again":"Verify and research")+'</button><span class="procnote" data-proc="up-'+u.id+'"></span></div>';
+  var prof="";
+  if(u.status==="working"){prof='<div class="evrow faint">Researching now. The evidence file, audit and draft controls appear here when it completes.</div>';}
+  else if(!u.research){prof='<div class="evrow faint">Not researched yet. Press Verify and research to build the evidence file, or select several rows and use Research selected above.</div>';}
+  else if(u.status!=="in_company"){prof='<div class="evrow"><b>'+esc((UP_STATUS[u.status]||{}).t||u.status)+'.</b> '+esc(R.note||(R.current_employer?("Current employer appears to be "+R.current_employer+"."):"Could not be confirmed."))+'</div>';}
+  else{
+    var sigs=((R.signals&&R.signals.length)?R.signals:(R.points||[])).map(function(p){return '<div class="evrow">- '+esc(p.text)+(p.recency?' <span class="faint">('+esc(p.recency)+')</span>':'')+evTag(p.confidence)+(p.source&&String(p.source).indexOf("http")===0?' <a href="'+esc(p.source)+'" target="_blank" rel="noopener">source</a>':'')+'</div>';}).join("");
+    prof=
+    '<div class="evrow"><b>Title, exactly as stated.</b> '+esc(R.title_exact||"not captured")+' <span class="faint">(never quoted in the email)</span></div>'+
+    '<div class="evrow"><b>Title in plain words.</b> '+esc(R.title_plain||R.corrected_title||"")+'</div>'+
+    (rem.summary?'<div class="evrow"><b>Remit.</b> '+esc(rem.summary)+evTag(rem.confidence)+(rem.direct_or_indirect?' <span class="pill amb" style="font-size:10.5px">'+esc(rem.direct_or_indirect)+'</span>':'')+'</div>':'')+
+    (rem.basis?'<div class="evrow faint" style="font-size:12.5px"><b>Basis.</b> '+esc(rem.basis)+(rem.alternatives_considered?' Considered and rejected: '+esc(rem.alternatives_considered):'')+'</div>':'')+
+    (reg.value?'<div class="evrow"><b>Region, exactly as evidenced.</b> '+esc(reg.value)+evTag(reg.confidence)+'</div>':'')+
+    (R.summary?'<div class="evrow"><b>What they own.</b> '+esc(R.summary)+'</div>':'')+
+    (sigs?'<div class="evrow" style="margin-top:9px"><b>Signals used in drafting.</b></div>'+sigs:'')+
+    (R.red_flags&&R.red_flags.length?'<div class="evrow" style="margin-top:9px"><b>Red flags.</b></div>'+R.red_flags.map(function(x){return '<div class="missue">'+esc(x)+'</div>';}).join(""):'')+
+    (R.relevance?'<div class="evrow" style="margin-top:9px"><b>Fit.</b> '+esc(R.relevance.fit||"")+'. '+esc(R.relevance.reason||"")+'</div>':'');
+  }
+  var meter=(u.status==="in_company")?meterHTML(u)+'<div style="margin:-4px 0 10px"><button class="btn sm" data-uaudit="'+u.id+'">Re-run audit</button></div>':"";
+  var leaveNote=(u.genNote&&!u.gen)?'<div class="vcheck"><b>The writer suggested leaving this one.</b> '+esc(u.genNote)+' You can still write it anyway using the button below.</div>':'';
+  var inco=u.status==="in_company";
+  var forceNow=(!inco)||(!!u.genNote&&!u.gen);
+  var canGen=!!u.research&&(inco||u.status==="uncertain"||u.status==="left_company");
+  var genBtn=canGen?'<button class="btn red sm" data-ugen="'+u.id+'" data-force="'+(forceNow?"1":"0")+'">'+(u.gen?"Rewrite email and InMail":(u.genNote?"Write email anyway":(inco?"Generate email and InMail":"Write email anyway")))+'</button>':"";
+  var revState=u.review==="practice"?'<span class="pill amb">In practice review</span>':(u.review==="approved"?'<span class="pill ok">Approved</span>':"");
+  var draft="";
+  if(u.gen){
+    draft='<div class="email" style="margin-top:12px"><div class="ehead"><p class="label">The draft '+revState+'</p><span class="acts" style="display:flex;gap:7px;flex-wrap:wrap">'+
+    '<button class="btn sm" data-uedit="'+u.id+'">Edit</button>'+
+    '<button class="btn sm" data-ucopy-subj="'+u.id+'">Copy subject</button>'+
+    '<button class="btn sm" data-ucopy-email="'+u.id+'">Copy email</button>'+
+    '<button class="btn sm" data-ucopy-inmail="'+u.id+'">Copy InMail</button>'+
+    '<button class="btn sm dark" data-ureview="'+u.id+'">'+(u.review==="practice"?"Saved for practice review":"Save for practice review")+'</button>'+
+    '<button class="btn sm red" data-uapprove="'+u.id+'" '+(u.review==="approved"?'disabled':'')+'>'+(u.review==="approved"?"Stored in Approved":"Approve and store")+'</button></span></div>'+
+    '<div class="subj"><b>Subject.</b> '+esc(u.gen.subject||"")+'</div><div class="bodytext">'+esc(withSender(u.gen.email||""))+'</div>'+
+    '<div class="subj" style="border-top:1px solid var(--line);margin-top:4px;padding-top:10px"><b style="color:var(--ink)">LinkedIn InMail</b></div><div class="bodytext">'+esc(withSender(u.gen.inmail||""))+'</div></div>'+
+    '<div class="assist"><b style="font-size:13px">Assistant, alongside this email</b><div class="anote">Tell it what to change: shorten it, lead with the water angle, make the bullets sharper, sound less formal. It rewrites within the house rules and you can undo.</div>'+
+    '<textarea data-uask="'+u.id+'" placeholder="What should change in this draft?"></textarea>'+
+    '<div style="display:flex;gap:8px;align-items:center"><button class="btn sm red" data-uassist="'+u.id+'">Improve with assistant</button><button class="btn sm ghost" data-uundo="'+u.id+'" '+(u.prevGen?'':'disabled')+'>Undo last change</button><span class="procnote" data-proc="as-'+u.id+'"></span></div>'+
+    '<div class="anote" data-uanote="'+u.id+'"></div></div>';
+  }
+  var ctx='<div class="evrow" style="margin-top:10px"><b>Context for the writer</b> <span class="faint">(optional, saved as you type)</span></div><textarea data-uctx="'+u.id+'" style="width:100%;box-sizing:border-box;border:1px solid var(--line-2);border-radius:9px;padding:9px 11px;font-family:var(--sans);font-size:13px;min-height:44px">'+esc(u.context||"")+'</textarea>';
+  return topActs+prof+meter+leaveNote+ctx+'<div class="upacts" style="margin-top:10px">'+genBtn+'</div>'+draft;
+}
+function renderProfiles(){renderUploaded();}
+function approveUploaded(u,btn){
+  if(!u||!u.gen)return;
+  var R=u.research||{},P=u.pdl||{};var title=R.title_plain||P.title||R.corrected_title||u.title||"";var div=R.business_unit||u.unit||"";var li=P.linkedin||R.linkedin_url||u.linkedin||"";var roles=(R.remit&&R.remit.summary)||R.summary||"";var loc=upCity(u);
+  addApprovedCustom(u.name,[title,div].filter(Boolean).join(", "),u.gen.subject||"",u.gen.email||"",u.gen.inmail||"",{designation:title,division:div,city:loc.city,country:loc.country,roles:roles,linkedin:li,email:u.email||""});
+  var ci2=u.gen&&u.gen.centralId;
+  if(ci2)centralUpdate(ci2,{status:"approved"},"approve",u.name);
+  else u.gen.centralId=recordDraft({contact:u.name,subject:u.gen.subject||"",body:u.gen.email||"",inmail:u.gen.inmail||"",source:"uploaded"},"approved","approve");
+  u.review="approved";persistUploaded();
+  if(btn){btn.textContent="Stored in Approved";btn.disabled=true;}
+  renderApproved();
+}
+function wireDetails(list){
   list.querySelectorAll("[data-updl]").forEach(function(b){b.addEventListener("click",function(){pdlOne(b.getAttribute("data-updl"),b);});});
   list.querySelectorAll("[data-uresearch]").forEach(function(b){b.addEventListener("click",function(){researchOne(b.getAttribute("data-uresearch"),b);});});
-  list.querySelectorAll("[data-uopen]").forEach(function(b){b.addEventListener("click",function(){setCtab("prof");var el=document.querySelector('[data-uid="'+b.getAttribute("data-uopen")+'"]');if(el)el.scrollIntoView({behavior:"smooth",block:"start"});});});
-  list.querySelectorAll("[data-uremove]").forEach(function(b){b.addEventListener("click",function(){var u0=upFind(b.getAttribute("data-uremove"));if(u0)logAction("delete","uploaded contact removed, "+u0.name);uploaded=uploaded.filter(function(x){return x.id!==b.getAttribute("data-uremove");});persistUploaded();renderUploaded();});});
-  renderProfiles();renderReview();
+  list.querySelectorAll("[data-uaudit]").forEach(function(b){b.addEventListener("click",function(){auditOne(b.getAttribute("data-uaudit"),b);});});
+  list.querySelectorAll("[data-ugen]").forEach(function(b){b.addEventListener("click",function(){generateOne(b.getAttribute("data-ugen"),b,b.getAttribute("data-force")==="1");});});
+  list.querySelectorAll("[data-uctx]").forEach(function(t){t.addEventListener("change",function(){var u=upFind(t.getAttribute("data-uctx"));if(u){u.context=t.value;persistUploaded();}});});
+  list.querySelectorAll("[data-uedit]").forEach(function(b){b.addEventListener("click",function(){editUploadedEmail(b.getAttribute("data-uedit"));});});
+  list.querySelectorAll("[data-ucopy-subj]").forEach(function(b){b.addEventListener("click",function(){var u=upFind(b.getAttribute("data-ucopy-subj"));copyText(u.gen.subject||"",b);});});
+  list.querySelectorAll("[data-ucopy-email]").forEach(function(b){b.addEventListener("click",function(){var u=upFind(b.getAttribute("data-ucopy-email"));copyText(withSender(u.gen.email||""),b);});});
+  list.querySelectorAll("[data-ucopy-inmail]").forEach(function(b){b.addEventListener("click",function(){var u=upFind(b.getAttribute("data-ucopy-inmail"));copyText(withSender(u.gen.inmail||""),b);});});
+  list.querySelectorAll("[data-ureview]").forEach(function(b){b.addEventListener("click",function(){saveForReview(b.getAttribute("data-ureview"));});});
+  list.querySelectorAll("[data-uapprove]").forEach(function(b){b.addEventListener("click",function(){approveUploaded(upFind(b.getAttribute("data-uapprove")),b);});});
+  list.querySelectorAll("[data-uassist]").forEach(function(b){b.addEventListener("click",function(){assistOne(b.getAttribute("data-uassist"),b);});});
+  list.querySelectorAll("[data-uundo]").forEach(function(b){b.addEventListener("click",function(){var u=upFind(b.getAttribute("data-uundo"));if(u&&u.prevGen){var keep=u.prevGen;u.prevGen=null;var cid=u.gen&&u.gen.centralId;u.gen={subject:keep.subject,email:keep.email,inmail:keep.inmail,centralId:cid};if(cid)centralUpdate(cid,{subject:u.gen.subject,body:u.gen.email,inmail:u.gen.inmail});persistUploaded();renderUploaded();}});});
+  list.querySelectorAll("[data-fuwrite]").forEach(function(b){b.addEventListener("click",function(){genFollowup(b.getAttribute("data-fuwrite"),b);});});
 }
-function evTag(v){v=String(v||"").toLowerCase();var cls=(v.indexOf("verif")>-1?"verified":(v.indexOf("report")>-1?"reported":(v.indexOf("infer")>-1?"inferred":"unknown")));return v?'<span class="evtag '+cls+'">'+esc(v)+'</span>':"";}
-function renderProfiles(){
-  updateContactCounts();
-  var box=document.getElementById("profList");if(!box)return;
-  var subset=uploaded.filter(function(u){return u.research||u.status==="working";});
-  if(!subset.length){box.innerHTML='<p class="muted">No research started yet. Go to the Contact list tab, add people, and press Verify and research. Each researched person appears here with their evidence file, audit and draft.</p>';return;}
-  box.innerHTML=subset.map(function(u){
-    var st=UP_STATUS[u.status]||UP_STATUS.pending;
-    var R=u.research||{};var rem=R.remit||{};var reg=R.region||{};
-    var loc=upCity(u);
-    var head='<div class="uphead"><div><div class="un">'+esc(u.name)+'</div><div class="ut">'+esc([R.title_plain||R.corrected_title||u.title,R.business_unit||u.unit,[loc.city,loc.country].filter(Boolean).join(", ")].filter(Boolean).join(" | "))+'</div></div><span class="upstatus '+st.c+'">'+esc(st.t)+'</span></div>';
-    var prof="";
-    if(u.status==="working"){prof='<div class="evrow faint">Researching now. The evidence file, audit and draft controls appear here when it completes.</div>';}
-    else if(u.status!=="in_company"){prof='<div class="evrow"><b>'+esc(st.t)+'.</b> '+esc(R.note||(R.current_employer?("Current employer appears to be "+R.current_employer+"."):"Could not be confirmed."))+'</div>';}
-    else{
-      var sigs=((R.signals&&R.signals.length)?R.signals:(R.points||[])).map(function(p){return '<div class="evrow">- '+esc(p.text)+(p.recency?' <span class="faint">('+esc(p.recency)+')</span>':'')+evTag(p.confidence)+(p.source&&String(p.source).indexOf("http")===0?' <a href="'+esc(p.source)+'" target="_blank" rel="noopener">source</a>':'')+'</div>';}).join("");
-      prof=
-      '<div class="evrow"><b>Title, exactly as stated.</b> '+esc(R.title_exact||"not captured")+' <span class="faint">(never quoted in the email)</span></div>'+
-      '<div class="evrow"><b>Title in plain words.</b> '+esc(R.title_plain||R.corrected_title||"")+'</div>'+
-      (rem.summary?'<div class="evrow"><b>Remit.</b> '+esc(rem.summary)+evTag(rem.confidence)+(rem.direct_or_indirect?' <span class="pill amb" style="font-size:10.5px">'+esc(rem.direct_or_indirect)+'</span>':'')+'</div>':'')+
-      (rem.basis?'<div class="evrow faint" style="font-size:12.5px"><b>Basis.</b> '+esc(rem.basis)+(rem.alternatives_considered?' Considered and rejected: '+esc(rem.alternatives_considered):'')+'</div>':'')+
-      (reg.value?'<div class="evrow"><b>Region, exactly as evidenced.</b> '+esc(reg.value)+evTag(reg.confidence)+'</div>':'')+
-      (R.summary?'<div class="evrow"><b>What they own.</b> '+esc(R.summary)+'</div>':'')+
-      (sigs?'<div class="evrow" style="margin-top:9px"><b>Signals used in drafting.</b></div>'+sigs:'')+
-      (R.red_flags&&R.red_flags.length?'<div class="evrow" style="margin-top:9px"><b>Red flags.</b></div>'+R.red_flags.map(function(x){return '<div class="missue">'+esc(x)+'</div>';}).join(""):'')+
-      (R.relevance?'<div class="evrow" style="margin-top:9px"><b>Fit.</b> '+esc(R.relevance.fit||"")+'. '+esc(R.relevance.reason||"")+'</div>':'');
-    }
-    var meter=(u.status==="in_company")?meterHTML(u)+'<div style="margin:-4px 0 10px"><button class="btn sm" data-uaudit="'+u.id+'">Re-run audit</button></div>':"";
-    var leaveNote=(u.genNote&&!u.gen)?'<div class="vcheck"><b>The writer suggested leaving this one.</b> '+esc(u.genNote)+' You can still write it anyway using the button below.</div>':'';
-    var inco=u.status==="in_company";
-    var forceNow=(!inco)||(!!u.genNote&&!u.gen);
-    var canGen=inco||u.status==="uncertain"||u.status==="left_company";
-    var genBtn=canGen?'<button class="btn red sm" data-ugen="'+u.id+'" data-force="'+(forceNow?"1":"0")+'">'+(u.gen?"Rewrite email and InMail":(u.genNote?"Write email anyway":(inco?"Generate email and InMail":"Write email anyway")))+'</button>':"";
-    var revState=u.review==="practice"?'<span class="pill amb">In practice review</span>':(u.review==="approved"?'<span class="pill ok">Approved</span>':"");
-    var draft="";
-    if(u.gen){
-      draft='<div class="email" style="margin-top:12px"><div class="ehead"><p class="label">The draft '+revState+'</p><span class="acts" style="display:flex;gap:7px;flex-wrap:wrap">'+
-      '<button class="btn sm" data-uedit="'+u.id+'">Edit</button>'+
-      '<button class="btn sm" data-ucopy-subj="'+u.id+'">Copy subject</button>'+
-      '<button class="btn sm" data-ucopy-email="'+u.id+'">Copy email</button>'+
-      '<button class="btn sm" data-ucopy-inmail="'+u.id+'">Copy InMail</button>'+
-      '<button class="btn sm dark" data-ureview="'+u.id+'">'+(u.review==="practice"?"Saved for practice review":"Save for practice review")+'</button>'+
-      '<button class="btn sm red" data-uapprove="'+u.id+'">Approve and store</button></span></div>'+
-      '<div class="subj"><b>Subject.</b> '+esc(u.gen.subject||"")+'</div><div class="bodytext">'+esc(withSender(u.gen.email||""))+'</div>'+
-      '<div class="subj" style="border-top:1px solid var(--line);margin-top:4px;padding-top:10px"><b style="color:var(--ink)">LinkedIn InMail</b></div><div class="bodytext">'+esc(withSender(u.gen.inmail||""))+'</div></div>'+
-      '<div class="assist"><b style="font-size:13px">Assistant, alongside this email</b><div class="anote">Tell it what to change: shorten it, lead with the water angle, make the bullets sharper, sound less formal. It rewrites within the house rules and you can undo.</div>'+
-      '<textarea data-uask="'+u.id+'" placeholder="What should change in this draft?"></textarea>'+
-      '<div style="display:flex;gap:8px;align-items:center"><button class="btn sm red" data-uassist="'+u.id+'">Improve with assistant</button><button class="btn sm ghost" data-uundo="'+u.id+'" '+(u.prevGen?'':'disabled')+'>Undo last change</button><span class="procnote" data-proc="as-'+u.id+'"></span></div>'+
-      '<div class="anote" data-uanote="'+u.id+'"></div></div>';
-    }
-    var ctx='<div class="evrow" style="margin-top:10px"><b>Context for the writer</b> <span class="faint">(optional, saved as you type)</span></div><textarea data-uctx="'+u.id+'" style="width:100%;box-sizing:border-box;border:1px solid var(--line-2);border-radius:9px;padding:9px 11px;font-family:var(--sans);font-size:13px;min-height:44px">'+esc(u.context||"")+'</textarea>';
-    return '<div class="upcard" data-uid="'+u.id+'">'+head+prof+meter+leaveNote+ctx+'<div class="upacts" style="margin-top:10px">'+genBtn+'<span class="procnote" data-proc="up-'+u.id+'"></span></div>'+draft+'</div>';
-  }).join("");
-  wireProfiles(box);
+function batchResearch(){
+  var sel=selectedContacts();if(!sel.length){window.alert("Tick at least one contact first.");return;}
+  var i=0;
+  function next(){if(i>=sel.length)return Promise.resolve();var u=sel[i++];if(u.status==="working")return next();return researchOne(u.id,null).then(next);}
+  next();
 }
-function wireProfiles(box){
-  box.querySelectorAll("[data-uaudit]").forEach(function(b){b.addEventListener("click",function(){auditOne(b.getAttribute("data-uaudit"),b);});});
-  box.querySelectorAll("[data-ugen]").forEach(function(b){b.addEventListener("click",function(){generateOne(b.getAttribute("data-ugen"),b,b.getAttribute("data-force")==="1");});});
-  box.querySelectorAll("[data-uctx]").forEach(function(t){t.addEventListener("change",function(){var u=upFind(t.getAttribute("data-uctx"));if(u){u.context=t.value;persistUploaded();}});});
-  box.querySelectorAll("[data-uedit]").forEach(function(b){b.addEventListener("click",function(){editUploadedEmail(b.getAttribute("data-uedit"));});});
-  box.querySelectorAll("[data-ucopy-subj]").forEach(function(b){b.addEventListener("click",function(){var u=upFind(b.getAttribute("data-ucopy-subj"));copyText(u.gen.subject||"",b);});});
-  box.querySelectorAll("[data-ucopy-email]").forEach(function(b){b.addEventListener("click",function(){var u=upFind(b.getAttribute("data-ucopy-email"));copyText(withSender(u.gen.email||""),b);});});
-  box.querySelectorAll("[data-ucopy-inmail]").forEach(function(b){b.addEventListener("click",function(){var u=upFind(b.getAttribute("data-ucopy-inmail"));copyText(withSender(u.gen.inmail||""),b);});});
-  box.querySelectorAll("[data-ureview]").forEach(function(b){b.addEventListener("click",function(){saveForReview(b.getAttribute("data-ureview"));});});
-  box.querySelectorAll("[data-uapprove]").forEach(function(b){b.addEventListener("click",function(){var u=upFind(b.getAttribute("data-uapprove"));var R=u.research||{},P=u.pdl||{};var title=R.title_plain||P.title||R.corrected_title||u.title||"";var div=R.business_unit||u.unit||"";var li=P.linkedin||R.linkedin_url||u.linkedin||"";var roles=(R.remit&&R.remit.summary)||R.summary||"";var loc=upCity(u);addApprovedCustom(u.name,[title,div].filter(Boolean).join(", "),u.gen.subject||"",u.gen.email||"",u.gen.inmail||"",{designation:title,division:div,city:loc.city,country:loc.country,roles:roles,linkedin:li,email:u.email||""});var ci2=u.gen&&u.gen.centralId;if(ci2)centralUpdate(ci2,{status:"approved"},"approve",u.name);else recordDraft({contact:u.name,subject:u.gen.subject||"",body:u.gen.email||"",inmail:u.gen.inmail||"",source:"uploaded"},"approved","approve");u.review="approved";persistUploaded();b.textContent="Stored in Approved";b.disabled=true;renderApproved();renderProfiles();});});
-  box.querySelectorAll("[data-uassist]").forEach(function(b){b.addEventListener("click",function(){assistOne(b.getAttribute("data-uassist"),b);});});
-  box.querySelectorAll("[data-uundo]").forEach(function(b){b.addEventListener("click",function(){var u=upFind(b.getAttribute("data-uundo"));if(u&&u.prevGen){var keep=u.prevGen;u.prevGen=null;var cid=u.gen&&u.gen.centralId;u.gen={subject:keep.subject,email:keep.email,inmail:keep.inmail,centralId:cid};if(cid)centralUpdate(cid,{subject:u.gen.subject,body:u.gen.email,inmail:u.gen.inmail});persistUploaded();renderProfiles();}});});
-}
+function batchReview(){var sel=selectedContacts().filter(function(u){return u.gen;});if(!sel.length){window.alert("Tick contacts that already have a draft.");return;}sel.forEach(function(u){saveForReview(u.id);});}
+function batchApprove(){var sel=selectedContacts().filter(function(u){return u.gen&&u.review!=="approved";});if(!sel.length){window.alert("Tick contacts that have a draft and are not yet approved.");return;}sel.forEach(function(u){approveUploaded(u,null);});renderUploaded();}
+function batchDelete(){var sel=selectedContacts();if(!sel.length){window.alert("Tick at least one contact first.");return;}if(!window.confirm("Remove "+sel.length+" selected contact"+(sel.length>1?"s":"")+" from this list? Recorded drafts stay in the permanent record."))return;sel.forEach(function(u){logAction("delete","uploaded contact removed, "+u.name);});var ids=sel.map(function(u){return u.id;});uploaded=uploaded.filter(function(x){return ids.indexOf(x.id)<0;});persistUploaded();renderUploaded();}
 function saveForReview(id){
   var u=upFind(id);if(!u||!u.gen)return;
   u.review="practice";
@@ -1768,12 +1832,115 @@ function assistOne(id,btn){
     var n2=document.querySelector('[data-uanote="'+id+'"]');if(n2)n2.textContent=g.note||"Applied.";
   }).catch(function(err){noteEl.textContent="The assistant could not run. "+String(err&&err.message||err).slice(0,90);}).finally(function(){setProc("as-"+id,"",false);var b2=document.querySelector('[data-uassist="'+id+'"]');if(b2){b2.disabled=false;b2.textContent=lbl;}});
 }
+function followupFor(name){var u=uploaded.find(function(x){return x.name===name&&x.followup;});return u?u.followup:null;}
+function followSystem(){return [
+"You write one short follow-up email for FutureBridge, an advisory firm, to a senior person at Solenis who received a first email about a week ago and has not replied. You write as the same senior peer who sent the first note.",
+"",
+"RULES:",
+"1. 90 to 100 words. Two or three short paragraphs with a blank line between them. Greeting: Hi [first name].",
+"2. The follow-up must ADD something, never repeat or summarise the first email. Open with one fresh, specific insight, development or sharper question drawn from the evidence that advances the tension raised in the first note. At most one clause may reference the earlier note, plainly, for example: I wrote last week about X.",
+"3. Banned openings and lines: just following up, circling back, bumping this, gentle reminder, checking in, wanted to make sure you saw, any apology for writing again.",
+"4. Same logic guardrails as the first email: every sentence must connect to this person's evidenced remit; use the region exactly as evidenced; never quote the raw profile title; expand every abbreviation; use only verified or reported claims.",
+"5. The close, a hard rule: If this is useful to discuss near-term, we'd welcome a 30-minute meeting at a date and time of your choosing.",
+"6. The sign-off, a hard rule: "+signoffWord()+" then [Your name] on its own line. Nothing else.",
+"7. Subject: Re: followed by the first email's subject, unchanged.",
+"8. Voice: shorter, briefer, peer to peer, confident, British spelling, no marketing tone, no selling the meeting.",
+"",
+"Return ONLY strict JSON, no markdown, with keys: subject, email, check. The check is one or two plain lines on what the follow-up adds beyond the first email.",
+styleClause()
+].join("\n");}
+function fuMsg(u){
+  var R=u.research||{};
+  return ["Write the follow-up for this person.","",
+  "Name: "+u.name,
+  "Title in natural business English: "+(R.title_plain||R.corrected_title||u.title||""),
+  "Remit: "+((R.remit&&R.remit.summary)||R.summary||""),
+  "Region, exactly as evidenced: "+((R.region&&R.region.value)||"unknown"),
+  "Signals:\n"+(((R.signals&&R.signals.length)?R.signals:(R.points||[])).map(function(x){return "- "+x.text+(x.confidence?(" ["+x.confidence+"]"):"");}).join("\n")||"none"),
+  "",
+  "THE FIRST EMAIL, sent about a week ago:",
+  "Subject: "+(u.gen.subject||""),
+  "",
+  withSender(u.gen.email||""),
+  "",
+  "Return only the JSON object."].join("\n");
+}
+function genFollowup(id,btn){
+  var u=upFind(id);if(!u||!u.gen)return;
+  var lbl=btn?btn.textContent:"";if(btn){btn.disabled=true;btn.innerHTML='<span class="spinner"></span>Writing';}
+  setProc("fu-"+id,"Writing the follow-up",true);
+  callClaude(followSystem(),[{role:"user",content:fuMsg(u)}],1300).then(function(text){
+    var g=parseJSON(text);
+    if(!g||!g.email){
+      if(!u._retriedFu){u._retriedFu=true;return genFollowup(id,btn);}
+      u._retriedFu=false;u.fuNote="The writer replied in an unreadable format. Press the button again.";persistUploaded();renderFollowups();return;
+    }
+    u._retriedFu=false;u.fuNote="";
+    var cid=u.followup&&u.followup.centralId;
+    u.followup={subject:g.subject||("Re: "+(u.gen.subject||"")),email:g.email,check:g.check||"",centralId:cid};
+    if(cid)centralUpdate(cid,{subject:u.followup.subject,body:u.followup.email});
+    else u.followup.centralId=recordDraft({contact:u.name,subject:u.followup.subject,body:u.followup.email,inmail:"",source:"followup"});
+    persistUploaded();renderFollowups();
+  }).catch(function(err){u.fuNote="The follow-up could not be written. "+String(err&&err.message||err).slice(0,120);persistUploaded();renderFollowups();})
+  .finally(function(){setProc("fu-"+id,"",false);var b2=document.querySelector('[data-fuwrite="'+id+'"]');if(b2){b2.disabled=false;b2.textContent=lbl||"Write follow-up";}});
+}
+function renderFollowups(){
+  updateContactCounts();
+  var box=document.getElementById("fuList");if(!box)return;
+  var subset=uploaded.filter(function(u){return u.gen;});
+  if(!subset.length){box.innerHTML='<p class="muted">No first emails yet. Once a contact has a generated email, their follow-up appears here.</p>';return;}
+  box.innerHTML=subset.map(function(u){
+    var open=!!u._fuOpen;
+    var ap=approved.find(function(a){return a.name===u.name;});
+    var due="";
+    if(ap&&ap.sent&&ap.sentAt){var d=new Date(ap.sentAt+7*86400000);var over=Date.now()>d.getTime();due='<span class="duechip'+(over?' over':'')+'">First email sent '+new Date(ap.sentAt).toLocaleDateString()+', follow-up '+(over?'due now':'due '+d.toLocaleDateString())+'</span>';}
+    else if(ap){due='<span class="faint" style="font-size:11.5px">Approved, not yet marked sent</span>';}
+    var state=u.followup?'<span class="pill ok">Follow-up drafted</span>':'<span class="pill amb">No follow-up yet</span>';
+    return '<div class="urow" data-fuid="'+u.id+'">'+
+      '<div class="urhead" style="grid-template-columns:30px 1.3fr 1.7fr 1.1fr 1.6fr" data-fuhead="'+u.id+'">'+
+      '<button class="caret" data-futoggle="'+u.id+'">'+(open?'&#9662;':'&#9656;')+'</button>'+
+      '<div class="cell tn">'+esc(u.name)+'</div>'+
+      '<div class="cell">'+esc((u.research&&(u.research.title_plain||u.research.corrected_title))||u.title||"")+'</div>'+
+      '<div class="cell">'+state+'</div>'+
+      '<div class="cell">'+due+'</div>'+
+      '</div>'+
+      '<div class="udetail" style="display:'+(open?'block':'none')+'">'+(open?fuDetailHTML(u):'')+'</div></div>';
+  }).join("");
+  box.querySelectorAll("[data-fuhead]").forEach(function(h){h.addEventListener("click",function(ev){if(ev.target.matches("input,button,a"))return;fuToggle(h.getAttribute("data-fuhead"));});});
+  box.querySelectorAll("[data-futoggle]").forEach(function(b){b.addEventListener("click",function(){fuToggle(b.getAttribute("data-futoggle"));});});
+  box.querySelectorAll("[data-fuwrite]").forEach(function(b){b.addEventListener("click",function(){genFollowup(b.getAttribute("data-fuwrite"),b);});});
+  box.querySelectorAll("[data-fucopy]").forEach(function(b){b.addEventListener("click",function(){var u=upFind(b.getAttribute("data-fucopy"));copyText(withSender(u.followup.email||""),b);});});
+  box.querySelectorAll("[data-fuedit]").forEach(function(b){b.addEventListener("click",function(){fuEdit(b.getAttribute("data-fuedit"));});});
+}
+function fuToggle(id){var u=upFind(id);if(!u)return;u._fuOpen=!u._fuOpen;persistUploaded();renderFollowups();}
+function fuDetailHTML(u){
+  var note=u.fuNote?'<div class="vcheck">'+esc(u.fuNote)+'</div>':'';
+  var acts='<div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:10px"><button class="btn red sm" data-fuwrite="'+u.id+'">'+(u.followup?"Rewrite follow-up":"Write follow-up")+'</button>'+(u.followup?'<button class="btn sm" data-fuedit="'+u.id+'">Edit</button><button class="btn sm" data-fucopy="'+u.id+'">Copy email</button>':'')+'<span class="procnote" data-proc="fu-'+u.id+'"></span></div>';
+  var body="";
+  if(u.followup){
+    body='<div class="email"><div class="subj"><b>Subject.</b> '+esc(u.followup.subject||"")+'</div><div class="bodytext">'+esc(withSender(u.followup.email||""))+'</div>'+(u.followup.check?'<div class="faint" style="font-size:12.5px;border-top:1px solid var(--line);padding-top:9px">'+esc(u.followup.check)+'</div>':'')+'</div>';
+  } else {
+    body='<div class="evrow faint">No follow-up written yet. It will build on the first email below without repeating it.</div><div class="email" style="opacity:.65"><div class="subj"><b>First email subject.</b> '+esc(u.gen.subject||"")+'</div><div class="bodytext">'+esc(withSender(u.gen.email||""))+'</div></div>';
+  }
+  return note+acts+body;
+}
+function fuEdit(id){
+  var u=upFind(id);if(!u||!u.followup)return;
+  var card=document.querySelector('[data-fuid="'+id+'"] .udetail');if(!card)return;
+  var em=card.querySelector('.email');if(!em)return;
+  var ed=document.createElement('div');ed.className='edit-area';
+  ed.innerHTML='<p class="label">Edit the follow-up</p><label>Subject</label><input type="text" data-fs /><label>Email</label><textarea data-fb rows="10"></textarea><div style="display:flex;gap:8px"><button class="btn red sm" data-fsave>Save</button><button class="btn sm" data-fcancel>Cancel</button></div>';
+  em.style.display='none';em.parentNode.insertBefore(ed,em);
+  ed.querySelector('[data-fs]').value=u.followup.subject||'';ed.querySelector('[data-fb]').value=u.followup.email||'';
+  ed.querySelector('[data-fsave]').addEventListener('click',function(){u.followup.subject=ed.querySelector('[data-fs]').value;u.followup.email=ed.querySelector('[data-fb]').value;logAction("edit",u.name+" follow-up");if(u.followup.centralId)centralUpdate(u.followup.centralId,{subject:u.followup.subject,body:u.followup.email});persistUploaded();renderFollowups();});
+  ed.querySelector('[data-fcancel]').addEventListener('click',function(){renderFollowups();});
+}
 function exportReviewCSV(){
   var mode=(document.getElementById("revStatus")||{}).value||"both";
   var items=centralAll().filter(function(r){return !r.deleted&&(mode==="both"?(r.status==="review"||r.status==="approved"):r.status===mode);});
   if(!items.length){window.alert("Nothing to export in this view yet.");return;}
-  var rows=[["Contact name","Designation","Division","Company","City","Country","Region","LinkedIn","Remit in plain words","Key signals used","Confidence score","Confidence band","Email subject","Email","LinkedIn InMail","Author","Status","Recorded"]];
-  items.forEach(function(r){rows.push([r.contact||"",r.designation||"",r.division||"","Solenis",r.city||"",r.country||"",r.region||"",r.linkedin||"",r.remit||"",r.signals||"",String(r.score||""),r.band?bandLabel(r.band):"",r.subject||"",withSender(r.body||""),withSender(r.inmail||""),r.author||"",r.status||"",new Date(r.ts||0).toISOString()]);});
+  var rows=[["Contact name","Designation","Division","Company","City","Country","Region","LinkedIn","Remit in plain words","Key signals used","Confidence score","Confidence band","Email subject","Email","LinkedIn InMail","Follow-up email","Author","Status","Recorded"]];
+  items.forEach(function(r){var fu=followupFor(r.contact);rows.push([r.contact||"",r.designation||"",r.division||"","Solenis",r.city||"",r.country||"",r.region||"",r.linkedin||"",r.remit||"",r.signals||"",String(r.score||""),r.band?bandLabel(r.band):"",r.subject||"",withSender(r.body||""),withSender(r.inmail||""),fu?withSender(fu.email||""):"",r.author||"",r.status||"",new Date(r.ts||0).toISOString()]);});
   download("solenis_practice_review.csv",toCSV(rows),"text/csv;charset=utf-8");
   logAction("edit","practice review CSV exported, "+items.length+" rows");
 }
@@ -1784,11 +1951,12 @@ function renderReview(){
   var items=centralAll().filter(function(r){return !r.deleted&&(mode==="both"?(r.status==="review"||r.status==="approved"):r.status===mode);}).sort(function(a,b){return (b.ts||0)-(a.ts||0);});
   if(!items.length){box.innerHTML='<p class="muted">Nothing here yet. On a profile, press Save for practice review and it appears in this tab for review, editing and approval.</p>';return;}
   box.innerHTML=items.map(function(r){
-    return '<div class="revitem" data-rid="'+esc(r.id)+'"><div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:flex-start"><div><b>'+esc(r.contact||"Contact")+'</b> <span class="pill '+(r.status==="approved"?"ok":"amb")+'">'+(r.status==="approved"?"Approved":"In practice review")+'</span>'+(r.band?' <span class="pill '+(r.band==="bank"?"ok":(r.band==="check"?"amb":"red"))+'">'+esc(String(r.score))+' / 100</span>':'')+'<div class="ovmeta">'+esc(r.author||"")+' &middot; '+new Date(r.ts||0).toLocaleString()+(r.designation?' &middot; '+esc(r.designation):'')+'</div></div></div>'+
+    var locked=r.status==="approved";
+    return '<div class="revitem'+(locked?' greyed':'')+'" data-rid="'+esc(r.id)+'"><div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:flex-start"><div><b>'+esc(r.contact||"Contact")+'</b> <span class="pill '+(r.status==="approved"?"ok":"amb")+'">'+(r.status==="approved"?"Approved":"In practice review")+'</span>'+(r.band?' <span class="pill '+(r.band==="bank"?"ok":(r.band==="check"?"amb":"red"))+'">'+esc(String(r.score))+' / 100</span>':'')+'<div class="ovmeta">'+esc(r.author||"")+' &middot; '+new Date(r.ts||0).toLocaleString()+(r.designation?' &middot; '+esc(r.designation):'')+'</div></div></div>'+
     '<label style="font-size:12px;font-weight:bold;display:block;margin-top:9px">Subject</label><input type="text" data-rs="'+esc(r.id)+'" value="'+esc(r.subject||"").replace(/"/g,"&quot;")+'" />'+
     '<label style="font-size:12px;font-weight:bold;display:block;margin-top:4px">Email</label><textarea data-rb="'+esc(r.id)+'" rows="11">'+esc(r.body||"")+'</textarea>'+
     '<label style="font-size:12px;font-weight:bold;display:block;margin-top:4px">LinkedIn InMail</label><textarea data-ri="'+esc(r.id)+'" rows="5">'+esc(r.inmail||"")+'</textarea>'+
-    '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px"><button class="btn sm" data-rsave="'+esc(r.id)+'">Save changes</button>'+(r.status!=="approved"?'<button class="btn sm red" data-rapprove="'+esc(r.id)+'">Approve</button>':'')+'<button class="btn sm ghost" data-rreturn="'+esc(r.id)+'">Return to drafts</button></div></div>';
+    (locked?'<div class="faint" style="margin-top:8px;font-size:12.5px">Approved. Locked here; manage it from Approved emails.</div>':'<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px"><button class="btn sm" data-rsave="'+esc(r.id)+'">Save changes</button><button class="btn sm red" data-rapprove="'+esc(r.id)+'">Approve</button><button class="btn sm ghost" data-rreturn="'+esc(r.id)+'">Return to drafts</button></div>')+'</div>';
   }).join("");
   box.querySelectorAll("[data-rsave]").forEach(function(b){b.addEventListener("click",function(){var id=b.getAttribute("data-rsave");centralUpdate(id,{subject:box.querySelector('[data-rs="'+id+'"]').value,body:box.querySelector('[data-rb="'+id+'"]').value,inmail:box.querySelector('[data-ri="'+id+'"]').value},"edit","practice review");b.textContent="Saved";setTimeout(function(){b.textContent="Save changes";},1200);syncReviewToContact(id);}); });
   box.querySelectorAll("[data-rapprove]").forEach(function(b){b.addEventListener("click",function(){var id=b.getAttribute("data-rapprove");centralUpdate(id,{status:"approved",subject:box.querySelector('[data-rs="'+id+'"]').value,body:box.querySelector('[data-rb="'+id+'"]').value,inmail:box.querySelector('[data-ri="'+id+'"]').value},"approve","practice review");var rec=centralAll().find(function(x){return x.id===id;});if(rec){addApprovedCustom(rec.contact||"Contact",rec.designation||"",rec.subject||"",rec.body||"",rec.inmail||"",{designation:rec.designation||"",division:rec.division||"",city:rec.city||"",country:rec.country||"",roles:rec.remit||"",linkedin:rec.linkedin||"",email:""});}syncReviewToContact(id,"approved");renderReview();renderApproved();}); });
@@ -1861,8 +2029,8 @@ function researchOne(id,btn){
     u._retriedResearch=false;
     u.research=r;
     u.status=(r.status==="in_company"||r.status==="left_company"||r.status==="uncertain")?r.status:"uncertain";
-    persistUploaded();renderUploaded();noteModelFallback();
-    if(u.status==="in_company"){setCtab("prof");auditOne(u.id,null);}
+    u._open=true;persistUploaded();renderUploaded();noteModelFallback();
+    if(u.status==="in_company"){auditOne(u.id,null);}
   }).catch(function(err){
     var em=String(err&&err.message||err);
     if(/Failed to fetch|NetworkError|Load failed/i.test(em))em="The browser could not reach the Anthropic API. This is usually a network block or an ad blocker. Check the connection and that no extension is blocking api.anthropic.com, then try again.";
@@ -1971,9 +2139,13 @@ function genMsg(u,force){
 function generateOne(id,btn,force){
   var u=upFind(id);if(!u)return;
   var lbl=busy(btn,"Writing");setProc("up-"+id,"Writing the email and InMail in our style",true);
-  callClaude(genSystem(),[{role:"user",content:genMsg(u,force)}],1800).then(function(text){
+  callClaude(genSystem(),[{role:"user",content:genMsg(u,force)}],2500).then(function(text){
     var g=parseJSON(text);
-    if(!g){u.gen=null;u.genNote="The writer replied but not in a readable format"+(window.__truncated?", and the reply was cut off":"")+". Press the button again, or switch to Claude Sonnet in Settings.";persistUploaded();setProc("up-"+id,"",false);renderUploaded();return;}
+    if(!g){
+      if(!u._retriedGen){u._retriedGen=true;setProc("up-"+id,"Reply was not readable, retrying once",true);return generateOne(id,btn,force);}
+      u._retriedGen=false;
+      u.gen=null;u.genNote="The writer replied twice in an unreadable format"+(window.__truncated?", the reply was cut off":"")+". Press the button once more, or switch to Claude Sonnet in Settings and retry.";persistUploaded();setProc("up-"+id,"",false);renderUploaded();return;}
+    u._retriedGen=false;
     if(g.decision==="leave"&&!force){u.gen=null;u.genNote=g.reason||"This person looks like a weaker fit for our work.";persistUploaded();setProc("up-"+id,"",false);renderUploaded();return;}
     if(!(g.email&&String(g.email).trim())){u.gen=null;u.genNote="The writer returned an empty draft. Press Write email anyway once more.";persistUploaded();setProc("up-"+id,"",false);renderUploaded();return;}
     u.genNote="";u.gen={subject:g.subject||"",email:g.email||"",inmail:g.inmail||""};
@@ -1988,14 +2160,14 @@ function generateOne(id,btn,force){
 }
 function editUploadedEmail(id){
   var u=upFind(id);if(!u||!u.gen)return;
-  var card=document.querySelector('#profList [data-uid="'+id+'"]');if(!card)return;
+  var card=document.querySelector('#uploadList [data-uid="'+id+'"]');if(!card)return;
   var em=card.querySelector('.email');if(!em)return;
   var ed=document.createElement('div');ed.className='edit-area';
   ed.innerHTML='<p class="label">Edit the draft</p><label>Subject</label><input type="text" data-ues /><label>Email</label><textarea data-ueb rows="12"></textarea><label>LinkedIn InMail</label><textarea data-uei rows="6"></textarea><div style="display:flex;gap:8px"><button class="btn red sm" data-uesave>Save</button><button class="btn sm" data-uecancel>Cancel</button></div>';
   em.style.display='none';em.parentNode.insertBefore(ed,em);
   ed.querySelector('[data-ues]').value=u.gen.subject||'';ed.querySelector('[data-ueb]').value=u.gen.email||'';ed.querySelector('[data-uei]').value=u.gen.inmail||'';
   ed.querySelector('[data-uesave]').addEventListener('click',function(){u.gen.subject=ed.querySelector('[data-ues]').value;u.gen.email=ed.querySelector('[data-ueb]').value;u.gen.inmail=ed.querySelector('[data-uei]').value;logAction("edit",u.name);if(u.gen.centralId)centralUpdate(u.gen.centralId,{subject:u.gen.subject,body:u.gen.email,inmail:u.gen.inmail});persistUploaded();renderProfiles();});
-  ed.querySelector('[data-uecancel]').addEventListener('click',function(){renderProfiles();});
+  ed.querySelector('[data-uecancel]').addEventListener('click',function(){renderUploaded();});
 }
 
 function csvTemplate(){
@@ -2138,6 +2310,8 @@ function initIdentityUI(){
   var rs=document.getElementById("revStatus");if(rs)rs.addEventListener("change",renderReview);
   var re=document.getElementById("revExport");if(re)re.addEventListener("click",exportReviewCSV);
   var dg=document.getElementById("runDiag");if(dg)dg.addEventListener("click",function(){runDiagnostics(dg);});
+  var sa2=document.getElementById("selAll");if(sa2)sa2.addEventListener("change",function(){uploaded.forEach(function(u){u._sel=sa2.checked;});persistUploaded();renderUploaded();});
+  [["fuExpAll",function(){uploaded.forEach(function(u){u._fuOpen=true;});persistUploaded();renderFollowups();}],["fuColAll",function(){uploaded.forEach(function(u){u._fuOpen=false;});persistUploaded();renderFollowups();}],["expAll",function(){setAllOpen(true);}],["colAll",function(){setAllOpen(false);}],["bResearch",batchResearch],["bReview",batchReview],["bApproveSel",batchApprove],["bDelete",batchDelete]].forEach(function(p){var el=document.getElementById(p[0]);if(el)el.addEventListener("click",p[1]);});
   ["ovPerson","ovStatus"].forEach(function(id){var el=document.getElementById(id);if(el)el.addEventListener("change",renderOversight);});
   ["logPerson","logAction"].forEach(function(id){var el=document.getElementById(id);if(el)el.addEventListener("change",renderLog);});
   var le=document.getElementById("logExport");if(le)le.addEventListener("click",exportLogCSV);
