@@ -723,7 +723,7 @@
       <div class="setting-row"><label for="set-pdl">People Data Labs API key</label><div class="hint">Used to verify a contact's current title, company and responsibilities against licensed LinkedIn data when you add contacts. The key is stored in your browser and sent directly to People Data Labs. If their service blocks direct browser requests, the tool falls back to a web-based check and tells you. Get a key at dashboard.peopledatalabs.com.</div><input type="password" id="set-pdl" placeholder="Your People Data Labs key" autocomplete="off" /></div>
       <h2>House style for the emails</h2>
       <div class="setting-row"><label for="set-style">Standing instruction applied to drafts and rewrites</label><div class="hint">Plain rules the assistant and the draft writer should follow for every email. The assistant can also update this for you.</div><textarea id="set-style" rows="4" placeholder="For example: keep emails under 180 words, always close with a 30-minute meeting request, never use dashes."></textarea></div>
-      <div class="setting-row"><label for="set-model">Writing model</label><div class="hint">The model used for research, audits, drafting and the assistant. The most capable tier is available to accounts with the top level of access; everyone can choose among the others.</div><select id="set-model" style="border:1px solid var(--line-2);border-radius:9px;padding:9px 11px;font-family:var(--sans);font-size:13.5px;background:#fff;min-width:280px"></select></div>
+      <div class="setting-row"><label for="set-model">Writing model</label><div class="hint">The model used for research, audits, drafting and the assistant. The most capable tier is available to accounts with the top level of access; everyone can choose among the others.</div><select id="set-model" style="border:1px solid var(--line-2);border-radius:9px;padding:9px 11px;font-family:var(--sans);font-size:13.5px;background:#fff;min-width:280px"></select><div class="hint" id="modelNotice" style="display:none;color:var(--red-2);margin-top:6px"></div><div class="hint">If a chosen model is not enabled on your API key, the studio automatically uses the next available one so work never stops.</div></div>
       <div class="setting-row"><label for="set-signoff">Email sign-off</label><div class="hint">Applied to every draft and every export, followed by the sender name.</div><select id="set-signoff" style="border:1px solid var(--line-2);border-radius:9px;padding:9px 11px;font-family:var(--sans);font-size:13.5px;background:#fff;min-width:280px"><option value="Best regards,">Best regards,</option><option value="Thanks,">Thanks,</option><option value="Kind regards,">Kind regards,</option></select></div>
       <div class="setting-row"><label for="set-pplx">Perplexity API key (optional)</label><div class="hint">When present, profile research first pulls grounded, citation-backed findings from Perplexity Sonar and then verifies them, which tightens accuracy on titles, regions and recent moves. Get a key at perplexity.ai in Settings, API. If Perplexity blocks direct browser calls, the studio detects it and continues with its built-in web research.</div><input type="password" id="set-pplx" placeholder="pplx-..." autocomplete="off" /></div>
       <div class="setting-row"><label>Signed in on this device</label><div class="hint">The studio remembers you in this browser. Signing out returns to the sign-in screen and keeps all saved work.</div><div style="display:flex;gap:12px;align-items:center"><span class="note" id="whoami" style="margin:0"></span><button class="btn sm" id="signOut">Sign out</button></div></div>
@@ -858,14 +858,21 @@ var MODELS=[
   {id:"claude-sonnet-4-6",label:"Claude Sonnet 4.6, fast"},
   {id:"claude-haiku-4-5-20251001",label:"Claude Haiku 4.5, fastest"}
 ];
+var MODEL_FALLBACK=["claude-opus-4-8","claude-sonnet-4-6","claude-haiku-4-5-20251001"];
 function modelId(){
   var m=store.get("model","");
-  var def=isSA()?"claude-fable-5":"claude-opus-4-8";
+  var def="claude-opus-4-8";
   if(!m)return def;
   var found=null;for(var i=0;i<MODELS.length;i++){if(MODELS[i].id===m)found=MODELS[i];}
   if(!found)return def;
   if(found.sa&&!isSA())return "claude-opus-4-8";
   return m;
+}
+function noteModelFallback(){
+  if(!window.__modelFellBack)return;
+  var msg="Note. Your selected model was not available on this API key, so the studio used "+window.__modelFellBack+" instead. You can pick an available model in Settings.";
+  var a=document.getElementById("modelNotice");if(a){a.textContent=msg;a.style.display="";}
+  var b=document.getElementById("uploadNote");if(b){b.textContent=msg;}
 }
 function pplxKey(){return (store.get("pplx_key","")||"").trim();}
 function callPerplexity(prompt){
@@ -1063,12 +1070,27 @@ function callClaude(system,messages,maxTokens,tools){
   var key=(store.get("anthropic_key","")||"").trim();
   var headers={"Content-Type":"application/json"};
   if(key){headers["x-api-key"]=key;headers["anthropic-version"]="2023-06-01";headers["anthropic-dangerous-direct-browser-access"]="true";}
-  var bodyObj={model:modelId(),max_tokens:maxTokens||1024,messages:messages};
-  if(system)bodyObj.system=system;
-  if(tools&&tools.length)bodyObj.tools=tools;
-  return fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:headers,body:JSON.stringify(bodyObj)})
-    .then(function(r){if(!r.ok)return r.text().then(function(t){throw new Error("API "+r.status+" "+(t||"").slice(0,160));});return r.json();})
-    .then(function(data){return (data.content||[]).filter(function(b){return b.type==="text";}).map(function(b){return b.text;}).join("\n").trim();});
+  var chosen=modelId();
+  var order=[chosen];MODEL_FALLBACK.forEach(function(m){if(order.indexOf(m)<0)order.push(m);});
+  function attempt(i){
+    var model=order[i];
+    var bodyObj={model:model,max_tokens:maxTokens||1024,messages:messages};
+    if(system)bodyObj.system=system;
+    if(tools&&tools.length)bodyObj.tools=tools;
+    return fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:headers,body:JSON.stringify(bodyObj)})
+      .then(function(r){
+        if(r.ok)return r.json().then(function(data){return (data.content||[]).filter(function(b){return b.type==="text";}).map(function(b){return b.text;}).join("\n").trim();});
+        return r.text().then(function(t){
+          var body=(t||"");
+          var modelIssue=r.status===404||r.status===403|| /model/i.test(body);
+          if(modelIssue&&i<order.length-1){if(model===chosen)window.__modelFellBack=order[i+1];return attempt(i+1);}
+          if(r.status===401)throw new Error("The Anthropic API key was rejected (401). Open Settings, re-paste a valid key with no stray spaces, and press Save. If it still fails, the key may be exhausted or revoked; create a fresh one at console.anthropic.com.");
+          if(modelIssue)throw new Error("No available model was accepted by this API key. In Settings, choose Claude Sonnet or Haiku, then Save. (Last error: "+body.slice(0,140)+")");
+          throw new Error("API "+r.status+" "+body.slice(0,180));
+        });
+      });
+  }
+  return attempt(0);
 }
 
 function srcMark(st){
@@ -1825,10 +1847,13 @@ function researchOne(id,btn){
     var r=parseJSON(text);
     u.research=r;
     u.status=(r.status==="in_company"||r.status==="left_company"||r.status==="uncertain")?r.status:"uncertain";
-    persistUploaded();renderUploaded();
+    persistUploaded();renderUploaded();noteModelFallback();
     if(u.status==="in_company"){setCtab("prof");auditOne(u.id,null);}
   }).catch(function(err){
-    u.status="error";u.research={note:"Research did not complete. This step needs the Anthropic API with web search. Inside the Claude preview it works without a key. If you host this yourself, add your Anthropic API key in Settings. ("+String(err.message||err)+")"};
+    var em=String(err&&err.message||err);
+    if(/Failed to fetch|NetworkError|Load failed/i.test(em))em="The browser could not reach the Anthropic API. This is usually a network block or an ad blocker. Check the connection and that no extension is blocking api.anthropic.com, then try again.";
+    if(!(store.get("anthropic_key","")||"").trim())em="No Anthropic API key is set. On the hosted studio a key is required: open Settings, paste your Anthropic API key, and press Save.";
+    u.status="error";u.research={note:"Research did not complete. "+em};
     persistUploaded();renderUploaded();
   });
 }
@@ -1939,7 +1964,7 @@ function generateOne(id,btn,force){
     u.genNote="";u.gen={subject:g.subject||"",email:g.email||"",inmail:g.inmail||""};
     return repairDraft(u).then(function(){
       u.gen.centralId=recordDraft({contact:u.name,subject:u.gen.subject||"",body:u.gen.email||"",inmail:u.gen.inmail||"",source:"uploaded",designation:(u.research&&(u.research.title_plain||u.research.corrected_title))||u.title||"",division:(u.research&&u.research.business_unit)||u.unit||"",city:(u.research&&u.research.location&&u.research.location.city)||"",country:(u.research&&u.research.location&&u.research.location.country)||"",region:(u.research&&u.research.region&&u.research.region.value)||"",remit:(u.research&&u.research.remit&&u.research.remit.summary)||"",signals:((u.research&&(u.research.signals||u.research.points))||[]).map(function(x){return x.text;}).join(" | "),linkedin:(u.research&&u.research.linkedin_url)||u.linkedin||""});
-      persistUploaded();setProc("up-"+id,"",false);renderUploaded();auditOne(id,null);
+      persistUploaded();setProc("up-"+id,"",false);renderUploaded();noteModelFallback();auditOne(id,null);
     });
   }).catch(function(err){
     setProc("up-"+id,"The writer did not return a draft. This step needs the Anthropic API, or your key in Settings. "+String(err.message||err).slice(0,90),false);
